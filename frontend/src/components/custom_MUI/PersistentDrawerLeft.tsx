@@ -74,7 +74,7 @@ export default function PersistentDrawerLeft({ options, children }: { options: {
         <List>
           {options.map(({ name, icon }) => (
             <ListItem key={name} disablePadding>
-              <ListItemButton onClick={handleOpenPopup}>
+              <ListItemButton onClick={() => handleOpenPopup(name)}>
                 <ListItemIcon>{icon}</ListItemIcon>
                 <ListItemText primary={name} />
               </ListItemButton>

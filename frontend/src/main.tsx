@@ -35,6 +35,7 @@ const theme = createTheme({
       main: '#f0f4f4',
     },
   },
+  spacing: 2,
 });
 
 const router = createBrowserRouter([
