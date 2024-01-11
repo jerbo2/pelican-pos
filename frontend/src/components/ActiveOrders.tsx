@@ -1,5 +1,3 @@
-import '../App.scss'
-
 export default function ActiveOrders() {
     return (
         <div>

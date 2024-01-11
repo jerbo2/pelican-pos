@@ -9,33 +9,61 @@ import NewOrder from './components/NewOrder';
 import './index.scss'
 import ActiveOrders from './components/ActiveOrders';
 import PastOrders from './components/PastOrders';
-import Configuration from './components/Configuration';
+import { Configuration } from './components/Configuration';
+import { createTheme, ThemeProvider } from '@mui/material';
+
+// declare module '@mui/material/styles' {
+//   interface Theme {
+//     status: {
+//       danger: string;
+//     };
+//   }
+//   // allow configuration using `createTheme`
+//   interface ThemeOptions {
+//     status?: {
+//       danger?: string;
+//     };
+//   }
+// }
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#181c24',
+    },
+    secondary: {
+      main: '#f0f4f4',
+    },
+  },
+});
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Landing/>,
+    element: <Landing />,
   },
   {
     path: "/new-order",
-    element: <NewOrder/>,
+    element: <NewOrder />,
   },
   {
     path: "/active-orders",
-    element: <ActiveOrders/>,
+    element: <ActiveOrders />,
   },
   {
     path: "/past-orders",
-    element: <PastOrders/>,
+    element: <PastOrders />,
   },
   {
     path: "/config",
-    element: <Configuration/>,
+    element: <Configuration />,
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ThemeProvider theme={theme}>
+      <RouterProvider router={router} />
+    </ThemeProvider>
   </React.StrictMode>,
 )
