@@ -6,7 +6,7 @@ import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 
-import { ConfigurationContext } from '../Configuration';
+import { ConfigurationContext } from '../Configuration/Configuration';
 import { Popup } from '../Styled';
 
 export default function TransitionsModal({children}: {children: React.ReactNode}) {

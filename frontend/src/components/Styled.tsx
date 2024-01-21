@@ -1,5 +1,19 @@
 import { styled } from '@mui/material/styles';
-import { Box, Grid, Button as MuiButton, TextField as MUITextField, Select as MUISelect, IconButton as MUIIconButton, Divider as MUIDivider } from '@mui/material';
+import {
+  Box, Grid,
+  Button as MuiButton,
+  TextField as MUITextField, TextFieldProps,
+  Select as MUISelect,
+  IconButton as MUIIconButton,
+  Divider as MUIDivider,
+  ListItemButton as MUIListItemButton,
+  ListItemIcon as MUIListItemIcon,
+  FormControl as MUIFormControl,
+  MenuItem as MUIMenuItem,
+  DialogTitle as MUIDialogTitle,
+  DialogContentText as MUIDialogContentText,
+  Snackbar as MUISnackbar,
+} from '@mui/material';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { DRAWER_WIDTH } from './Constants';
 
@@ -28,6 +42,12 @@ const ButtonWider = styled(Button)({
 
 const ButtonWidest = styled(Button)({
   width: '100%',
+});
+
+const ListItemButton = styled(MUIListItemButton)({
+  '& .MuiListItemText-primary': {
+    fontSize: '1.75rem',
+  },
 });
 
 const CenterGrid = styled(Grid)({
@@ -99,34 +119,116 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-const TextField = styled(MUITextField)({
+const TextField = styled(MUITextField)<TextFieldProps>({
   margin: '8px',
   '& input': {
     fontSize: '2.15rem',
-    fontWeight: 700,
   },
   '& label': {
     fontSize: '2.15rem',
   },
-  '& label.Mui-focused': {
+  '& label.MuiInputLabel-shrink': {
     fontSize: '1rem',
   },
+  '& .MuiInputBase-root': {
+    fontSize: '2.15rem',
+  },
+});
+
+//MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper MuiMenu-paper MuiMenu-paper paper div containing the list
+//MuiList-root MuiList-padding MuiMenu-list for ul
+//MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters for li
+
+const MenuItem = styled(MUIMenuItem)({
+  fontSize: '2.15rem',
 });
 
 const Select = styled(MUISelect)({
   margin: '8px',
+  fontSize: '2.15rem',
+  "& .MuiInputLabel": {
+    color: "green"
+  },
 });
 
 const IconButton = styled(MUIIconButton)({
   margin: '8px',
   fontSize: '3.5rem',
+  zIndex: 1000,
 });
 
-const Divider = styled(MUIDivider)(({theme}) => ({
+const IconButtonSmaller = styled(MUIIconButton)({
+  margin: '8px',
+  fontSize: '2.15rem',
+  zIndex: 1000,
+});
+
+const Divider = styled(MUIDivider)(({ theme }) => ({
   margin: '24px',
   width: '100%',
   border: `0.5px solid ${theme.palette.primary.main}`,
   borderRadius: '0.375rem',
 }));
 
-export { Button, ButtonWider, ButtonWidest, CenterGrid, Popup, DrawerMain, DrawerAppBar, DrawerHeader, TextField, Select, IconButton, Divider };
+const FormControl = styled(MUIFormControl)({
+  padding: '0px',
+  margin: '0px',
+  border: 'none',
+});
+
+const DialogTitle = styled(MUIDialogTitle)({
+  fontSize: '2.15rem',
+  fontWeight: 'bold'
+});
+
+const DialogContentText = styled(MUIDialogContentText)({
+  fontSize: '2.15rem',
+});
+
+const Snackbar = styled(MUISnackbar)(({ theme }) => {
+  return {
+    '& .MuiSnackbarContent-root': {
+      fontSize: '2.15rem',
+      backgroundColor: theme.palette.primary.main,
+    },
+  }
+});
+
+const Circle = styled('div')(({ theme }) => ({
+  minWidth: '50px', 
+  minHeight: '50px', 
+  borderRadius: '50%',
+  border: '4px solid', 
+  borderColor: theme.palette.primary.main,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginRight: theme.spacing(2),
+  fontSize: '2.5rem',
+  fontWeight: 'bold', 
+  lineHeight: '40px',
+  margin: '8px',
+}));
+
+export {
+  Button,
+  ButtonWider,
+  ButtonWidest,
+  CenterGrid,
+  Popup,
+  DrawerMain,
+  DrawerAppBar,
+  DrawerHeader,
+  TextField,
+  Select,
+  IconButton,
+  IconButtonSmaller,
+  Divider,
+  ListItemButton,
+  FormControl,
+  MenuItem,
+  DialogTitle,
+  DialogContentText,
+  Snackbar,
+  Circle
+};

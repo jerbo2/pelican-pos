@@ -17,7 +17,7 @@ class Item(Base):
     __tablename__ = "items"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
+    name = Column(String, index=True, unique=True)
     form_cfg = Column(JSONB, index=True)
     category_id = Column(Integer, ForeignKey("categories.id"))
 

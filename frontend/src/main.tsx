@@ -9,8 +9,9 @@ import NewOrder from './components/NewOrder';
 import './index.scss'
 import ActiveOrders from './components/ActiveOrders';
 import PastOrders from './components/PastOrders';
-import { Configuration } from './components/Configuration';
+import { Configuration } from './components/Configuration/Configuration';
 import { createTheme, ThemeProvider } from '@mui/material';
+import ConfigLanding from './components/Configuration/ConfigLanding';
 
 // declare module '@mui/material/styles' {
 //   interface Theme {
@@ -57,8 +58,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/config",
-    element: <Configuration />,
+    element: <ConfigLanding />,
   },
+  {
+    path: "/config/:category",
+    element: <Configuration />
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
