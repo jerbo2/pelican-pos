@@ -54,11 +54,14 @@ export default function ConfigModalContent() {
     }, [labelOption]);
 
     const handleCancel = () => {
-        setFormConfig((prevFormConfig: FormComponentConfig[]) => {
-            const newConfig = [...prevFormConfig];
-            newConfig.pop();
-            return newConfig;
-        });
+        // mismatch in lengths mean the form option is new / not yet saved. cancelling should remove it
+        if (storedItems.find((item) => item.name === itemName)?.form_cfg.length !== formConfig.length) {
+            setFormConfig((prevFormConfig: FormComponentConfig[]) => {
+                const newConfig = [...prevFormConfig];
+                newConfig.pop();
+                return newConfig;
+            });
+        }
         handleClosePopup();
     };
 
@@ -141,9 +144,7 @@ export default function ConfigModalContent() {
                     </CenterGrid>
 
                     <CenterGrid item xs={6}>
-                        <CenterGrid item xs={6}>
-                            <ButtonWidest variant='contained' onClick={handleCancel}>Cancel</ButtonWidest>
-                        </CenterGrid>
+                        <ButtonWidest variant='contained' onClick={handleCancel}>Cancel</ButtonWidest>
                     </CenterGrid>
                 </CenterGrid>
             );

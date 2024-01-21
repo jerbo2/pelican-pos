@@ -9,7 +9,7 @@ function Landing() {
       <CenterGrid container spacing={2} alignItems="center" justifyContent="center" style={{ height: '100%' }}>
 
         <CenterGrid item xs={12}>
-            <img src="/pelican-logo-1-no-bg-trimmed.png" alt="logo" style={{ height: '12.5rem', width: '12.5rem' }} />
+          <img src="/pelican-logo-1-no-bg-trimmed.png" alt="logo" style={{ height: '12.5rem', width: '12.5rem' }} />
         </CenterGrid>
 
         <CenterGrid item xs={12}>
@@ -38,7 +38,7 @@ function Landing() {
 
         <CenterGrid item xs={6}>
           <Button variant="contained" fullWidth onClick={() => navigate('/config')}>
-            Update Items
+            Configurator
           </Button>
         </CenterGrid>
       </CenterGrid>

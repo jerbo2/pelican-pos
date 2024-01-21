@@ -11,7 +11,7 @@ export default function BuildList() {
     const handleEdit = (id: string) => {
         const index = parseInt(id);
         setOpenPopup(true);
-        setSelected(formConfig[index]);
+        setSelected({...formConfig[index], order: index});
     }
 
     return (

@@ -48,7 +48,6 @@ def update_item(item_id: int, item: schemas.ItemUpdate, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Item not found")
     return crud.update_item(db=db, item_id=item_id, item=item)
 
-
 @app.get("/categories/", response_model=list[schemas.Category])
 def read_categories(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     categories = crud.get_categories(db, skip=skip, limit=limit)

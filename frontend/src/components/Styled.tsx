@@ -13,6 +13,8 @@ import {
   DialogTitle as MUIDialogTitle,
   DialogContentText as MUIDialogContentText,
   Snackbar as MUISnackbar,
+  Card as MUICard,
+  CardContent as MUICardContent,
 } from '@mui/material';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { DRAWER_WIDTH } from './Constants';
@@ -210,6 +212,23 @@ const Circle = styled('div')(({ theme }) => ({
   margin: '8px',
 }));
 
+const Card = styled(MUICard)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  backgroundColor: theme.palette.secondary.main,
+  color: theme.palette.primary.main,
+  fontSize: '2.75rem',
+  fontWeight: 'bold',
+  borderRadius: '0.375rem',
+  boxShadow: theme.shadows[6],
+  minHeight: '10rem',
+}));
+
+const CardContent = styled(MUICardContent)({
+  textAlign: 'center',
+  flexGrow: 1,
+});
+
 export {
   Button,
   ButtonWider,
@@ -230,5 +249,7 @@ export {
   DialogTitle,
   DialogContentText,
   Snackbar,
-  Circle
+  Circle,
+  Card,
+  CardContent
 };

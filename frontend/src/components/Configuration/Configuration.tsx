@@ -9,6 +9,7 @@ import ConfigSnackbar from './ConfigSnackbar';
 import ConfigModalContent from './ConfigModalContent';
 import { Add, Build } from '@mui/icons-material';
 import BuildList from './ConfigBuildList';
+import ConfigCurrentItems from './ConfigCurrentItems';
 
 
 type FormComponentConfig = {
@@ -50,9 +51,10 @@ const ConfigurationContext = createContext<{
     setStoredItems: (storedItems: Item[]) => void;
     setCategoryID: (categoryID: number) => void;
     setOpenPopup: (openPopup: boolean) => void;
+    setItemName: (itemName: string) => void;
     handleOpenPopup: (formObjType: string) => void;
     handleClosePopup: () => void;
-    handleOpenDrawer: () => void;
+    handleOpenDrawer: (create: boolean) => void;
     handleCloseDrawer: () => void;
     handleCloseDialog: () => void;
     handleSetItemName: (name: string) => void;
@@ -74,6 +76,7 @@ const ConfigurationContext = createContext<{
     setStoredItems: () => { },
     setCategoryID: () => { },
     setOpenPopup: () => { },
+    setItemName: () => { },
     handleOpenPopup: () => { },
     handleClosePopup: () => { },
     handleOpenDrawer: () => { },
@@ -129,19 +132,19 @@ const ConfigurationProvider: React.FC<React.PropsWithChildren> = ({ children }) 
         const newFormObject = { label: '', type: '', order: formConfig.length, options: [] };
         switch (formObjType) {
             case 'Dropdown':
-                newFormObject.label = 'Dropdown';
+                newFormObject.label = '';
                 newFormObject.type = 'single_select';
                 break;
             case 'Text Field':
-                newFormObject.label = 'Text Field';
+                newFormObject.label = '';
                 newFormObject.type = 'text';
                 break;
             case 'Date & Time':
-                newFormObject.label = 'Date & Time';
+                newFormObject.label = '';
                 newFormObject.type = 'datetime';
                 break;
             default:
-                newFormObject.label = 'Error';
+                newFormObject.label = '';
                 newFormObject.type = 'error';
                 break;
         }
@@ -155,8 +158,13 @@ const ConfigurationProvider: React.FC<React.PropsWithChildren> = ({ children }) 
         setOpenPopup(false);
     };
 
-    const handleOpenDrawer = () => {
-        setOpenDialog(true);
+    const handleOpenDrawer = (create: boolean) => {
+        if (create) {
+            setOpenDialog(true);
+        }
+        else {
+            setOpenDrawer(true);
+        }
     };
 
     useEffect(() => {
@@ -212,7 +220,7 @@ const ConfigurationProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     }, []);
 
     return (
-        <ConfigurationContext.Provider value={{ openPopup, openDrawer, openDialog, openSnackbar, itemName, formConfig, selected, snackbarMessage, storedItems, categoryID, setFormConfig, setSelected, setOpenSnackbar, setSnackbarMessage, setStoredItems, setCategoryID, setOpenPopup, handleOpenPopup, handleClosePopup, handleOpenDrawer, handleCloseDrawer, handleCloseDialog, handleSetItemName }}>
+        <ConfigurationContext.Provider value={{ openPopup, openDrawer, openDialog, openSnackbar, itemName, formConfig, selected, snackbarMessage, storedItems, categoryID, setFormConfig, setSelected, setOpenSnackbar, setSnackbarMessage, setStoredItems, setCategoryID, setOpenPopup, setItemName, handleOpenPopup, handleClosePopup, handleOpenDrawer, handleCloseDrawer, handleCloseDialog, handleSetItemName }}>
             {children}
         </ConfigurationContext.Provider>
     );
@@ -234,7 +242,8 @@ function Configuration() {
                     children={
                         <>
                             <TransitionsModal children={<ConfigModalContent />} />
-                            <BuildList /> 
+                            <BuildList />
+                            <ConfigCurrentItems />
                         </>
                     }
                 />

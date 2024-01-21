@@ -6,9 +6,12 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import { Box } from '@mui/material';
+import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
 
 import { DRAWER_WIDTH } from '../Constants';
-import { DrawerAppBar, DrawerHeader, DrawerMain, Button } from '../Styled';
+import { DrawerAppBar, DrawerHeader, DrawerMain, Button, CenterGrid, ButtonWider } from '../Styled';
+
+import { useNavigate } from 'react-router';
 
 export default function PersistentDrawerLeft({
   appBarHeaderDrawerClosed,
@@ -29,21 +32,42 @@ export default function PersistentDrawerLeft({
     handleOpenDrawer: () => void,
   }) {
 
+  const navigate = useNavigate();
+
   return (
     <Box sx={{ display: 'flex' }}>
       <DrawerAppBar position="fixed" open={open}>
         <Toolbar>
-          <Box sx={{ flexGrow: 1 }} />
-          <Button
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleOpenDrawer}
-            sx={{ ...(open && { display: 'none' }) }}
-          >
-            {appBarHeaderDrawerClosed}
-          </Button>
-          <Typography variant="h4" component="div" sx={{ ...(!open && { display: 'none' }) }}>{appBarHeaderDrawerOpen}</Typography>
-          <Box sx={{ flexGrow: 1 }} />
+          <CenterGrid container sx={{ flexGrow: 1 }}>
+            <CenterGrid item xs={4}>
+              <Button
+                color="inherit"
+                aria-label="back"
+                onClick={() => navigate(-1)}
+                sx={{
+                  ...(open && { display: 'none' }),
+                }}
+              >
+                <ArrowBackIosNewOutlinedIcon fontSize='large' />
+              </Button>
+            </CenterGrid>
+            <CenterGrid item xs={4}>
+              <Typography
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleOpenDrawer}
+                sx={{ ...(open && { display: 'none' }), cursor: 'pointer'}}
+                variant='h3'
+                fontWeight='bold'
+              >
+                {appBarHeaderDrawerClosed.toUpperCase()}
+              </Typography>
+            </CenterGrid>
+            <CenterGrid item xs={4} />
+          <CenterGrid item xs={12}>
+            <Typography variant="h3" fontWeight='bold' component="div" sx={{ ...(!open && { display: 'none' }) }}>{appBarHeaderDrawerOpen}</Typography>
+          </CenterGrid>
+          </CenterGrid>
         </Toolbar>
       </DrawerAppBar>
       <Drawer

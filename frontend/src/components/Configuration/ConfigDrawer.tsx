@@ -39,6 +39,6 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
       }
       whiteSpaceChildren={children}
       open={openDrawer}
-      handleOpenDrawer={handleOpenDrawer}/>
+      handleOpenDrawer={()=>handleOpenDrawer(true)}/>
   );
 }
