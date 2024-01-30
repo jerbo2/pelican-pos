@@ -7,14 +7,47 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Divider from '@mui/material/Divider';
-
-import { ConfigurationContext } from './Configuration';
 import { ButtonWidest, ListItemButton } from '../Styled';
-
 import PersistentDrawerLeft from '../custom_MUI/PersistentDrawerLeft';
 
+import { UIContext } from "./contexts/UIContext";
+import { ItemContext } from "./contexts/ItemContext";
+import { FormConfigContext } from "./contexts/FormConfigContext";
+
 export default function ConfigDrawer({ options, children }: { options: { name: string, icon: React.ReactNode }[], children: React.ReactNode }) {
-  const { handleOpenPopup, openDrawer, handleCloseDrawer, handleOpenDrawer, itemName, setFormConfig } = useContext(ConfigurationContext);
+  const { openDrawer, handleOpenDrawer, setOpenPopup, setOpenDrawer } = useContext(UIContext);
+  const { itemName } = useContext(ItemContext);
+  const { formConfig, setFormConfig, setSelected } = useContext(FormConfigContext);
+
+  const handleCloseDrawer = () => {
+    setOpenDrawer(false);
+  }
+
+  const handleOpenPopup = (formObjType: string) => {
+    setOpenPopup(true);
+    const newFormObject = { label: '', type: '', order: formConfig.length, options: [] };
+    switch (formObjType) {
+      case 'Dropdown':
+        newFormObject.label = '';
+        newFormObject.type = 'single_select';
+        break;
+      case 'Text Field':
+        newFormObject.label = '';
+        newFormObject.type = 'text';
+        break;
+      case 'Date & Time':
+        newFormObject.label = '';
+        newFormObject.type = 'datetime';
+        break;
+      default:
+        newFormObject.label = '';
+        newFormObject.type = 'error';
+        break;
+    }
+
+    setFormConfig([...formConfig, newFormObject]);
+    setSelected(newFormObject);
+  }
 
   return (
     <PersistentDrawerLeft
@@ -33,12 +66,12 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
           ))}
           <Divider />
           <ListItem>
-            <ButtonWidest variant='contained' onClick={()=>{handleCloseDrawer();setFormConfig([])}}>Cancel</ButtonWidest>
+            <ButtonWidest variant='contained' onClick={() => { handleCloseDrawer(); setFormConfig([]) }}>Done</ButtonWidest>
           </ListItem>
         </List>
       }
       whiteSpaceChildren={children}
       open={openDrawer}
-      handleOpenDrawer={()=>handleOpenDrawer(true)}/>
+      handleOpenDrawer={() => handleOpenDrawer(true)} />
   );
 }

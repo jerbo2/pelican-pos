@@ -1,10 +1,10 @@
 
 import { useContext, useState } from "react";
 import { TextField, MenuItem } from "../Styled"
-import { ConfigurationContext } from "./Configuration";
+import { FormConfigContext } from "./contexts/FormConfigContext";
 
 export default function ConfigPreviewComponents({configIndex}: {configIndex: number}) {
-    const { formConfig } = useContext(ConfigurationContext);
+    const { formConfig } = useContext(FormConfigContext);
     const [previewSelected, setPreviewSelected] = useState<string[]>(['']);
 
     const handlePreviewSelectedChange = (e: React.ChangeEvent<HTMLInputElement>) => {

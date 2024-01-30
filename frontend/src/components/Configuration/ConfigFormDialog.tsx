@@ -1,15 +1,41 @@
 
-import { useContext } from 'react';
-
+import { useContext, useEffect } from 'react';
 import FormDialog from '../custom_MUI/FormDialog';
-
 import { Button } from '../Styled';
-
-import { ConfigurationContext } from './Configuration';
+import { ItemContext } from './contexts/ItemContext';
+import { UIContext } from './contexts/UIContext';
 
 export default function ConfigFormDialog() {
-  const { openDialog, handleCloseDialog, handleSetItemName } = useContext(ConfigurationContext);
+  const { itemName, storedItems, setItemName } = useContext(ItemContext);
+  const { openDialog, setOpenDrawer, setSnackbarMessage, setOpenSnackbar, setOpenDialog } = useContext(UIContext);
 
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  useEffect(() => {
+    console.log(itemName)
+    if (!openDialog && itemName !== '') {
+        setOpenDrawer(true);
+    }
+  }, [openDialog]);
+
+  const handleSetItemName = (name: string) => {
+    let itemExists = false;
+    storedItems.forEach((item) => {
+        if (item.name.toLowerCase() === name.toLowerCase()) {
+            setSnackbarMessage('This item already exists. . .');
+            setOpenSnackbar(true);
+            itemExists = true;
+        }
+    });
+
+    if (!itemExists) {
+        setItemName(name);
+        handleCloseDialog();
+    }
+}
+  
   return (
     <FormDialog
       openDialog={openDialog}

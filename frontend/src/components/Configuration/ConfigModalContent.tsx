@@ -1,21 +1,24 @@
-import React, { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import { useContext, useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import { CenterGrid, TextField, IconButton, Divider, MenuItem, ButtonWidest } from '../Styled';
-import { ConfigurationContext, handleSave } from './Configuration';
+import { handleSave } from './Configuration';
+import { FormConfigContext } from './contexts/FormConfigContext';
+import { ItemContext } from './contexts/ItemContext';
+import { UIContext } from './contexts/UIContext';
 import { FormComponentConfig } from './Configuration';
 import ConfigPreviewComponents from './ConfigPreviewComponents';
 
 
-export default function ConfigModalContent() {
-    const { itemName, formConfig, selected, categoryID, storedItems, handleClosePopup, setFormConfig, setSnackbarMessage, setOpenSnackbar } = useContext(ConfigurationContext);
+export default function ConfigModalContent({handleClosePopup}: {handleClosePopup: () => void}){
+    const { itemName, storedItems, categoryID } = useContext(ItemContext);
+    const { formConfig, setFormConfig, selected } = useContext(FormConfigContext);
+    const { setSnackbarMessage, setOpenSnackbar } = useContext(UIContext);
     const [formOption, setFormOption] = useState<string>('');
     const [selectedFormOption, setSelectedFormOption] = useState<string>('');
     const [labelOption, setLabelOption] = useState<string>(selected.label || '');
     const optionElement = document.getElementById('select-option') as HTMLOptionElement;
-
 
     const handleEditOption = (mode: string) => {
         if (formOption.trim() !== '' || selectedFormOption !== '') {

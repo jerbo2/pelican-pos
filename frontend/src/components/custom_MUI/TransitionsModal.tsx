@@ -5,12 +5,10 @@ import { useContext } from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
-
-import { ConfigurationContext } from '../Configuration/Configuration';
 import { Popup } from '../Styled';
 
-export default function TransitionsModal({children}: {children: React.ReactNode}) {
-  const { openPopup, handleClosePopup } = useContext(ConfigurationContext);
+export default function TransitionsModal({children, openPopup, handleClosePopup}: {children: React.ReactNode, openPopup: boolean, handleClosePopup: () => void}) {
+  // const { openPopup, handleClosePopup } = useContext(ConfigurationContext);
 
   return (
     <div>

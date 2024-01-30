@@ -1,12 +1,14 @@
 import React, { useContext } from "react";
-import { ConfigurationContext } from "./Configuration";
+import { FormConfigContext } from "./contexts/FormConfigContext";
+import { UIContext } from "./contexts/UIContext";
 import { Box } from '@mui/material';
 import { CenterGrid, Circle, IconButton, Divider } from "../Styled";
 import ConfigPreviewComponents from "./ConfigPreviewComponents";
 import EditIcon from '@mui/icons-material/Edit';
 
 export default function BuildList() {
-    const { formConfig, setOpenPopup, setSelected } = useContext(ConfigurationContext);
+    const { formConfig, setSelected } = useContext(FormConfigContext);
+    const { setOpenPopup } = useContext(UIContext);
 
     const handleEdit = (id: string) => {
         const index = parseInt(id);

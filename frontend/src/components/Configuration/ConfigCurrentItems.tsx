@@ -1,10 +1,15 @@
 import React, { useContext } from "react";
 import { CardActionArea, Fade } from "@mui/material";
 import { CenterGrid, Card, CardContent } from "../Styled";
-import { ConfigurationContext } from "./Configuration";
+import { UIContext } from "./contexts/UIContext";
+import { ItemContext } from "./contexts/ItemContext";
+import { FormConfigContext } from "./contexts/FormConfigContext";
 
 export default function ConfigCurrentItems() {
-    const { storedItems, openDrawer, handleOpenDrawer, setItemName, setFormConfig } = useContext(ConfigurationContext);
+    const { storedItems, setItemName } = useContext(ItemContext);
+    const { openDrawer, handleOpenDrawer } = useContext(UIContext);
+    const { setFormConfig } = useContext(FormConfigContext);
+
     const handleTapCard = (str_id: string) => {
         const id = parseInt(str_id);
         console.log(id)
@@ -12,6 +17,7 @@ export default function ConfigCurrentItems() {
         setItemName(storedItems[id].name);
         setFormConfig(storedItems[id].form_cfg);
     }
+    
     return (
         !openDrawer && (
             <React.Fragment>

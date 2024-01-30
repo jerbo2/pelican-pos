@@ -1,11 +1,11 @@
 import { useContext } from "react";
 import SimpleSnackbar from "../custom_MUI/SimpleSnackbar";
 
-import { ConfigurationContext } from "./Configuration";
+import { UIContext } from "./contexts/UIContext";
 
 export default function ConfigSnackbar() {
     const { openSnackbar, snackbarMessage, setOpenSnackbar } = useContext(
-        ConfigurationContext
+        UIContext
     );
 
     return (
