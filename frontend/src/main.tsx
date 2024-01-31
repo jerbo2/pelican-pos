@@ -5,7 +5,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Landing from './components/Landing';
-import NewOrder from './components/NewOrder';
+import NewOrderLanding from './components/NewOrders/NewOrderLanding';
 import './index.scss'
 import ActiveOrders from './components/ActiveOrders';
 import PastOrders from './components/PastOrders';
@@ -15,6 +15,10 @@ import ConfigLanding from './components/Configuration/ConfigLanding';
 import { LoadingProvider } from './components/Loading/LoadingContext';
 import { AxiosInterceptorSetup } from './components/Loading/LoadingInterceptors';
 import LoadingIndicator from './components/Loading/LoadingIndicator';
+import NewOrder from './components/NewOrders/NewOrder';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+
 
 
 const theme = createTheme({
@@ -36,7 +40,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/new-order",
-    element: <NewOrder />,
+    element: <NewOrderLanding />,
+  },
+  {
+    path: "/new-order/:category",
+    element:
+      <NewOrder />
   },
   {
     path: "/active-orders",
@@ -61,7 +70,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
       <LoadingProvider>
         <AxiosInterceptorSetup />
-        <RouterProvider router={router} />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <RouterProvider router={router} />
+        </LocalizationProvider>
         <LoadingIndicator />
       </LoadingProvider>
     </ThemeProvider>

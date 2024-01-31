@@ -24,7 +24,7 @@ export default function BuildList() {
                         <React.Fragment key={index}>
                             <CenterGrid item xs={12}>
                                 <Circle>{index + 1}</Circle>
-                                <ConfigPreviewComponents configIndex={index}  />
+                                <ConfigPreviewComponents configIndex={index} type={config.type}  />
                                 <IconButton aria-label="edit" size="large" color="primary" onClick={(e)=>handleEdit(e.currentTarget.id)} id={`${index}`}>
                                     <EditIcon fontSize='inherit' />
                                 </IconButton>

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Box } from '@mui/material';
 import ConfigDrawer from './ConfigDrawer';
-import TransitionsModal from '../custom_MUI/TransitionsModal';
+import TransitionsModal from '../custom_comps/TransitionsModal';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import ConfigFormDialog from './ConfigFormDialog';
 import ConfigSnackbar from './ConfigSnackbar';

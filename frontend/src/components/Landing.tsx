@@ -30,15 +30,15 @@ function Landing() {
           </Button>
         </CenterGrid>
 
-        <CenterGrid item xs={6}>
+        <CenterGrid item xs={12} sm={6}>
           <Button variant="contained" fullWidth>
             Open Drawer
           </Button>
         </CenterGrid>
 
-        <CenterGrid item xs={6}>
+        <CenterGrid item xs={12} sm={6}>
           <Button variant="contained" fullWidth onClick={() => navigate('/config')}>
-            Configurator
+            Config
           </Button>
         </CenterGrid>
       </CenterGrid>

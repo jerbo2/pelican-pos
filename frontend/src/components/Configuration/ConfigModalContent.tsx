@@ -77,7 +77,7 @@ export default function ConfigModalContent({handleClosePopup}: {handleClosePopup
                     </CenterGrid>
 
                     <CenterGrid item xs={12}>
-                        <ConfigPreviewComponents configIndex={selected.order} />
+                        <ConfigPreviewComponents configIndex={selected.order} type='single_select' />
                     </CenterGrid>
 
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
@@ -153,10 +153,88 @@ export default function ConfigModalContent({handleClosePopup}: {handleClosePopup
             );
         case 'text':
             return (
-                <Box>
-                    <input type="text" placeholder={formConfig[selected.order]?.label} />
-                </Box>
+                <CenterGrid container>
+                    <CenterGrid item xs={12}>
+                        <Typography variant='h3' fontWeight='bold'>Preview</Typography>
+                    </CenterGrid>
+
+                    <CenterGrid item xs={12}>
+                        <ConfigPreviewComponents configIndex={selected.order} type='text' />
+                    </CenterGrid>
+
+                    <CenterGrid item xs={12}><Divider /></CenterGrid>
+
+                    <CenterGrid item xs={12}>
+                        <Typography variant='h3' fontWeight='bold'>Configuration</Typography>
+                    </CenterGrid>
+
+                    <CenterGrid item xs={6}>
+                        <TextField
+                            fullWidth
+                            label='Label'
+                            variant='filled'
+                            value={labelOption}
+                            onChange={(e) => setLabelOption(e.target.value)}
+                        />
+                    </CenterGrid>
+
+                    <CenterGrid item xs={6} style={{ position: 'relative' }}>
+                        <TextField
+                            fullWidth
+                            id='select-option'
+                            label='Option'
+                            onChange={(e) => setFormOption(e.target.value)}
+                            variant="filled"
+                        />
+                        <IconButton
+                            aria-label='add'
+                            size='large'
+                            style={{ position: 'absolute', top: 0, right: 0 }}
+                            onClick={() => handleEditOption('add')}
+                        >
+                            <AddOutlinedIcon fontSize='inherit' />
+                        </IconButton>
+                    </CenterGrid>
+
+                    <CenterGrid item xs={12} style={{ position: 'relative' }}>
+                        <TextField
+                            select
+                            fullWidth
+                            label='Options'
+                            variant='filled'
+                            value={selectedFormOption}
+                            onChange={(e) => setSelectedFormOption(e.target.value)}
+                        >
+                            {formConfig[selected.order]?.options.map((option) => (
+                                <MenuItem key={option} value={option}>{option}</MenuItem>
+                            ))}
+                        </TextField>
+                        <IconButton
+                            aria-label='delete'
+                            size='large'
+                            style={{ position: 'absolute', top: 0, right: '2rem' }}
+                            onClick={() => handleEditOption('delete')}
+                        >
+                            <RemoveCircleOutlineIcon fontSize='inherit' />
+                        </IconButton>
+                    </CenterGrid>
+
+                    <CenterGrid item xs={12}><Divider /></CenterGrid>
+
+                    <CenterGrid item xs={6}>
+                        <ButtonWidest variant='contained' onClick={async () => {
+                            await handleSave(itemName, formConfig, categoryID, storedItems, setSnackbarMessage, setOpenSnackbar);
+                            handleClosePopup();
+                        }}>Ok</ButtonWidest>
+                    </CenterGrid>
+
+                    <CenterGrid item xs={6}>
+                        <ButtonWidest variant='contained' onClick={handleCancel}>Cancel</ButtonWidest>
+                    </CenterGrid>
+                </CenterGrid>
             );
+        case 'datetime':
+            return <ConfigPreviewComponents configIndex={selected.order} type='datetime' />;
         default:
             return <Box><span>This form object wasn't recognized. . .</span></Box>;
 
