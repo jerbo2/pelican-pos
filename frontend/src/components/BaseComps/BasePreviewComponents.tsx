@@ -1,11 +1,10 @@
 
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { TextField, MenuItem } from "../Styled"
-import { FormConfigContext } from "./contexts/FormConfigContext";
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { FormComponentConfig } from "../Configuration/Configuration";
 
-export default function ConfigPreviewComponents({ configIndex, type }: { configIndex: number, type: string }) {
-    const { formConfig } = useContext(FormConfigContext);
+export default function BasePreviewComponents({ component }: { component: FormComponentConfig }) {
     const [previewSelected, setPreviewSelected] = useState<string[]>([]);
 
     const handlePreviewSelectedChange = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -15,15 +14,15 @@ export default function ConfigPreviewComponents({ configIndex, type }: { configI
     }
 
     const commonProps = {
-        label: formConfig[configIndex]?.label,
+        label: component.label,
         fullWidth: true,
-        value: previewSelected[configIndex] || '',
-        onChange: handlePreviewSelectedChange(configIndex),
+        value: previewSelected[component.order] || '',
+        onChange: handlePreviewSelectedChange(component.order),
     };
 
     console.log(previewSelected)
 
-    switch (type) {
+    switch (component.type) {
         case 'text':
             return (
                 <TextField variant="filled" {...commonProps} />
@@ -31,7 +30,7 @@ export default function ConfigPreviewComponents({ configIndex, type }: { configI
         case 'single_select':
             return (
                 <TextField select variant='filled' {...commonProps}>
-                    {formConfig[configIndex]?.options.map((option) => (
+                    {component.options.map((option) => (
                         <MenuItem key={`preview_${option}`} value={option}>{option}</MenuItem>
                     ))}
                 </TextField>

@@ -65,7 +65,7 @@ export default function PersistentDrawerLeft({
             </CenterGrid>
             <CenterGrid item xs={4} />
           <CenterGrid item xs={12}>
-            <Typography variant="h3" fontWeight='bold' component="div" sx={{ ...(!open && { display: 'none' }) }}>{appBarHeaderDrawerOpen}</Typography>
+            <Typography variant="h3" fontWeight='bold' component="div" textAlign='center' sx={{ ...(!open && { display: 'none' }) }}>{appBarHeaderDrawerOpen}</Typography>
           </CenterGrid>
           </CenterGrid>
         </Toolbar>

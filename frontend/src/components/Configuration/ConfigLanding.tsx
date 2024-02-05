@@ -1,4 +1,4 @@
-import BaseItems from "../custom_comps/BaseItems";
+import BaseItems from "../BaseComps/BaseItems";
 
 export default function ConfigLanding() {
     return (

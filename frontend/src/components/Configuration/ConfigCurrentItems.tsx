@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { UIContext } from "./contexts/UIContext";
 import { ItemContext } from "./contexts/ItemContext";
 import { FormConfigContext } from "./contexts/FormConfigContext";
-import BaseCurrentItems from "../custom_comps/BaseCurrentItems";
+import BaseCurrentItems from "../BaseComps/BaseCurrentItems";
 
 export default function ConfigCurrentItems() {
     const { storedItems, setItemName } = useContext(ItemContext);

@@ -1,6 +1,6 @@
 
 import { useContext, useEffect } from 'react';
-import FormDialog from '../custom_comps/FormDialog';
+import FormDialog from '../BaseComps/FormDialog';
 import { Button } from '../Styled';
 import { ItemContext } from './contexts/ItemContext';
 import { UIContext } from './contexts/UIContext';

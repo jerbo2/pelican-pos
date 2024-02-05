@@ -229,6 +229,22 @@ const CardContent = styled(MUICardContent)({
   flexGrow: 1,
 });
 
+const DraggableListBox = styled(Box)({
+  position: 'relative',
+  width: '200px',
+  height: '40px',
+  transformOrigin: '50% 50% 0px',
+  borderRadius: '5px',
+  color: 'white',
+  lineHeight: '40px',
+  paddingLeft: '32px',
+  fontSize: '14.5px',
+  background: 'lightblue',
+  textTransform: 'uppercase',
+  letterSpacing: '1px',
+  touchAction: 'none',
+});
+
 export {
   Button,
   ButtonWider,
@@ -251,5 +267,6 @@ export {
   Snackbar,
   Circle,
   Card,
-  CardContent
+  CardContent,
+  DraggableListBox
 };

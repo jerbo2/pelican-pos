@@ -1,12 +1,12 @@
 import { useContext, useState } from "react"
-import BaseCurrentItems from "../custom_comps/BaseCurrentItems"
+import BaseCurrentItems from "../BaseComps/BaseCurrentItems"
 import { ItemContext } from "../Configuration/contexts/ItemContext"
 import { FormConfigContext } from "../Configuration/contexts/FormConfigContext"
+import { Button } from "../Styled"
 
-export default function NewOrderCurrentItems() {
+export default function NewOrderCurrentItems({notShowCards, setNotShowCards}: {notShowCards: boolean, setNotShowCards: (arg0: boolean) => void}){
     const { storedItems, setItemName } = useContext(ItemContext)
     const { setFormConfig, formConfig } = useContext(FormConfigContext)
-    const [ notShowCards, setNotShowCards ] = useState(false)
 
     console.log(storedItems)
 
@@ -21,6 +21,6 @@ export default function NewOrderCurrentItems() {
     console.log(formConfig)
 
     return (
-            <BaseCurrentItems showTrigger={notShowCards} items={storedItems} handleTapCard={handleTapCard} />
+        <BaseCurrentItems showTrigger={notShowCards} items={storedItems} handleTapCard={handleTapCard} />
     )
 }

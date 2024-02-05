@@ -1,12 +1,10 @@
 import axios from 'axios';
 import { Box } from '@mui/material';
 import ConfigDrawer from './ConfigDrawer';
-import TransitionsModal from '../custom_comps/TransitionsModal';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import ConfigFormDialog from './ConfigFormDialog';
 import ConfigSnackbar from './ConfigSnackbar';
-import ConfigModalContent from './ConfigModalContent';
-import BuildList from './ConfigBuildList';
+import ConfigBuildList from './ConfigBuildList';
 import ConfigCurrentItems from './ConfigCurrentItems';
 
 import { UIProvider } from './contexts/UIContext';
@@ -84,7 +82,7 @@ function Configuration() {
                             children={
                                 <>
                                     <ConfigModal />
-                                    <BuildList />
+                                    <ConfigBuildList />
                                     <ConfigCurrentItems />
                                 </>
                             }

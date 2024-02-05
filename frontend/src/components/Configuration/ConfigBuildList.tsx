@@ -3,10 +3,10 @@ import { FormConfigContext } from "./contexts/FormConfigContext";
 import { UIContext } from "./contexts/UIContext";
 import { Box } from '@mui/material';
 import { CenterGrid, Circle, IconButton, Divider } from "../Styled";
-import ConfigPreviewComponents from "./ConfigPreviewComponents";
 import EditIcon from '@mui/icons-material/Edit';
+import BasePreviewComponents from "../BaseComps/BasePreviewComponents";
 
-export default function BuildList() {
+export default function ConfigBuildList() {
     const { formConfig, setSelected } = useContext(FormConfigContext);
     const { setOpenPopup } = useContext(UIContext);
 
@@ -24,7 +24,7 @@ export default function BuildList() {
                         <React.Fragment key={index}>
                             <CenterGrid item xs={12}>
                                 <Circle>{index + 1}</Circle>
-                                <ConfigPreviewComponents configIndex={index} type={config.type}  />
+                                <BasePreviewComponents component={formConfig[index]} />
                                 <IconButton aria-label="edit" size="large" color="primary" onClick={(e)=>handleEdit(e.currentTarget.id)} id={`${index}`}>
                                     <EditIcon fontSize='inherit' />
                                 </IconButton>

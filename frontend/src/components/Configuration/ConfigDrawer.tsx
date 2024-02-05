@@ -8,7 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Divider from '@mui/material/Divider';
 import { ButtonWidest, ListItemButton } from '../Styled';
-import PersistentDrawerLeft from '../custom_comps/PersistentDrawerLeft';
+import PersistentDrawerLeft from '../BaseComps/PersistentDrawerLeft';
 
 import { UIContext } from "./contexts/UIContext";
 import { ItemContext } from "./contexts/ItemContext";

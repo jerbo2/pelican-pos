@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import SimpleSnackbar from "../custom_comps/SimpleSnackbar";
+import SimpleSnackbar from "../BaseComps/SimpleSnackbar";
 
 import { UIContext } from "./contexts/UIContext";
 

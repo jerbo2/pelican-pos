@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import TransitionsModal from "../custom_comps/TransitionsModal";
+import TransitionsModal from "../BaseComps/TransitionsModal";
 import ConfigModalContent from "./ConfigModalContent";
 import { UIContext } from "./contexts/UIContext";
 import { ItemContext } from "./contexts/ItemContext";

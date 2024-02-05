@@ -8,7 +8,7 @@ import { FormConfigContext } from './contexts/FormConfigContext';
 import { ItemContext } from './contexts/ItemContext';
 import { UIContext } from './contexts/UIContext';
 import { FormComponentConfig } from './Configuration';
-import ConfigPreviewComponents from './ConfigPreviewComponents';
+import BasePreviewComponents from '../BaseComps/BasePreviewComponents';
 
 
 export default function ConfigModalContent({handleClosePopup}: {handleClosePopup: () => void}){
@@ -77,7 +77,7 @@ export default function ConfigModalContent({handleClosePopup}: {handleClosePopup
                     </CenterGrid>
 
                     <CenterGrid item xs={12}>
-                        <ConfigPreviewComponents configIndex={selected.order} type='single_select' />
+                        <BasePreviewComponents component={formConfig[selected.order]} />
                     </CenterGrid>
 
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
@@ -159,7 +159,7 @@ export default function ConfigModalContent({handleClosePopup}: {handleClosePopup
                     </CenterGrid>
 
                     <CenterGrid item xs={12}>
-                        <ConfigPreviewComponents configIndex={selected.order} type='text' />
+                        <BasePreviewComponents component={formConfig[selected.order]} />
                     </CenterGrid>
 
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
@@ -234,7 +234,7 @@ export default function ConfigModalContent({handleClosePopup}: {handleClosePopup
                 </CenterGrid>
             );
         case 'datetime':
-            return <ConfigPreviewComponents configIndex={selected.order} type='datetime' />;
+            return <BasePreviewComponents component={formConfig[selected.order]} />
         default:
             return <Box><span>This form object wasn't recognized. . .</span></Box>;
 

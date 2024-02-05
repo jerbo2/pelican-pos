@@ -62,7 +62,7 @@ const router = createBrowserRouter([
   {
     path: "/config/:category",
     element: <Configuration />
-  }
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
