@@ -219,7 +219,7 @@ const Card = styled(MUICard)(({ theme }) => ({
   color: theme.palette.primary.main,
   fontSize: '2.75rem',
   fontWeight: 'bold',
-  borderRadius: '0.375rem',
+  borderRadius: '1.375rem',
   boxShadow: theme.shadows[6],
   minHeight: '10rem',
 }));

@@ -11,8 +11,8 @@ export default function BaseCurrentItems({showTrigger, items, handleTapCard}: {s
                     {items.map((item, index) => {
                         return (
                             <React.Fragment key={index}>
-                                <CenterGrid item xs={6} sm={3} sx={{ textAlign: 'center' }}>
-                                    <CardActionArea sx={{ m: 16 }}>
+                                <CenterGrid item xs={12} sx={{ textAlign: 'center' }}>
+                                    <CardActionArea sx={{ m: 16, width: '50%', tranform: 'translateX(50%)' }}>
                                         <Fade in={!showTrigger}>
                                             <Card variant="outlined" id={`${index}`} onClick={(e) => handleTapCard(e.currentTarget.id)}>
                                                 <CardContent>
@@ -23,7 +23,6 @@ export default function BaseCurrentItems({showTrigger, items, handleTapCard}: {s
                                     </CardActionArea>
                                 </CenterGrid>
                             </React.Fragment>
-
                         )
                     })}
                 </CenterGrid>

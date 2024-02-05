@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { FormConfigContext } from "../Configuration/contexts/FormConfigContext";
 import { ItemContext } from "../Configuration/contexts/ItemContext";
-import { CenterGrid, Circle, Divider, ButtonWider } from "../Styled";
+import { CenterGrid, Circle, Divider, ButtonWidest } from "../Styled";
 import BasePreviewComponents from "../BaseComps/BasePreviewComponents";
 import BaseToolBar from "../BaseComps/BaseToolBar";
 
@@ -34,10 +34,10 @@ export default function NewOrderForm({ notShowCards, setNotShowCards }: { notSho
                         )
                     })}
                     <CenterGrid item xs={6}>
-                        <ButtonWider variant='contained' onClick={() => setNotShowCards(false)}>CANCEL</ButtonWider>
+                        <ButtonWidest variant='contained' onClick={() => setNotShowCards(false)}>CANCEL</ButtonWidest>
                     </CenterGrid>
                     <CenterGrid item xs={6}>
-                        <ButtonWider variant='contained' onClick={() => console.log('submitted but not really')}>SUBMIT</ButtonWider>
+                        <ButtonWidest variant='contained' onClick={() => console.log('submitted but not really')}>SUBMIT</ButtonWidest>
                     </CenterGrid>
                 </>
             )}
