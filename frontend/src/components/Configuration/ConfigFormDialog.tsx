@@ -1,7 +1,7 @@
 
 import { useContext, useEffect } from 'react';
 import FormDialog from '../BaseComps/FormDialog';
-import { Button } from '../Styled';
+import { Button, TextField } from '../Styled';
 import { ItemContext } from './contexts/ItemContext';
 import { UIContext } from './contexts/UIContext';
 
@@ -16,31 +16,32 @@ export default function ConfigFormDialog() {
   useEffect(() => {
     console.log(itemName)
     if (!openDialog && itemName !== '') {
-        setOpenDrawer(true);
+      setOpenDrawer(true);
     }
   }, [openDialog]);
 
   const handleSetItemName = (name: string) => {
     let itemExists = false;
     storedItems.forEach((item) => {
-        if (item.name.toLowerCase() === name.toLowerCase()) {
-            setSnackbarMessage('This item already exists. . .');
-            setOpenSnackbar(true);
-            itemExists = true;
-        }
+      if (item.name.toLowerCase() === name.toLowerCase()) {
+        setSnackbarMessage('This item already exists. . .');
+        setOpenSnackbar(true);
+        itemExists = true;
+      }
     });
 
     if (!itemExists) {
-        setItemName(name);
-        handleCloseDialog();
+      setItemName(name);
+      handleCloseDialog();
     }
-}
-  
+  }
+
   return (
     <FormDialog
       openDialog={openDialog}
       handleCloseDialog={handleCloseDialog}
       setItemName={handleSetItemName}
+      shiftAmount={0}
       dialogTitle="Create a new item!"
       dialogContent="Enter a name for this item below. . ."
       dialogActions={
@@ -48,6 +49,19 @@ export default function ConfigFormDialog() {
           <Button onClick={() => { handleSetItemName(''); handleCloseDialog() }}>Cancel</Button>
           <Button type="submit">Create</Button>
         </>
+      }
+      dialogExtras={
+        <TextField
+          autoFocus
+          required
+          margin="dense"
+          id="name"
+          name="itemName"
+          label="Item Name"
+          type="itemName"
+          fullWidth
+          variant="standard"
+        />
       }
     />
   );

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useContext } from 'react';
 
 // imports from MUI
 import Backdrop from '@mui/material/Backdrop';

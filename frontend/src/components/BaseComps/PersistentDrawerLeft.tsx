@@ -9,7 +9,7 @@ import { Box } from '@mui/material';
 import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
 
 import { DRAWER_WIDTH } from '../Constants';
-import { DrawerAppBar, DrawerHeader, DrawerMain, Button, CenterGrid, ButtonWider } from '../Styled';
+import { DrawerAppBar, DrawerHeader, DrawerMain, Button, CenterGrid } from '../Styled';
 
 import { useNavigate } from 'react-router';
 
@@ -56,7 +56,7 @@ export default function PersistentDrawerLeft({
                 color="inherit"
                 aria-label="open drawer"
                 onClick={handleOpenDrawer}
-                sx={{ ...(open && { display: 'none' }), cursor: 'pointer'}}
+                sx={{ ...(open && { display: 'none' }), cursor: 'pointer', fontSize: {xs: '1.25rem', sm: '2.25rem', md: '3rem'}}}
                 variant='h3'
                 fontWeight='bold'
               >

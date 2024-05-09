@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Box } from '@mui/material';
+import { WEBSOCKET_URL } from '../Constants';
 import ConfigDrawer from './ConfigDrawer';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import ConfigFormDialog from './ConfigFormDialog';
@@ -10,6 +11,7 @@ import ConfigCurrentItems from './ConfigCurrentItems';
 import { UIProvider } from './contexts/UIContext';
 import { FormConfigProvider } from './contexts/FormConfigContext';
 import { ItemProvider } from './contexts/ItemContext';
+import { WebSocketProvider } from '../BaseComps/contexts/WebSocketContext';
 import ConfigModal from './ConfigModal';
 
 
@@ -34,34 +36,6 @@ type Category = {
 
 }
 
-async function handleSave(itemName: string, formConfig: FormComponentConfig[], category: number, storedItems: Item[], setSnackbarMessage: (snackbarMessage: string) => void, setOpenSnackbar: (openSnackbar: boolean) => void) {
-    console.log(storedItems);
-
-    const itemExists = storedItems.some(item => item.name === itemName);
-    const itemID = storedItems.filter(item => item.name === itemName)[0]?.id;
-    const url = itemExists ? `/api/v1/items/update/${itemID}/` : '/api/v1/items/create/';
-    const axiosMethod = itemExists ? axios.put : axios.post;
-
-    const payload = {
-        "name": itemName,
-        "form_cfg": formConfig,
-        "category_id": category,
-        "id": itemID
-    };
-
-    console.log(payload);
-
-    try {
-        const res = await axiosMethod(url, payload);
-        console.log(res.data);
-        setSnackbarMessage(`${itemName} ${itemExists ? 'Updated' : 'Saved'}!`);
-        setOpenSnackbar(true);
-    } catch (err) {
-        console.log(err);
-        setSnackbarMessage(`Error ${itemExists ? 'Updating' : 'Saving'} Item`);
-        setOpenSnackbar(true);
-    }
-}
 
 function Configuration() {
     const icon = <AddOutlinedIcon color='primary' fontSize='large' />;
@@ -71,22 +45,24 @@ function Configuration() {
             <UIProvider>
                 <FormConfigProvider>
                     <ItemProvider>
-                        <ConfigSnackbar />
-                        <ConfigFormDialog />
-                        <ConfigDrawer
-                            options={[
-                                { name: 'Dropdown', icon: icon },
-                                { name: 'Text Field', icon: icon },
-                                { name: 'Date & Time', icon: icon },
-                            ]}
-                            children={
-                                <>
-                                    <ConfigModal />
-                                    <ConfigBuildList />
-                                    <ConfigCurrentItems />
-                                </>
-                            }
-                        />
+                        <WebSocketProvider url={WEBSOCKET_URL}>
+                            <ConfigSnackbar />
+                            <ConfigFormDialog />
+                            <ConfigDrawer
+                                options={[
+                                    { name: 'Dropdown', icon: icon },
+                                    { name: 'Text Field', icon: icon },
+                                    { name: 'Date & Time', icon: icon },
+                                ]}
+                                children={
+                                    <>
+                                        <ConfigModal />
+                                        <ConfigBuildList />
+                                        <ConfigCurrentItems />
+                                    </>
+                                }
+                            />
+                        </WebSocketProvider>
                     </ItemProvider>
                 </FormConfigProvider>
             </UIProvider>
@@ -95,5 +71,5 @@ function Configuration() {
 }
 
 
-export { Configuration, handleSave };
+export { Configuration };
 export type { FormComponentConfig, Item, Category };

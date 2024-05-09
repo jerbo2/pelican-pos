@@ -4,7 +4,7 @@ from . import models, schemas
 
 
 def get_items(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Item).offset(skip).limit(limit).all()
+    return db.query(models.Item).order_by(models.Item.id.asc()).offset(skip).limit(limit).all()
 
 
 def get_item(db: Session, item_id: int):
@@ -12,7 +12,7 @@ def get_item(db: Session, item_id: int):
 
 
 def get_categories(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Category).offset(skip).limit(limit).all()
+    return db.query(models.Category).order_by(models.Category.id.asc()).offset(skip).limit(limit).all()
 
 
 def create_category(db: Session, category: schemas.CategoryCreate):
@@ -41,3 +41,25 @@ def update_item(db: Session, item_id: int, item: schemas.ItemUpdate):
         db.commit()
         db.refresh(db_item)
     return db_item
+
+def delete_item(db: Session, item_id: int):
+    db_item = get_item(db, item_id)
+    if db_item:
+        db.delete(db_item)
+        db.commit()
+    return db_item
+
+def create_order(db: Session, order: schemas.OrderCreate):
+    db_order = models.Order()
+    db.add(db_order)
+    db.commit()
+    db.refresh(db_order)
+    return db_order
+
+def add_to_active_order(db: Session, order_id: int, item_id: int, quantity: int = 1):
+    db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    db_item = db.query(models.Item).filter(models.Item.id == item_id).first()
+    if db_order and db_item:
+        db_order.items.append(db_item)
+        db.commit()
+    return db_order

@@ -20,8 +20,6 @@ export default function BasePreviewComponents({ component }: { component: FormCo
         onChange: handlePreviewSelectedChange(component.order),
     };
 
-    console.log(previewSelected)
-
     switch (component.type) {
         case 'text':
             return (
@@ -37,7 +35,7 @@ export default function BasePreviewComponents({ component }: { component: FormCo
             )
         case 'datetime':
             return (
-                <DateTimePicker/>
+                <DateTimePicker sx={{width: '100%'}} minutesStep={5}/>
             )
         default:
             return ('Oops. . .')

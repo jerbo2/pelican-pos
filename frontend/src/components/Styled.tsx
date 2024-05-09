@@ -12,12 +12,20 @@ import {
   MenuItem as MUIMenuItem,
   DialogTitle as MUIDialogTitle,
   DialogContentText as MUIDialogContentText,
+  Dialog as MUIDialog,
+  DialogProps as MUIDialogProps,
   Snackbar as MUISnackbar,
   Card as MUICard,
   CardContent as MUICardContent,
+  CardActionArea as MUICardActionArea,
 } from '@mui/material';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { DRAWER_WIDTH } from './Constants';
+import zIndex from '@mui/material/styles/zIndex';
+
+interface DialogProps extends MUIDialogProps {
+  shiftamount?: number;
+}
 
 const Button = styled(MuiButton)(({ theme }) => ({
   height: '40%',
@@ -59,12 +67,16 @@ const CenterGrid = styled(Grid)({
 });
 
 const Popup = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column', // Stack children vertically
+  justifyContent: 'space-between', // Adjust this based on your design needs
   position: 'absolute',
   top: '50%',
   left: `calc(50% + ${DRAWER_WIDTH / 2}px)`,
   transform: 'translate(-50%, -50%)',
   width: '70vw',
-  height: '70vh',
+  minHeight: '10vh',
+  maxHeight: '100vh',
   backgroundColor: '#fff',
   border: `2px solid ${theme.palette.primary.main}`,
   color: theme.palette.primary.main,
@@ -197,17 +209,17 @@ const Snackbar = styled(MUISnackbar)(({ theme }) => {
 });
 
 const Circle = styled('div')(({ theme }) => ({
-  minWidth: '50px', 
-  minHeight: '50px', 
+  minWidth: '50px',
+  minHeight: '50px',
   borderRadius: '50%',
-  border: '4px solid', 
+  border: '4px solid',
   borderColor: theme.palette.primary.main,
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   marginRight: theme.spacing(2),
   fontSize: '2.5rem',
-  fontWeight: 'bold', 
+  fontWeight: 'bold',
   lineHeight: '40px',
   margin: '8px',
 }));
@@ -229,6 +241,12 @@ const CardContent = styled(MUICardContent)({
   flexGrow: 1,
 });
 
+const CardActionArea = styled(MUICardActionArea)({
+  margin: '16px',
+  width: '50%',
+  borderRadius: '1.375rem',
+});
+
 const DraggableListBox = styled(Box)({
   position: 'relative',
   width: '200px',
@@ -244,6 +262,16 @@ const DraggableListBox = styled(Box)({
   letterSpacing: '1px',
   touchAction: 'none',
 });
+
+const Dialog = styled(MUIDialog)<DialogProps>(({shiftamount = DRAWER_WIDTH / 2}) => ({
+  '& .MuiDialog-container': {
+    position: 'fixed',
+    top: '50%',
+    left: `calc(50% + ${shiftamount}px)`, // Centering dialog in the available space
+    transform: 'translate(-50%, -50%)',
+  },
+}));
+
 
 export {
   Button,
@@ -264,9 +292,11 @@ export {
   MenuItem,
   DialogTitle,
   DialogContentText,
+  Dialog,
   Snackbar,
   Circle,
   Card,
   CardContent,
+  CardActionArea,
   DraggableListBox
 };

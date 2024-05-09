@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Union, Optional
+from datetime import datetime
 
 
 class SelectConfig(BaseModel):
@@ -31,8 +32,27 @@ class ItemUpdate(ItemBase):
     pass
 
 
+class ItemDelete(ItemBase):
+    pass
+
+
 class Item(ItemBase):
     id: int
+
+    class Config:
+        from_attributes = True
+
+class OrderCreate(BaseModel):
+    pass
+
+class OrderDelete(BaseModel):
+    pass
+
+class Order(BaseModel):
+    id: int
+    created_at: datetime
+    status: str
+    items: List[Item] = []
 
     class Config:
         from_attributes = True
@@ -52,3 +72,5 @@ class Category(CategoryBase):
 
     class Config:
         from_attributes = True
+
+    
