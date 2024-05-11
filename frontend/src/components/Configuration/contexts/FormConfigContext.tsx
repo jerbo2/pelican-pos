@@ -1,5 +1,5 @@
 import React, { useState, createContext } from 'react';
-import { FormComponentConfig } from '../Configuration';
+import { FormComponentConfig } from '../../BaseComps/dbTypes';
 
 const FormConfigContext = createContext<{
     formConfig: FormComponentConfig[],

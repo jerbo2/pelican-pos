@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { UIContext } from "./contexts/UIContext";
+import { UIContext } from "../BaseComps/contexts/UIContext";
 import { ItemContext } from "./contexts/ItemContext";
 import { FormConfigContext } from "./contexts/FormConfigContext";
 import BaseCurrentItems from "../BaseComps/BaseCurrentItems";

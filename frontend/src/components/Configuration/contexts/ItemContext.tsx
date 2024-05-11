@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { Item, Category } from '../Configuration';
+import { Item, CategoryWithItems } from '../../BaseComps/dbTypes';
 import axios from 'axios';
 
 const ItemContext = createContext<{
@@ -29,9 +29,9 @@ const ItemProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const categoryName = window.location.pathname.split('/').pop();
 
     const getStoredItems = () => {
-        axios.get('/api/v1/categories/')
+        axios.get('/api/v1/categories?include_items=True')
             .then((res) => {
-                res.data.forEach((category: Category) => {
+                res.data.forEach((category: CategoryWithItems) => {
                     if (category.name.toLowerCase() === categoryName?.toLowerCase()) {
                         setStoredItems(category.items);
                         setCategoryID(category.id);

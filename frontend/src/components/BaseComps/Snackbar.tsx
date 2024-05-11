@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import SimpleSnackbar from "../BaseComps/SimpleSnackbar";
+import SimpleSnackbar from "./SimpleSnackbar";
 
 import { UIContext } from "./contexts/UIContext";
 
-export default function ConfigSnackbar() {
+export default function Snackbar() {
     const { openSnackbar, snackbarMessage, setOpenSnackbar } = useContext(
         UIContext
     );

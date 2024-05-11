@@ -1,4 +1,6 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import func
+from sqlalchemy.dialects.postgresql import JSONB
 
 from . import models, schemas
 
@@ -11,8 +13,11 @@ def get_item(db: Session, item_id: int):
     return db.query(models.Item).filter(models.Item.id == item_id).first()
 
 
-def get_categories(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Category).order_by(models.Category.id.asc()).offset(skip).limit(limit).all()
+def get_categories(db: Session, skip: int = 0, limit: int = 100, include_items: bool = False):
+    query = db.query(models.Category).order_by(models.Category.id.asc())
+    if include_items:
+        query = query.options(joinedload(models.Category.items))
+    return query.offset(skip).limit(limit).all()
 
 
 def create_category(db: Session, category: schemas.CategoryCreate):
@@ -56,10 +61,44 @@ def create_order(db: Session, order: schemas.OrderCreate):
     db.refresh(db_order)
     return db_order
 
-def add_to_active_order(db: Session, order_id: int, item_id: int, quantity: int = 1):
+def add_to_active_order(db: Session, order_id: int, item_id: int, configurations: list):
+    # Retrieve the existing Order and Item from the database
     db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
     db_item = db.query(models.Item).filter(models.Item.id == item_id).first()
+
     if db_order and db_item:
-        db_order.items.append(db_item)
+        # Check if the item is already in the order with the same configurations
+        order_item = db.query(models.OrderItem).filter(
+            models.OrderItem.order_id == order_id,
+            models.OrderItem.item_id == item_id,
+            models.OrderItem.configurations.op('@>')(
+                func.cast(configurations, JSONB)  # Casting the list to JSONB
+            )
+        ).first()
+
+        if order_item:
+            # If the exact configuration exists, you might want to update or increment quantity (if applicable)
+            pass
+        else:
+            # If not, create and add new OrderItem
+            new_order_item = models.OrderItem(order=db_order, item=db_item, configurations=func.cast(configurations, JSONB))
+            db.add(new_order_item)
+        
         db.commit()
+        db.refresh(db_order)
     return db_order
+
+def get_order(db: Session, order_id: int):
+    return db.query(models.Order).filter(models.Order.id == order_id).first()
+
+def get_order_items(db: Session, order_id: int):
+    # Join OrderItem with Item and filter by order_id, for this i really only care about item name and configurations
+    order_items = db.query(models.OrderItem, models.Item.name.label("item_name")).\
+        join(models.Item, models.OrderItem.item_id == models.Item.id).\
+        filter(models.OrderItem.order_id == order_id).\
+        all()
+    
+    result = [schemas.OrderItem(item_name=item_name, configurations=order_item.configurations) 
+              for order_item, item_name in order_items]
+
+    return result

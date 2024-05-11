@@ -5,8 +5,8 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import { CenterGrid, TextField, IconButton, Divider, MenuItem, ButtonWidest } from '../Styled';
 import { FormConfigContext } from './contexts/FormConfigContext';
 import { ItemContext } from './contexts/ItemContext';
-import { UIContext } from './contexts/UIContext';
-import { FormComponentConfig } from './Configuration';
+import { UIContext } from '../BaseComps/contexts/UIContext';
+import { FormComponentConfig } from '../BaseComps/dbTypes';
 import { WebSocketContext } from '../BaseComps/contexts/WebSocketContext';
 import BasePreviewComponents from '../BaseComps/BasePreviewComponents';
 import ConfirmationButton from '../BaseComps/ConfirmationButton';
@@ -196,7 +196,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
                             value={selectedFormOption}
                             onChange={(e) => setSelectedFormOption(e.target.value)}
                         >
-                            {formConfig[selected.order]?.options.map((option) => (
+                            {formConfig[selected.order]?.options.map((option: any) => (
                                 <MenuItem key={option} value={option}>{option}</MenuItem>
                             ))}
                         </TextField>
@@ -222,7 +222,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
 
                     {!formOptionNew && (
                         <CenterGrid item xs={12}>
-                            <ConfirmationButton onDeleteConfirmed={handleFormComponentDelete} dialogContent={formCompDelConfirm}>Delete</ConfirmationButton>
+                            <ConfirmationButton onConfirmed={handleFormComponentDelete} dialogContent={formCompDelConfirm}>Delete</ConfirmationButton>
                         </CenterGrid>
                     )}
 
@@ -267,7 +267,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
 
                     {!formOptionNew && (
                         <CenterGrid item xs={12}>
-                            <ConfirmationButton onDeleteConfirmed={handleFormComponentDelete} dialogContent={formCompDelConfirm}>Delete</ConfirmationButton>
+                            <ConfirmationButton onConfirmed={handleFormComponentDelete} dialogContent={formCompDelConfirm}>Delete</ConfirmationButton>
                         </CenterGrid>
                     )}
 
@@ -282,7 +282,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
                             <ButtonWidest variant='contained' onClick={handleCancel}>Ok</ButtonWidest>
                         </CenterGrid>
                         <CenterGrid item xs={12}>
-                            <ConfirmationButton onDeleteConfirmed={handleFormComponentDelete} dialogContent={formCompDelConfirm}>Delete</ConfirmationButton>
+                            <ConfirmationButton onConfirmed={handleFormComponentDelete} dialogContent={formCompDelConfirm}>Delete</ConfirmationButton>
                         </CenterGrid>
                     </CenterGrid>
                 )

@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { FormConfigContext } from "./contexts/FormConfigContext";
-import { UIContext } from "./contexts/UIContext";
+import { UIContext } from "../BaseComps/contexts/UIContext";
 import { Box } from '@mui/material';
 import { CenterGrid, Circle, IconButton, Divider } from "../Styled";
 import EditIcon from '@mui/icons-material/Edit';

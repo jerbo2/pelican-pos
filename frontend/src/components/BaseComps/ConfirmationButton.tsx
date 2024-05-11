@@ -1,27 +1,33 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { ButtonWidest } from '../Styled';
 import FormDialog from './FormDialog';
 
 interface ConfirmationButtonProps {
-    onDeleteConfirmed: () => void;
+    onConfirmed: () => void;
     dialogContent?: string;
     shiftAmount?: number;
+    override?: boolean;
     children: ReactNode;
 }
 
-function ConfirmationButton({ onDeleteConfirmed, dialogContent, shiftAmount, children }: ConfirmationButtonProps) {
-    const [open, setOpen] = useState(false);
+function ConfirmationButton({ onConfirmed, dialogContent, shiftAmount, override, children }: ConfirmationButtonProps) {
+    const [open, setOpen] = useState(false);    
 
     const handleClickOpen = () => {
-        setOpen(true);
+        if (!override) {
+            setOpen(true);
+        }
+        else {
+            onConfirmed();
+        }
     };
 
     const handleClose = () => {
         setOpen(false);
     };
 
-    const handleDelete = () => {
-        onDeleteConfirmed();
+    const handleConfirm = () => {
+        onConfirmed();
         setOpen(false);
     };
 
@@ -40,7 +46,7 @@ function ConfirmationButton({ onDeleteConfirmed, dialogContent, shiftAmount, chi
                 dialogActions={
                     <>
                         <ButtonWidest onClick={handleClose}>No</ButtonWidest>
-                        <ButtonWidest onClick={handleDelete}>Yes</ButtonWidest>
+                        <ButtonWidest onClick={handleConfirm}>Yes</ButtonWidest>
                     </>
                 }
             />

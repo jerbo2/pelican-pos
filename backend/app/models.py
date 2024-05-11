@@ -1,17 +1,10 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, DateTime
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy.dialects.postgresql import JSONB, ARRAY
 from sqlalchemy.orm import relationship
 
 from .database import Base
-import datetime
-
-order_items_table = Table(
-    "order_items",
-    Base.metadata,
-    Column("order_id", Integer, ForeignKey("orders.id"), primary_key=True),
-    Column("item_id", Integer, ForeignKey("items.id"), primary_key=True),
-    Column("quantity", Integer, default=1),  # Optionally track quantity of each item
-)
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 
 class Category(Base):
@@ -19,10 +12,11 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True, unique=True, index=True)
     name = Column(String, index=True)
+    proper_name = Column(String, index=True)
 
-    items = relationship("Item", back_populates="category")
+    items = relationship("Item", back_populates="category", lazy='select')
 
-
+# item table
 class Item(Base):
     __tablename__ = "items"
 
@@ -32,17 +26,28 @@ class Item(Base):
     category_id = Column(Integer, ForeignKey("categories.id"))
 
     category = relationship("Category", back_populates="items")
-    orders = relationship("Order", secondary=order_items_table, back_populates="items")
+    orders = relationship("OrderItem", back_populates="item")
 
-
+# order table
 class Order(Base):
     __tablename__ = "orders"
 
     id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
+    created_at = Column(DateTime, default=datetime.now(ZoneInfo("America/New_York")))
     status = Column(
         String, default="pending"
-    )  # You can track status (pending, completed, etc.)
+    )  
 
     # Relationships
-    items = relationship("Item", secondary=order_items_table, back_populates="orders")
+    items = relationship("OrderItem", back_populates="order")
+
+# order items table that connects orders and items with item configurations
+class OrderItem(Base):
+    __tablename__ = 'order_items'
+    id = Column(Integer, primary_key=True)  # Add a unique primary key
+    order_id = Column(Integer, ForeignKey('orders.id'))
+    item_id = Column(Integer, ForeignKey('items.id'))
+    configurations = Column(ARRAY(JSONB))
+    quantity = Column(Integer, default=1)
+    order = relationship("Order", back_populates="items")
+    item = relationship("Item", back_populates="orders")

@@ -1,41 +1,17 @@
-import axios from 'axios';
 import { Box } from '@mui/material';
 import { WEBSOCKET_URL } from '../Constants';
 import ConfigDrawer from './ConfigDrawer';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import ConfigFormDialog from './ConfigFormDialog';
-import ConfigSnackbar from './ConfigSnackbar';
+import Snackbar from '../BaseComps/Snackbar';
 import ConfigBuildList from './ConfigBuildList';
 import ConfigCurrentItems from './ConfigCurrentItems';
 
-import { UIProvider } from './contexts/UIContext';
+import { UIProvider } from '../BaseComps/contexts/UIContext';
 import { FormConfigProvider } from './contexts/FormConfigContext';
 import { ItemProvider } from './contexts/ItemContext';
 import { WebSocketProvider } from '../BaseComps/contexts/WebSocketContext';
 import ConfigModal from './ConfigModal';
-
-
-type FormComponentConfig = {
-    label: string;
-    type: string;
-    order: number;
-    options: string[];
-}
-
-type Item = {
-    name: string;
-    form_cfg: FormComponentConfig[];
-    category_id: number;
-    id: number;
-}
-
-type Category = {
-    name: string;
-    id: number;
-    items: Item[];
-
-}
-
 
 function Configuration() {
     const icon = <AddOutlinedIcon color='primary' fontSize='large' />;
@@ -46,7 +22,7 @@ function Configuration() {
                 <FormConfigProvider>
                     <ItemProvider>
                         <WebSocketProvider url={WEBSOCKET_URL}>
-                            <ConfigSnackbar />
+                            <Snackbar />
                             <ConfigFormDialog />
                             <ConfigDrawer
                                 options={[
@@ -72,4 +48,3 @@ function Configuration() {
 
 
 export { Configuration };
-export type { FormComponentConfig, Item, Category };

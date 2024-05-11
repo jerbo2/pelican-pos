@@ -1,8 +1,8 @@
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, Query
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 import logging, json
-from typing import List
+from typing import List, Dict, Union
 
 from . import crud, models, schemas
 from .database import SessionLocal, engine
@@ -107,18 +107,46 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
 
 @app.put("/orders/{order_id}/add/{item_id}", response_model=schemas.Order)
 def add_to_active_order(
-    order_id: int, item_id: int, quantity: int = 1, db: Session = Depends(get_db)
+    order_id: int, item_id: int, configurations: List[Dict], db: Session = Depends(get_db)
 ):
+    print(order_id, item_id, configurations)
     db_order = crud.add_to_active_order(
-        db=db, order_id=order_id, item_id=item_id, quantity=quantity
+        db=db, order_id=order_id, item_id=item_id, configurations=configurations
     )
     return db_order
 
 
-@app.get("/categories/", response_model=list[schemas.Category])
-def read_categories(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    categories = crud.get_categories(db, skip=skip, limit=limit)
-    return categories
+@app.get("/orders/{order_id}", response_model=schemas.Order)
+def get_order(order_id: int, db: Session = Depends(get_db)):
+    db_order = crud.get_order(db, order_id=order_id)
+    if db_order is None:
+        raise HTTPException(status_code=404, detail="Order not found")
+    return db_order
+
+
+@app.get("/orders-items/{order_id}", response_model=list[schemas.OrderItem])
+def get_order_items(order_id: int, db: Session = Depends(get_db)):
+    db_order_items = crud.get_order_items(db, order_id=order_id)
+    return db_order_items
+
+
+@app.get(
+    "/categories/",
+    response_model=Union[List[schemas.Category], List[schemas.CategoryWithItems]],
+)
+def read_categories(
+    skip: int = 0,
+    limit: int = 100,
+    include_items: bool = Query(False, description="Include items in response"),
+    db: Session = Depends(get_db),
+):
+    categories = crud.get_categories(
+        db, skip=skip, limit=limit, include_items=include_items
+    )
+    if include_items:
+        return [schemas.CategoryWithItems.model_validate(category) for category in categories]
+    else:
+        return [schemas.Category.model_validate(category) for category in categories]
 
 
 @app.post("/categories/", response_model=schemas.Category)

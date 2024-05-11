@@ -6,7 +6,14 @@ import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import { Popup } from '../Styled';
 
-export default function TransitionsModal({children, openPopup, handleClosePopup}: {children: React.ReactNode, openPopup: boolean, handleClosePopup: () => void}) {
+interface TransitionsModalProps {
+  children: React.ReactNode;
+  openPopup: boolean;
+  handleClosePopup: () => void;
+  popup_sx?: any;
+}
+
+export default function TransitionsModal({children, openPopup, handleClosePopup, popup_sx}: TransitionsModalProps) {
   // const { openPopup, handleClosePopup } = useContext(ConfigurationContext);
 
   return (
@@ -25,7 +32,7 @@ export default function TransitionsModal({children, openPopup, handleClosePopup}
         }}
       >
         <Fade in={openPopup}>
-          <Popup>
+          <Popup sx={popup_sx}>
             {children}
           </Popup>
         </Fade>

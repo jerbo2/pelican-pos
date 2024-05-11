@@ -18,6 +18,8 @@ import LoadingIndicator from './components/Loading/LoadingIndicator';
 import NewOrder from './components/NewOrders/NewOrder';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { OrderProvider } from './components/NewOrders/contexts/OrderContext';
+import { UIProvider } from './components/BaseComps/contexts/UIContext';
 
 
 
@@ -40,7 +42,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/new-order",
-    element: <NewOrderLanding />,
+    element: <UIProvider><OrderProvider><NewOrderLanding /></OrderProvider></UIProvider>,
   },
   {
     path: "/new-order/:category",

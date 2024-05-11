@@ -3,7 +3,7 @@ import { useContext, useEffect } from 'react';
 import FormDialog from '../BaseComps/FormDialog';
 import { Button, TextField } from '../Styled';
 import { ItemContext } from './contexts/ItemContext';
-import { UIContext } from './contexts/UIContext';
+import { UIContext } from '../BaseComps/contexts/UIContext';
 
 export default function ConfigFormDialog() {
   const { itemName, storedItems, setItemName } = useContext(ItemContext);

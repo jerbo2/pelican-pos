@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import List, Union, Optional
+from pydantic import BaseModel, Json
+from typing import List, Dict, Union, Optional
 from datetime import datetime
 
 
@@ -42,35 +42,44 @@ class Item(ItemBase):
     class Config:
         from_attributes = True
 
+
 class OrderCreate(BaseModel):
     pass
 
+
 class OrderDelete(BaseModel):
     pass
+
 
 class Order(BaseModel):
     id: int
     created_at: datetime
     status: str
-    items: List[Item] = []
+
+    class Config:
+        from_attributes = True
+
+# OrderItem model has order & item ids, but item name and configs are most important to return
+class OrderItem(BaseModel):
+    item_name: str
+    configurations: List[Dict]
 
     class Config:
         from_attributes = True
 
 
-class CategoryBase(BaseModel):
-    name: str
-
-
-class CategoryCreate(CategoryBase):
+class CategoryCreate(BaseModel):
     pass
 
 
-class Category(CategoryBase):
+class Category(BaseModel):
     id: int
-    items: list[Item] = []
+    name: str
+    proper_name: str
 
     class Config:
         from_attributes = True
 
-    
+
+class CategoryWithItems(Category):
+    items: list[Item]

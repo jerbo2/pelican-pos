@@ -11,7 +11,7 @@ import Divider from '@mui/material/Divider';
 import { ButtonWidest, ListItemButton } from '../Styled';
 import PersistentDrawerLeft from '../BaseComps/PersistentDrawerLeft';
 
-import { UIContext } from "./contexts/UIContext";
+import { UIContext } from "../BaseComps/contexts/UIContext";
 import { ItemContext } from "./contexts/ItemContext";
 import { FormConfigContext } from "./contexts/FormConfigContext";
 import { WebSocketContext } from '../BaseComps/contexts/WebSocketContext';
@@ -118,7 +118,7 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
           <List>
             <ListItem>
               <ConfirmationButton
-                onDeleteConfirmed={onDeleteConfirmed}
+                onConfirmed={onDeleteConfirmed}
                 shiftAmount={0}
               >Delete</ConfirmationButton>
             </ListItem>
