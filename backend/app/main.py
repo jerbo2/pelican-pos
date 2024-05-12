@@ -153,3 +153,11 @@ def read_categories(
 def create_category(category: schemas.CategoryCreate, db: Session = Depends(get_db)):
     db_category = crud.create_category(db=db, category=category)
     return db_category
+
+
+@app.get("/order-items/{order_id}/price/{order_item_id}", response_model=float)
+def get_order_item_price(
+    order_id: int, order_item_id: int, db: Session = Depends(get_db)
+):
+    price = crud.get_order_item_price(db, order_id=order_id, order_item_id=order_item_id)
+    return price

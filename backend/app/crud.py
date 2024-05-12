@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import JSONB
+import operator
 
 from . import models, schemas
 
@@ -77,11 +78,12 @@ def add_to_active_order(db: Session, order_id: int, item_id: int, configurations
         ).first()
 
         if order_item:
-            # If the exact configuration exists, you might want to update or increment quantity (if applicable)
-            pass
+            order_item.quantity += 1
         else:
             # If not, create and add new OrderItem
+            prices = calculate_prices(db_item.form_cfg, configurations)
             new_order_item = models.OrderItem(order=db_order, item=db_item, configurations=func.cast(configurations, JSONB))
+            new_order_item.price = prices
             db.add(new_order_item)
         
         db.commit()
@@ -98,7 +100,54 @@ def get_order_items(db: Session, order_id: int):
         filter(models.OrderItem.order_id == order_id).\
         all()
     
-    result = [schemas.OrderItem(item_name=item_name, configurations=order_item.configurations) 
+    result = [schemas.OrderItem(item_name=item_name, configurations=order_item.configurations, quantity=order_item.quantity, price=order_item.price) 
               for order_item, item_name in order_items]
 
     return result
+
+
+operators = {
+    '+': operator.add,
+    '*': operator.mul,
+}
+
+def apply_operator(op, value, operand):
+    operation = operators[op]
+    return operation(value, operand)
+
+def calculate_prices(item_config, order_item_config):
+    price = 0
+
+    for form_config, item_config in zip(item_config, order_item_config): 
+        pricing_config = form_config.get("pricing_config")
+        op = pricing_config['priceFactor']
+        print(pricing_config, item_config)
+        if pricing_config['priceBy'] == "Constant":
+            price = apply_operator(op, float(pricing_config['constantValue']), price)
+        elif pricing_config['priceBy'] == "Per Option":
+            price = apply_operator(op, float(pricing_config['perOptionMapping'][item_config['value']]), price)
+        elif pricing_config['priceBy'] == "Option Value":
+            price = apply_operator(op, float(item_config['value']), price)
+    
+    return price
+
+def get_order_item_price(db: Session, order_id: int, order_item_id: int):
+    # Get the order item and item from the database
+    order_item = db.query(models.OrderItem).filter(models.OrderItem.id == order_item_id).first()
+    item = db.query(models.Item).filter(models.Item.id == order_item.item_id).first()
+
+    price = 0
+
+    # iterate over the configurations and calculate the price
+    for form_config, item_config in zip(item.form_cfg, order_item.configurations): 
+        pricing_config = form_config.get("pricing_config")
+        op = pricing_config['priceFactor']
+        if pricing_config['priceBy'] == "Constant":
+            price = apply_operator(op, float(pricing_config['constantValue']), price)
+        elif pricing_config['priceBy'] == "Per Option":
+            price = apply_operator(op, float(pricing_config['perOptionMapping'][item_config['value']]), price)
+        elif pricing_config['priceBy'] == "Option Value":
+            price = apply_operator(op, float(item_config['value']), price)
+    
+    return price
+    

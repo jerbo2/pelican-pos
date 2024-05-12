@@ -3,13 +3,18 @@ from typing import List, Dict, Union, Optional
 from datetime import datetime
 
 
-class SelectConfig(BaseModel):
+class ConfigBase(BaseModel):
+    pricing_config: Dict
+    order: int
+
+
+class SelectConfig(ConfigBase):
     type: str = "select"
     options: Optional[List[str]]
     label: Optional[str]
 
 
-class TextConfig(BaseModel):
+class TextConfig(ConfigBase):
     type: str = "textfield"
     placeholder: Optional[str]
     label: Optional[str]
@@ -59,10 +64,13 @@ class Order(BaseModel):
     class Config:
         from_attributes = True
 
+
 # OrderItem model has order & item ids, but item name and configs are most important to return
 class OrderItem(BaseModel):
     item_name: str
     configurations: List[Dict]
+    quantity: int
+    price: float
 
     class Config:
         from_attributes = True

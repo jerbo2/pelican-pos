@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float
 from sqlalchemy.dialects.postgresql import JSONB, ARRAY
 from sqlalchemy.orm import relationship
 
@@ -49,5 +49,6 @@ class OrderItem(Base):
     item_id = Column(Integer, ForeignKey('items.id'))
     configurations = Column(ARRAY(JSONB))
     quantity = Column(Integer, default=1)
+    price = Column(Float, default=0.0)
     order = relationship("Order", back_populates="items")
     item = relationship("Item", back_populates="orders")

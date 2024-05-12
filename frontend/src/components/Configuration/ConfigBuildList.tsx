@@ -19,7 +19,7 @@ export default function ConfigBuildList() {
     return (
         <Box>
             <CenterGrid container>
-                {formConfig.map((config, index) => {
+                {formConfig.map((_, index) => {
                     return (
                         <React.Fragment key={index}>
                             <CenterGrid item xs={12}>

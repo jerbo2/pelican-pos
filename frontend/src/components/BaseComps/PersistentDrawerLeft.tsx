@@ -12,6 +12,7 @@ import { DRAWER_WIDTH } from '../Constants';
 import { DrawerAppBar, DrawerHeader, DrawerMain, Button, CenterGrid } from '../Styled';
 
 import { useNavigate } from 'react-router';
+import BackIcon from './BackIcon';
 
 export default function PersistentDrawerLeft({
   appBarHeaderDrawerClosed,
@@ -35,66 +36,64 @@ export default function PersistentDrawerLeft({
   const navigate = useNavigate();
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <DrawerAppBar position="fixed" open={open}>
-        <Toolbar>
-          <CenterGrid container sx={{ flexGrow: 1 }}>
-            <CenterGrid item xs={4}>
-              <Button
-                color="inherit"
-                aria-label="back"
-                onClick={() => navigate(-1)}
-                sx={{
-                  ...(open && { display: 'none' }),
-                }}
-              >
-                <ArrowBackIosNewOutlinedIcon fontSize='large' />
-              </Button>
-            </CenterGrid>
-            <CenterGrid item xs={4}>
-              <Typography
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleOpenDrawer}
-                sx={{ ...(open && { display: 'none' }), cursor: 'pointer', fontSize: {xs: '1.25rem', sm: '2.25rem', md: '3rem'}}}
-                variant='h3'
-                fontWeight='bold'
-              >
-                {appBarHeaderDrawerClosed.toUpperCase()}
-              </Typography>
-            </CenterGrid>
-            <CenterGrid item xs={4} />
-          <CenterGrid item xs={12}>
-            <Typography variant="h3" fontWeight='bold' component="div" textAlign='center' sx={{ ...(!open && { display: 'none' }) }}>{appBarHeaderDrawerOpen}</Typography>
-          </CenterGrid>
-          </CenterGrid>
-        </Toolbar>
-      </DrawerAppBar>
-      <Drawer
-        sx={{
-          width: DRAWER_WIDTH,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
+    <CenterGrid container>
+      <Box sx={{ display: 'flex', width: '100%' }}>
+        <DrawerAppBar position="fixed" open={open}>
+          <Toolbar>
+            {!open ? (
+              <>
+                <CenterGrid item xs={2}>
+                  <BackIcon />
+                </CenterGrid>
+                <CenterGrid item xs={8}>
+                  <Typography
+                    color="inherit"
+                    aria-label="open drawer"
+                    onClick={handleOpenDrawer}
+                    sx={{ cursor: 'pointer', fontSize: { xs: '1.25rem', sm: '2.25rem', md: '3rem' } }}
+                    variant='h3'
+                    fontWeight='bold'
+                  >
+                    {appBarHeaderDrawerClosed.toUpperCase()}
+                  </Typography>
+                </CenterGrid>
+                <CenterGrid item xs={2} />
+              </>
+            )
+              : (
+                <CenterGrid item xs={12}>
+                  <Typography variant="h3" fontWeight='bold' component="div" textAlign='center'>{appBarHeaderDrawerOpen}</Typography>
+                </CenterGrid>
+              )
+            }
+          </Toolbar>
+        </DrawerAppBar>
+        <Drawer
+          sx={{
             width: DRAWER_WIDTH,
-            boxSizing: 'border-box',
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open}
-      >
-        <DrawerHeader>
-          <Typography variant="h4" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
-            {drawerHeader}
-          </Typography>
-        </DrawerHeader>
-        <Divider />
-        {drawerListChildren}
-      </Drawer>
-      <DrawerMain open={open}>
-        <DrawerHeader />
-        {whiteSpaceChildren}
-      </DrawerMain>
-    </Box>
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: DRAWER_WIDTH,
+              boxSizing: 'border-box',
+            },
+          }}
+          variant="persistent"
+          anchor="left"
+          open={open}
+        >
+          <DrawerHeader>
+            <Typography variant="h4" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
+              {drawerHeader}
+            </Typography>
+          </DrawerHeader>
+          <Divider />
+          {drawerListChildren}
+        </Drawer>
+        <DrawerMain open={open}>
+          <DrawerHeader />
+          {whiteSpaceChildren}
+        </DrawerMain>
+      </Box>
+    </CenterGrid>
   );
 }

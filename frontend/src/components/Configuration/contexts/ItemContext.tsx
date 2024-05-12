@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { Item, CategoryWithItems } from '../../BaseComps/dbTypes';
 import axios from 'axios';
 
@@ -6,9 +6,9 @@ const ItemContext = createContext<{
     itemName: string;
     storedItems: Item[];
     categoryID: number;
-    setStoredItems: (storedItems: Item[]) => void;
-    setCategoryID: (categoryID: number) => void;
-    setItemName: (itemName: string) => void;
+    setStoredItems: Dispatch<SetStateAction<Item[]>>;
+    setCategoryID: Dispatch<SetStateAction<number>>;
+    setItemName: Dispatch<SetStateAction<string>>;
     getStoredItems: () => void;
 }>({
     itemName: '',

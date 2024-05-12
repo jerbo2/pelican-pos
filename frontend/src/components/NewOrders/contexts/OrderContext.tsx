@@ -1,4 +1,4 @@
-import React, { useState, createContext, useEffect } from 'react';
+import React, { useState, createContext, useEffect, Dispatch, SetStateAction } from 'react';
 import { Order } from '../NewOrderForm';
 import axios from 'axios';
 
@@ -10,13 +10,15 @@ type Configuration = {
 type OrderItems = {
     item_name: string;
     configurations: Configuration[];
+    quantity: number;
+    price: number;
 }
 
 const OrderContext = createContext<{
     activeOrder: Order,
-    setActiveOrder: (order: Order) => void,
+    setActiveOrder: Dispatch<SetStateAction<Order>>,
     orderItems: OrderItems[],
-    setOrderItems: (orderItems: OrderItems[]) => void,
+    setOrderItems: Dispatch<SetStateAction<OrderItems[]>>
 }>({
     activeOrder: { id: -1, status: '', created_at: '' },
     setActiveOrder: () => { },

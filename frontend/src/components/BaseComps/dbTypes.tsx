@@ -1,8 +1,17 @@
+type PricingConfig = {
+    affectsPrice: boolean;
+    priceFactor?: string;
+    priceBy?: string;
+    constantValue?: string;
+    perOptionMapping?: Record<string, string>;
+}
+
 type FormComponentConfig = {
     label: string;
     type: string;
     order: number;
     options: string[];
+    pricing_config: PricingConfig;
 }
 
 type Item = {
@@ -22,4 +31,4 @@ interface CategoryWithItems extends Category {
     items: Item[];
 }
 
-export type { FormComponentConfig, Item, Category, CategoryWithItems }
+export type { PricingConfig, FormComponentConfig, Item, Category, CategoryWithItems }

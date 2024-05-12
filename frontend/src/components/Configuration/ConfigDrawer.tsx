@@ -18,6 +18,8 @@ import { WebSocketContext } from '../BaseComps/contexts/WebSocketContext';
 
 import ConfirmationButton from '../BaseComps/ConfirmationButton';
 
+import { FormComponentConfig } from '../BaseComps/dbTypes';
+
 export default function ConfigDrawer({ options, children }: { options: { name: string, icon: React.ReactNode }[], children: React.ReactNode }) {
   const { openDrawer, handleOpenDrawer, setOpenPopup, setOpenDrawer } = useContext(UIContext);
   const { itemName, storedItems, setStoredItems, setItemName } = useContext(ItemContext);
@@ -28,7 +30,14 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
     const messageData = JSON.parse(lastMessage || '{}');
     if (messageData.type === 'config-update' && formConfig.length !== 0) {
       console.log('updating form config')
-      setFormConfig(messageData.payload);
+      const selected = messageData.payload;
+      console.log('selected:', selected)
+      setFormConfig((prevState: FormComponentConfig[]) => {
+        const newConfig = [...prevState];
+        newConfig[selected.order] = selected;
+        console.log('newConfig:', newConfig)
+        return newConfig;
+    });
     }
     else if (messageData.type === 'items-update') {
       console.log('updating stored items')
@@ -70,7 +79,7 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
 
   const handleOpenPopup = (formObjType: string) => {
     setOpenPopup(true);
-    const newFormObject = { label: '', type: '', order: formConfig.length, options: [] };
+    const newFormObject = { label: '', type: '', order: formConfig.length, options: [], pricing_config: {affectsPrice: false}};
     switch (formObjType) {
       case 'Dropdown':
         newFormObject.label = '';
@@ -79,10 +88,6 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
       case 'Text Field':
         newFormObject.label = '';
         newFormObject.type = 'text';
-        break;
-      case 'Date & Time':
-        newFormObject.label = '';
-        newFormObject.type = 'datetime';
         break;
       default:
         newFormObject.label = '';

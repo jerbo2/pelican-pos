@@ -13,8 +13,9 @@ import { ItemProvider } from './contexts/ItemContext';
 import { WebSocketProvider } from '../BaseComps/contexts/WebSocketContext';
 import ConfigModal from './ConfigModal';
 
+const icon = <AddOutlinedIcon color='primary' fontSize='large' />;
+
 function Configuration() {
-    const icon = <AddOutlinedIcon color='primary' fontSize='large' />;
 
     return (
         <Box sx={{ width: '100vw', height: '100vh' }}>
@@ -28,7 +29,6 @@ function Configuration() {
                                 options={[
                                     { name: 'Dropdown', icon: icon },
                                     { name: 'Text Field', icon: icon },
-                                    { name: 'Date & Time', icon: icon },
                                 ]}
                                 children={
                                     <>

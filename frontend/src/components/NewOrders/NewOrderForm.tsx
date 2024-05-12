@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { FormConfigContext } from "../Configuration/contexts/FormConfigContext";
 import { ItemContext } from "../Configuration/contexts/ItemContext";
-import { CenterGrid, Circle, Divider, ButtonWidest } from "../Styled";
+import { CenterGrid, Circle, Divider } from "../Styled";
 import BasePreviewComponents from "../BaseComps/BasePreviewComponents";
 import BaseToolBar from "../BaseComps/BaseToolBar";
 import ConfirmationButton from "../BaseComps/ConfirmationButton";
@@ -9,6 +9,7 @@ import axios from "axios";
 import { UIContext } from "../BaseComps/contexts/UIContext";
 import { useNavigate } from "react-router";
 import { OrderContext } from "./contexts/OrderContext";
+import BackIcon from "../BaseComps/BackIcon";
 
 const confirmCancelOrderText = 'Are you sure you want to cancel?'
 const confirmSubmitWithoutAllFieldsText = 'Some fields are not filled out, is that okay?'
@@ -112,7 +113,7 @@ export default function NewOrderForm({ notShowCards, setNotShowCards }: { notSho
 
         <CenterGrid container>
             <CenterGrid item xs={12}>
-                <BaseToolBar pageName={pageName} />
+                <BaseToolBar pageName={pageName} leftIcon={!notShowCards ? <BackIcon/> : null}/>
             </CenterGrid>
             {notShowCards && (
                 <>

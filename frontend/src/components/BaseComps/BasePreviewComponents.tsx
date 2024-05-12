@@ -39,10 +39,6 @@ export default function BasePreviewComponents({ component, handleOnValueChange, 
                     ))}
                 </TextField>
             );
-        case 'datetime':
-            return (
-                <DateTimePicker sx={{width: '100%'}} minutesStep={5}/>
-            )
         default:
             return ('Oops. . .');
     }

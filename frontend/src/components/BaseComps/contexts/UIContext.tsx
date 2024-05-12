@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+import { Dispatch, createContext, useState, SetStateAction } from 'react';
 
 const UIContext = createContext<{
     openPopup: boolean;
@@ -6,11 +6,11 @@ const UIContext = createContext<{
     openDialog: boolean;
     openSnackbar: boolean;
     snackbarMessage: string;
-    setOpenSnackbar: (openSnackbar: boolean) => void;
-    setSnackbarMessage: (snackbarMessage: string) => void;
-    setOpenPopup: (openPopup: boolean) => void;
-    setOpenDrawer: (openDrawer: boolean) => void;
-    setOpenDialog: (openDialog: boolean) => void;
+    setOpenSnackbar: Dispatch<SetStateAction<boolean>>;
+    setSnackbarMessage: Dispatch<SetStateAction<string>>;
+    setOpenPopup: Dispatch<SetStateAction<boolean>>;
+    setOpenDrawer: Dispatch<SetStateAction<boolean>>;
+    setOpenDialog: Dispatch<SetStateAction<boolean>>;
     handleOpenDrawer: (create: boolean) => void;
 }>({
     openPopup: false,

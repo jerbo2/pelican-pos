@@ -18,10 +18,11 @@ import {
   Card as MUICard,
   CardContent as MUICardContent,
   CardActionArea as MUICardActionArea,
+  FormControlLabel as MUIFormControlLabel,
+  Checkbox as MUICheckbox,
 } from '@mui/material';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { DRAWER_WIDTH } from './Constants';
-import zIndex from '@mui/material/styles/zIndex';
 
 interface DialogProps extends MUIDialogProps {
   shiftamount?: number;
@@ -76,13 +77,14 @@ const Popup = styled(Box)(({ theme }) => ({
   transform: 'translate(-50%, -50%)',
   width: '70vw',
   minHeight: '10vh',
-  maxHeight: '100vh',
+  maxHeight: '85vh',
   backgroundColor: '#fff',
   border: `2px solid ${theme.palette.primary.main}`,
   color: theme.palette.primary.main,
   boxShadow: theme.shadows[24],
   padding: theme.spacing(2, 4, 3),
   borderRadius: '0.375rem',
+  overflowY: 'auto',
 }));
 
 const DrawerMain = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -272,6 +274,18 @@ const Dialog = styled(MUIDialog)<DialogProps>(({shiftamount = DRAWER_WIDTH / 2})
   },
 }));
 
+const FormControlLabel = styled(MUIFormControlLabel)({
+  '& .MuiTypography-root': {
+    fontSize: '2.15rem',
+  },
+});
+
+const Checkbox = styled(MUICheckbox)({
+  '& .MuiSvgIcon-root': {
+    fontSize: '2.15rem',
+  },
+});
+
 
 export {
   Button,
@@ -298,5 +312,7 @@ export {
   Card,
   CardContent,
   CardActionArea,
-  DraggableListBox
+  DraggableListBox,
+  FormControlLabel,
+  Checkbox,
 };

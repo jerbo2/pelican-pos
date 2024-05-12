@@ -10,35 +10,37 @@ import { FormComponentConfig } from '../BaseComps/dbTypes';
 import { WebSocketContext } from '../BaseComps/contexts/WebSocketContext';
 import BasePreviewComponents from '../BaseComps/BasePreviewComponents';
 import ConfirmationButton from '../BaseComps/ConfirmationButton';
+import ConfigPricingSequence from './ConfigPricingSequence';
 import axios from 'axios';
 
 const formCompDelConfirm = 'Are you sure you want to delete this form option?'
 
 export default function ConfigModalContent({ handleClosePopup }: { handleClosePopup: () => void }) {
     const { itemName, storedItems, categoryID, setStoredItems } = useContext(ItemContext);
-    const { formConfig, setFormConfig, selected } = useContext(FormConfigContext);
+    const { formConfig, setFormConfig, selected, setSelected } = useContext(FormConfigContext);
     const { setSnackbarMessage, setOpenSnackbar } = useContext(UIContext);
     const { sendMessage } = useContext(WebSocketContext);
 
     const [formOption, setFormOption] = useState<string>('');
     const [selectedFormOption, setSelectedFormOption] = useState<string>('');
     const [labelOption, setLabelOption] = useState<string>(selected.label || '');
+
     const optionElement = document.getElementById('select-option') as HTMLOptionElement;
 
     const formOptionNew = storedItems.find((item) => item.name === itemName)?.form_cfg.length !== formConfig.length;
 
-    function generateHash(data: FormComponentConfig[]) {
-        return data.reduce((acc, item) => acc + JSON.stringify(item), '');
+    function generateHash(data: FormComponentConfig) {
+        return JSON.stringify(data)
     }
 
-    async function handleSave(newFormConfig: FormComponentConfig[]) {
-        const item = storedItems.filter(item => item.name === itemName)[0];
-        const itemExists = item !== undefined;
+    async function handleSave(delComp?: boolean) {
+        const currentItem = storedItems.filter(item => item.name === itemName)[0];
+        const itemExists = currentItem !== undefined;
 
-        if (itemExists) {
-            const storedConfigHash = generateHash(item.form_cfg);
-            const currentConfigHash = generateHash(newFormConfig);
-            if (storedConfigHash === currentConfigHash) {
+        if (itemExists && !delComp) {
+            const currentConfigHash = generateHash(currentItem.form_cfg[selected.order]);
+            const newConfigHash = generateHash(selected);
+            if (currentConfigHash === newConfigHash) {
                 console.log('No changes detected');
                 handleClosePopup();
                 return;
@@ -46,14 +48,24 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
 
         }
 
-        const url = itemExists ? `/api/v1/items/update/${item.id}/` : '/api/v1/items/create/';
+        let newConfig = [...formConfig];
+        if (delComp) {
+            newConfig.splice(selected.order, 1);
+        }
+        else {
+            newConfig[selected.order] = selected;
+        }
+
+        const url = itemExists ? `/api/v1/items/update/${currentItem.id}/` : '/api/v1/items/create/';
         const axiosMethod = itemExists ? axios.put : axios.post;
 
         const payload = {
             "name": itemName,
-            "form_cfg": newFormConfig,
+            "form_cfg": newConfig,
             "category_id": categoryID,
         };
+
+        console.log('Payload:', payload);
 
         try {
             const res = await axiosMethod(url, payload);
@@ -61,10 +73,12 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
             setOpenSnackbar(true);
             const newStoredItems = itemExists ? storedItems.map(item => item.name === itemName ? res.data : item) : [...storedItems, res.data];
             setStoredItems(newStoredItems);
+            // update entire form config to reflect changes
             setFormConfig(res.data.form_cfg);
+            console.log(res.data.form_cfg)
 
             sendMessage(JSON.stringify({ type: 'items-update', payload: newStoredItems }));
-            sendMessage(JSON.stringify({ type: 'config-update', payload: res.data.form_cfg }));
+            sendMessage(JSON.stringify({ type: 'config-update', payload: res.data.form_cfg[selected.order] }));
             handleClosePopup();
         } catch (err) {
             console.log(err);
@@ -73,50 +87,36 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
         }
     }
 
-
     const handleEditOption = (mode: string) => {
         if (formOption.trim() !== '' || selectedFormOption !== '') {
+            if (mode === 'add' && selected.options.includes(formOption.trim())) {
+                setSnackbarMessage('Option already exists');
+                setOpenSnackbar(true);
+                return;
+            }
+
             // will need to check for all form components that have options
-            setFormConfig((prevFormConfig: FormComponentConfig[]) => {
-                const newConfig = [...prevFormConfig];
+            setSelected((prevSelected: FormComponentConfig) => {
+                const newSelected = { ...prevSelected };
+                const updatedOptions = mode === 'add' ? [...newSelected.options, formOption.trim()] : newSelected.options.filter((option) => option !== selectedFormOption);
+                newSelected.options = updatedOptions;
+                return newSelected;
+            });
 
-                const updatedFormObject = {
-                    ...newConfig[selected.order],
-                    options: mode === 'add' ? [...newConfig[selected.order].options, formOption.trim()] : newConfig[selected.order].options.filter((option) => option !== selectedFormOption)
-                };
-
-                newConfig[selected.order] = updatedFormObject;
-
-                return newConfig;
-
-            })
             setFormOption('');
             setSelectedFormOption('');
-            //setPreviewSelected([]);
             optionElement.value = '';
         }
 
     };
 
     useEffect(() => {
-        setFormConfig((prevFormConfig: FormComponentConfig[]) => {
-            const newConfig = [...prevFormConfig];
-            const updatedFormObject = { ...newConfig[selected.order], label: labelOption || '' };
-
-            newConfig[selected.order] = updatedFormObject;
-
-            return newConfig;
+        setSelected((prevSelected: FormComponentConfig) => {
+            const updatedSelected = { ...prevSelected, label: labelOption || '' };
+            return updatedSelected;
         });
 
     }, [labelOption]);
-
-
-    useEffect(() => {
-        if (selected.type === 'datetime' && formOptionNew) {
-            handleSave(formConfig);
-            handleClosePopup();
-        }
-    }, [selected.type]);
 
 
     const handleCancel = () => {
@@ -132,16 +132,13 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
     };
 
     const handleFormComponentDelete = () => {
-        const newFormConfig = [...formConfig];
-        newFormConfig.splice(selected.order, 1);
-
         handleClosePopup();
-
-        handleSave(newFormConfig);
+        handleSave(true);
     };
 
 
-    switch (formConfig[selected.order]?.type) {
+    // selected represents the specific form component that is being edited
+    switch (selected.type) {
         case 'single_select':
             return (
                 <CenterGrid container>
@@ -150,7 +147,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
                     </CenterGrid>
 
                     <CenterGrid item xs={12}>
-                        <BasePreviewComponents component={formConfig[selected.order]} />
+                        <BasePreviewComponents component={selected} />
                     </CenterGrid>
 
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
@@ -196,7 +193,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
                             value={selectedFormOption}
                             onChange={(e) => setSelectedFormOption(e.target.value)}
                         >
-                            {formConfig[selected.order]?.options.map((option: any) => (
+                            {selected.options.map((option: any) => (
                                 <MenuItem key={option} value={option}>{option}</MenuItem>
                             ))}
                         </TextField>
@@ -212,8 +209,12 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
 
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
 
+                    <ConfigPricingSequence />
+
+                    <CenterGrid item xs={12}><Divider /></CenterGrid>
+
                     <CenterGrid item xs={6}>
-                        <ButtonWidest variant='contained' onClick={() => { handleSave(formConfig) }}>Ok</ButtonWidest>
+                        <ButtonWidest variant='contained' onClick={handleSave}>Ok</ButtonWidest>
                     </CenterGrid>
 
                     <CenterGrid item xs={6}>
@@ -236,7 +237,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
                     </CenterGrid>
 
                     <CenterGrid item xs={12}>
-                        <BasePreviewComponents component={formConfig[selected.order]} />
+                        <BasePreviewComponents component={selected} />
                     </CenterGrid>
 
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
@@ -257,8 +258,12 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
 
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
 
+                    <ConfigPricingSequence />
+
+                    <CenterGrid item xs={12}><Divider /></CenterGrid>
+
                     <CenterGrid item xs={6}>
-                        <ButtonWidest variant='contained' onClick={() => { handleSave(formConfig) }}>Ok</ButtonWidest>
+                        <ButtonWidest variant='contained' onClick={handleSave}>Ok</ButtonWidest>
                     </CenterGrid>
 
                     <CenterGrid item xs={6}>
@@ -272,20 +277,6 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
                     )}
 
                 </CenterGrid>
-            );
-        case 'datetime':
-            return (
-                // datetime can't really be configured so just save and exit, only render when it's already established
-                !formOptionNew && (
-                    <CenterGrid container>
-                        <CenterGrid item xs={12}>
-                            <ButtonWidest variant='contained' onClick={handleCancel}>Ok</ButtonWidest>
-                        </CenterGrid>
-                        <CenterGrid item xs={12}>
-                            <ConfirmationButton onConfirmed={handleFormComponentDelete} dialogContent={formCompDelConfirm}>Delete</ConfirmationButton>
-                        </CenterGrid>
-                    </CenterGrid>
-                )
             );
         default:
             return <Box><span></span></Box>;

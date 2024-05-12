@@ -1,10 +1,13 @@
-import { CenterGrid, ButtonWider } from "../Styled"
+import { CenterGrid, ButtonWider, ButtonWidest } from "../Styled"
 import { useNavigate } from "react-router"
-import { Box } from "@mui/material"
+import { List, Hidden, Button, Typography, Divider, ListItem } from "@mui/material"
 import BaseToolBar from "./BaseToolBar"
 import { useEffect, useState } from "react";
 import axios from 'axios';
 import { Category } from "./dbTypes";
+import TemporaryDrawer from "./TemporaryDrawer";
+import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
+import Box from '@mui/material/Box';
 
 interface BaseItems {
     pageRoot: string;
@@ -12,9 +15,15 @@ interface BaseItems {
     rightIcon?: React.ReactNode;
 }
 
+
 export default function BaseItems({ pageRoot, pageName, rightIcon }: BaseItems) {
     const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
+    const [openDrawer, setOpenDrawer] = useState(false);
+
+    const toggleDrawer = (newOpen: boolean) => () => {
+        setOpenDrawer(newOpen);
+    };
 
     const handleRedirect = (category: string) => {
         navigate(`/${pageRoot}/${category}`)
@@ -28,13 +37,51 @@ export default function BaseItems({ pageRoot, pageName, rightIcon }: BaseItems) 
         get_categories()
     }, []);
 
+    const DrawerList = (
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
+            <List>
+                <ListItem>
+                    <ButtonWidest variant="contained" onClick={() => navigate('/')}>Home</ButtonWidest>
+                </ListItem>
+                <Divider />
+                <ListItem>
+                    <ButtonWidest variant="contained" onClick={() => navigate('/active-orders')}>Active</ButtonWidest>
+                </ListItem>
+                <ListItem>
+                    <ButtonWidest variant="contained" onClick={() => navigate('/new-order')}>New</ButtonWidest>
+                </ListItem>
+                <ListItem>
+                    <ButtonWidest variant="contained" onClick={() => navigate('/past-orders')}>Past</ButtonWidest>
+                </ListItem>
+                <Divider />
+                <ListItem>
+                    <ButtonWidest variant="contained" onClick={() => navigate('/config')}>Config</ButtonWidest>
+                </ListItem>
+                <Divider />
+            </List>
+        </Box>
+    )
+
     const toolbarHeight = '64px';
+
+    const leftIcon = (
+        <Hidden smDown>
+            <Button
+                color="inherit"
+                aria-label="back"
+                onClick={toggleDrawer(true)}
+            >
+                <MenuOutlinedIcon fontSize='large' />
+            </Button>
+        </Hidden>
+    )
 
     return (
         <Box sx={{ width: '100vw', height: '100vh' }}>
+            <TemporaryDrawer drawerList={DrawerList} openDrawer={openDrawer} toggleDrawer={toggleDrawer} />
             <CenterGrid container>
                 <CenterGrid item xs={12}>
-                    <BaseToolBar pageName={pageName} rightIcon={rightIcon} />
+                    <BaseToolBar pageName={pageName} leftIcon={leftIcon} rightIcon={rightIcon} />
                 </CenterGrid>
 
                 <CenterGrid container alignItems="center" justifyContent="center" sx={{ height: `calc(100vh - ${toolbarHeight})` }}>
