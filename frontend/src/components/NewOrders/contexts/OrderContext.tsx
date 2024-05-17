@@ -1,17 +1,15 @@
 import React, { useState, createContext, useEffect, Dispatch, SetStateAction } from 'react';
-import { Order } from '../NewOrderForm';
 import axios from 'axios';
+import { Order, OrderItems } from '../../BaseComps/dbTypes';
 
-type Configuration = {
-    label: string;
-    value: string;
-}
 
-type OrderItems = {
-    item_name: string;
-    configurations: Configuration[];
-    quantity: number;
-    price: number;
+export const defaultOrderItem: OrderItems = {
+    id: -1,
+    item_name: '',
+    category_name: '',
+    configurations: [],
+    quantity: 0,
+    price: 0
 }
 
 const OrderContext = createContext<{
@@ -19,16 +17,21 @@ const OrderContext = createContext<{
     setActiveOrder: Dispatch<SetStateAction<Order>>,
     orderItems: OrderItems[],
     setOrderItems: Dispatch<SetStateAction<OrderItems[]>>
+    editItem: OrderItems,
+    setEditItem: Dispatch<SetStateAction<OrderItems>>
 }>({
     activeOrder: { id: -1, status: '', created_at: '' },
     setActiveOrder: () => { },
     orderItems: [],
     setOrderItems: () => { },
+    editItem: defaultOrderItem,
+    setEditItem: () => { }
 });
 
 const OrderProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [activeOrder, setActiveOrder] = useState<Order>({ id: -1, status: '', created_at: '' });
     const [orderItems, setOrderItems] = useState<OrderItems[]>([]);
+    const [editItem, setEditItem] = useState<OrderItems>(defaultOrderItem);
 
     useEffect(() => {
         // retreive active order from session storage if available
@@ -45,7 +48,7 @@ const OrderProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     }, [])
 
     return (
-        <OrderContext.Provider value={{ activeOrder, setActiveOrder, orderItems, setOrderItems }}>
+        <OrderContext.Provider value={{ activeOrder, setActiveOrder, orderItems, setOrderItems, editItem, setEditItem }}>
             {children}
         </OrderContext.Provider>
     );

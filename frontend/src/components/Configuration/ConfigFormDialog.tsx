@@ -41,7 +41,6 @@ export default function ConfigFormDialog() {
       openDialog={openDialog}
       handleCloseDialog={handleCloseDialog}
       setItemName={handleSetItemName}
-      shiftAmount={0}
       dialogTitle="Create a new item!"
       dialogContent="Enter a name for this item below. . ."
       dialogActions={

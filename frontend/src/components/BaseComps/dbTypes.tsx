@@ -1,9 +1,22 @@
+type DependencyType = 'self' | 'external';
+
+interface Dependency {
+    name: string;
+    values: Record<string, number>;
+}
+
 type PricingConfig = {
     affectsPrice: boolean;
+    dependsOn?: Dependency;
     priceFactor?: string;
     priceBy?: string;
     constantValue?: string;
     perOptionMapping?: Record<string, string>;
+}
+
+type FormValue = {
+    label: string,
+    value: string
 }
 
 type FormComponentConfig = {
@@ -31,4 +44,24 @@ interface CategoryWithItems extends Category {
     items: Item[];
 }
 
-export type { PricingConfig, FormComponentConfig, Item, Category, CategoryWithItems }
+type Configuration = {
+    label: string;
+    value: string;
+}
+
+type OrderItems = {
+    id: number,
+    item_name: string;
+    category_name: string;
+    configurations: Configuration[];
+    quantity: number;
+    price: number;
+}
+
+type Order = {
+    id: number;
+    status: string;
+    created_at: string;
+}
+
+export type { Dependency, PricingConfig, FormValue, FormComponentConfig, Item, Category, CategoryWithItems, OrderItems, Order}

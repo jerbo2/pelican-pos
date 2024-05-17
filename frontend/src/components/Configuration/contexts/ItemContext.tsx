@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { Item, CategoryWithItems } from '../../BaseComps/dbTypes';
+import { useNavigate } from 'react-router';
 import axios from 'axios';
 
 const ItemContext = createContext<{
@@ -26,22 +27,28 @@ const ItemProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [storedItems, setStoredItems] = useState<Item[]>([]);
     const [categoryID, setCategoryID] = useState<number>(0);
 
-    const categoryName = window.location.pathname.split('/').pop();
+    const URL = window.location.pathname;
+    const categoryName = URL.split('/').pop();
+    const navigate = useNavigate();
 
-    const getStoredItems = () => {
-        axios.get('/api/v1/categories?include_items=True')
-            .then((res) => {
-                res.data.forEach((category: CategoryWithItems) => {
-                    if (category.name.toLowerCase() === categoryName?.toLowerCase()) {
-                        setStoredItems(category.items);
-                        setCategoryID(category.id);
-                    }
-                })
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-    }
+    const getStoredItems = async () => {
+        try {
+            const res = await axios.get('/api/v1/categories?include_items=True');
+            const match = res.data.find((category: CategoryWithItems) => category.name.toLowerCase() === categoryName?.toLowerCase());
+            if (match) {
+                setStoredItems(match.items);
+                setCategoryID(match.id);
+                console.log(`Category found: ${categoryName}`);
+            }
+            else {
+                console.error(`Category not found: ${categoryName}`);
+                // remove bad category from URL
+                navigate(URL.replace(categoryName || '', ''));
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     useEffect(() => {
         getStoredItems();

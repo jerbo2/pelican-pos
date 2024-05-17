@@ -37,6 +37,9 @@ class Order(Base):
     status = Column(
         String, default="pending"
     )  
+    customer_name = Column(String, index=True, nullable=True)
+    customer_phone_number = Column(String, index=True, nullable=True)
+    complete_at = Column(DateTime, nullable=True)
 
     # Relationships
     items = relationship("OrderItem", back_populates="order")

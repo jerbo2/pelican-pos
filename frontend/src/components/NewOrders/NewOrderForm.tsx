@@ -1,31 +1,22 @@
-import React, { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, Dispatch, SetStateAction } from "react";
 import { FormConfigContext } from "../Configuration/contexts/FormConfigContext";
 import { ItemContext } from "../Configuration/contexts/ItemContext";
-import { CenterGrid, Circle, Divider } from "../Styled";
-import BasePreviewComponents from "../BaseComps/BasePreviewComponents";
-import BaseToolBar from "../BaseComps/BaseToolBar";
-import ConfirmationButton from "../BaseComps/ConfirmationButton";
 import axios from "axios";
 import { UIContext } from "../BaseComps/contexts/UIContext";
 import { useNavigate } from "react-router";
 import { OrderContext } from "./contexts/OrderContext";
+import { Order } from "../BaseComps/dbTypes";
 import BackIcon from "../BaseComps/BackIcon";
+import NewOrderFormBase from "./NewOrderFormBase";
+import { FormValue } from "./NewOrderFormBase";
 
-const confirmCancelOrderText = 'Are you sure you want to cancel?'
-const confirmSubmitWithoutAllFieldsText = 'Some fields are not filled out, is that okay?'
+interface NewOrderFormProps {
+    showCards: boolean;
+    setShowCards: Dispatch<SetStateAction<boolean>>;
 
-type Order = {
-    id: number;
-    status: string;
-    created_at: string;
 }
 
-type FormValue = {
-    label: string,
-    value: string
-}
-
-export default function NewOrderForm({ notShowCards, setNotShowCards }: { notShowCards: boolean, setNotShowCards: (arg0: boolean) => void }) {
+export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormProps) {
     const { formConfig } = useContext(FormConfigContext);
     const { itemName, storedItems } = useContext(ItemContext);
     const { setSnackbarMessage, setOpenSnackbar } = useContext(UIContext);
@@ -34,18 +25,7 @@ export default function NewOrderForm({ notShowCards, setNotShowCards }: { notSho
     const [formValues, setFormValues] = useState<FormValue[]>([]);
     
     const navigate = useNavigate();
-    const [emptyFormConfirm, setEmptyFormConfirm] = useState(true);
-    const pageName = notShowCards ? `CREATING NEW ${itemName.toLocaleUpperCase()} ORDER` : 'SELECT AN ITEM'
-
-    useEffect(() => {
-        // check if all formValues are filled out
-        if (formValues.every(formValue => formValue.value !== '')) {
-            setEmptyFormConfirm(true);
-        } else {
-            setEmptyFormConfirm(false);
-        }
-    }, [formValues])
-
+    const pageName = !showCards ? `CREATING NEW ${itemName.toLocaleUpperCase()} ORDER` : 'SELECT AN ITEM'
 
     useEffect(() => {
         // create initial form values from formConfig (label with empty val)
@@ -89,6 +69,8 @@ export default function NewOrderForm({ notShowCards, setNotShowCards }: { notSho
             }
         });
 
+        console.log(configurations)
+
         try {
             const order = await axios.put(putUrl, configurations)
             setActiveOrder(order.data)
@@ -102,45 +84,15 @@ export default function NewOrderForm({ notShowCards, setNotShowCards }: { notSho
         }
     }
 
-    const handleOnValueChange = (index: number, value: string) => {
-        // Passed to BasePreviewComponents to update formValues
-        const updatedFormValues = [...formValues];
-        updatedFormValues[index].value = value;
-        setFormValues(updatedFormValues);
-    }
-
     return (
-
-        <CenterGrid container>
-            <CenterGrid item xs={12}>
-                <BaseToolBar pageName={pageName} leftIcon={!notShowCards ? <BackIcon/> : null}/>
-            </CenterGrid>
-            {notShowCards && (
-                <>
-                    {formConfig.map((_, index) => {
-                        return (
-                            <React.Fragment key={index}>
-
-                                <CenterGrid item xs={12}>
-                                    {/* <Circle>{index + 1}</Circle> */}
-                                    <BasePreviewComponents component={formConfig[index]} handleOnValueChange={handleOnValueChange} index={index} />
-                                </CenterGrid>
-                                <CenterGrid item key={`${index}_divider`} xs={12}>
-                                    <Divider />
-                                </CenterGrid>
-
-                            </React.Fragment>
-                        )
-                    })}
-                    <CenterGrid item xs={6}>
-                        <ConfirmationButton onConfirmed={() => setNotShowCards(false)} dialogContent={confirmCancelOrderText} shiftAmount={0}>CANCEL</ConfirmationButton>
-                    </CenterGrid>
-                    <CenterGrid item xs={6}>
-                        <ConfirmationButton onConfirmed={addToOrder} override={emptyFormConfirm} dialogContent={confirmSubmitWithoutAllFieldsText} shiftAmount={0}>SUBMIT</ConfirmationButton>
-                    </CenterGrid>
-                </>
-            )}
-        </CenterGrid>
+        <NewOrderFormBase
+            pageName={pageName}
+            initialValues={formValues}
+            handleSubmit={addToOrder}
+            handleCancel={()=>setShowCards(true)}
+            showCards={showCards}
+            toolbarLeftIcon={<BackIcon />}
+        />
     )
 }
 

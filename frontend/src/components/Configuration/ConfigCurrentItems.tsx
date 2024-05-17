@@ -11,7 +11,6 @@ export default function ConfigCurrentItems() {
 
     const handleTapCard = (str_id: string) => {
         const id = parseInt(str_id);
-        console.log(id)
         handleOpenDrawer(false);
         setItemName(storedItems[id].name);
         setFormConfig(storedItems[id].form_cfg);

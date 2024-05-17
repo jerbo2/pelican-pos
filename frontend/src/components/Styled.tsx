@@ -21,6 +21,7 @@ import {
   FormControlLabel as MUIFormControlLabel,
   Checkbox as MUICheckbox,
 } from '@mui/material';
+import {DateTimePicker as MUIDateTimePicker} from '@mui/x-date-pickers';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { DRAWER_WIDTH } from './Constants';
 
@@ -151,6 +152,18 @@ const TextField = styled(MUITextField)<TextFieldProps>({
   },
 });
 
+const TextFieldSmaller = styled(TextField)({
+  '& input': {
+    fontSize: '1.5rem',
+  },
+  '& label': {
+    fontSize: '1.5rem',
+  },
+  '& .MuiInputBase-root': {
+    fontSize: '1.5rem',
+  },
+});
+
 //MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper MuiMenu-paper MuiMenu-paper paper div containing the list
 //MuiList-root MuiList-padding MuiMenu-list for ul
 //MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters for li
@@ -265,7 +278,7 @@ const DraggableListBox = styled(Box)({
   touchAction: 'none',
 });
 
-const Dialog = styled(MUIDialog)<DialogProps>(({shiftamount = DRAWER_WIDTH / 2}) => ({
+const Dialog = styled(MUIDialog)<DialogProps>(({shiftamount = 0}) => ({
   '& .MuiDialog-container': {
     position: 'fixed',
     top: '50%',
@@ -286,6 +299,20 @@ const Checkbox = styled(MUICheckbox)({
   },
 });
 
+const DateTimePicker = styled(MUIDateTimePicker)({
+  width: '100%',
+  margin: '8px',
+  '& .MuiInputBase-input': {
+    fontSize: '1.5rem',
+  },
+  '& .MuiFormLabel-root': {
+    fontSize: '1.5rem',
+  },
+  '& label.MuiInputLabel-shrink': {
+    fontSize: '1rem',
+  },
+});
+
 
 export {
   Button,
@@ -297,6 +324,7 @@ export {
   DrawerAppBar,
   DrawerHeader,
   TextField,
+  TextFieldSmaller,
   Select,
   IconButton,
   IconButtonSmaller,
@@ -315,4 +343,5 @@ export {
   DraggableListBox,
   FormControlLabel,
   Checkbox,
+  DateTimePicker
 };

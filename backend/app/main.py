@@ -99,6 +99,16 @@ def delete_item(item_id: int, db: Session = Depends(get_db)):
     return crud.delete_item(db=db, item_id=item_id)
 
 
+@app.post("/items/{item_id}/check_price", response_model=float)
+def check_price(
+    item_id: int, configurations: List[Dict], db: Session = Depends(get_db)
+):
+    price = crud.check_item_price(db, item_id=item_id, configurations=configurations)
+    if price is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return price
+
+
 @app.post("/orders/create/", response_model=schemas.Order)
 def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
     db_order = crud.create_order(db=db, order=order)
@@ -107,7 +117,10 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
 
 @app.put("/orders/{order_id}/add/{item_id}", response_model=schemas.Order)
 def add_to_active_order(
-    order_id: int, item_id: int, configurations: List[Dict], db: Session = Depends(get_db)
+    order_id: int,
+    item_id: int,
+    configurations: List[Dict],
+    db: Session = Depends(get_db),
 ):
     print(order_id, item_id, configurations)
     db_order = crud.add_to_active_order(
@@ -129,6 +142,15 @@ def get_order_items(order_id: int, db: Session = Depends(get_db)):
     db_order_items = crud.get_order_items(db, order_id=order_id)
     return db_order_items
 
+@app.patch("/orders-items/{order_item_id}/update", response_model=schemas.OrderItemUpdate)
+def update_order_item(
+    order_item_id: int, configurations: List[Dict], db: Session = Depends(get_db)
+):
+    db_order_item = crud.update_order_item(
+        db=db, order_item_id=order_item_id, configurations=configurations
+    )
+    return db_order_item
+
 
 @app.get(
     "/categories/",
@@ -144,7 +166,10 @@ def read_categories(
         db, skip=skip, limit=limit, include_items=include_items
     )
     if include_items:
-        return [schemas.CategoryWithItems.model_validate(category) for category in categories]
+        return [
+            schemas.CategoryWithItems.model_validate(category)
+            for category in categories
+        ]
     else:
         return [schemas.Category.model_validate(category) for category in categories]
 
@@ -153,11 +178,3 @@ def read_categories(
 def create_category(category: schemas.CategoryCreate, db: Session = Depends(get_db)):
     db_category = crud.create_category(db=db, category=category)
     return db_category
-
-
-@app.get("/order-items/{order_id}/price/{order_item_id}", response_model=float)
-def get_order_item_price(
-    order_id: int, order_item_id: int, db: Session = Depends(get_db)
-):
-    price = crud.get_order_item_price(db, order_id=order_id, order_item_id=order_item_id)
-    return price

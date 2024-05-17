@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect } from 'react';
+import { ReactNode, useState, useEffect, ComponentType } from 'react';
 import { ButtonWidest } from '../Styled';
 import FormDialog from './FormDialog';
 
@@ -8,10 +8,11 @@ interface ConfirmationButtonProps {
     shiftAmount?: number;
     override?: boolean;
     children: ReactNode;
+    buttonType?: ComponentType<any>; // Accept any button component
 }
 
-function ConfirmationButton({ onConfirmed, dialogContent, shiftAmount, override, children }: ConfirmationButtonProps) {
-    const [open, setOpen] = useState(false);    
+function ConfirmationButton({ onConfirmed, dialogContent, shiftAmount, override, children, buttonType: ButtonType = ButtonWidest }: ConfirmationButtonProps) {
+    const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
         if (!override) {
@@ -33,9 +34,9 @@ function ConfirmationButton({ onConfirmed, dialogContent, shiftAmount, override,
 
     return (
         <>
-            <ButtonWidest variant="contained" onClick={handleClickOpen}>
+            <ButtonType variant='contained' onClick={handleClickOpen}>
                 {children}
-            </ButtonWidest>
+            </ButtonType>
             <FormDialog
                 openDialog={open}
                 handleCloseDialog={handleClose}

@@ -5,7 +5,6 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Landing from './components/Landing';
-import NewOrderLanding from './components/NewOrders/NewOrderLanding';
 import './index.scss'
 import ActiveOrders from './components/ActiveOrders';
 import PastOrders from './components/PastOrders';
@@ -18,8 +17,6 @@ import LoadingIndicator from './components/Loading/LoadingIndicator';
 import NewOrder from './components/NewOrders/NewOrder';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { OrderProvider } from './components/NewOrders/contexts/OrderContext';
-import { UIProvider } from './components/BaseComps/contexts/UIContext';
 
 
 
@@ -42,7 +39,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/new-order",
-    element: <UIProvider><OrderProvider><NewOrderLanding /></OrderProvider></UIProvider>,
+    element: <NewOrder />,
   },
   {
     path: "/new-order/:category",

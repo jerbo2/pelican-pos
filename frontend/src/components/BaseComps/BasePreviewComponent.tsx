@@ -1,25 +1,40 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TextField, MenuItem } from "../Styled"
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { FormComponentConfig } from "./dbTypes";
+import { FormComponentConfig, FormValue } from "./dbTypes";
 
-interface BasePreviewComponentsProps {
+interface BasePreviewComponentProps {
     component: FormComponentConfig;
-    handleOnValueChange?: (index: number, value: string) => void;
+    formValues?: FormValue[];
+    setFormValues?: React.Dispatch<React.SetStateAction<FormValue[]>>;
     index?: number;
+    initialValue?: string;
 }
 
-export default function BasePreviewComponents({ component, handleOnValueChange, index }: BasePreviewComponentsProps) {
+export default function BasePreviewComponent({ component, formValues, setFormValues, index, initialValue }: BasePreviewComponentProps) {
     const [previewSelected, setPreviewSelected] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (initialValue) {
+            const updatedPreviewSelected = [...previewSelected];
+            updatedPreviewSelected[component.order] = initialValue;
+            setPreviewSelected(updatedPreviewSelected);
+        }
+    }, [initialValue]);
 
     const handlePreviewSelectedChange = () => (e: React.ChangeEvent<HTMLInputElement>) => {
         const updatedPreviewSelected = [...previewSelected];
         updatedPreviewSelected[component.order] = e.target.value;
         setPreviewSelected(updatedPreviewSelected);
         // index and handleOnValueChange are optional depending on if the parent component needs to know the value
-        handleOnValueChange?.(index ?? -1, e.target.value);
+        //handleOnValueChange?.(index ?? -1, e.target.value);
+        if (formValues && setFormValues) {
+            const updatedFormValues = [...formValues];
+            updatedFormValues[index ?? -1].value = e.target.value;
+            setFormValues(updatedFormValues);
+        }
     }
+
 
     const commonProps = {
         label: component.label,
@@ -34,6 +49,7 @@ export default function BasePreviewComponents({ component, handleOnValueChange, 
         case 'single_select':
             return (
                 <TextField select variant='filled' {...commonProps}>
+                    <MenuItem value=''>—</MenuItem>
                     {component.options.map((option) => (
                         <MenuItem key={`preview_${option}`} value={option}>{option}</MenuItem>
                     ))}

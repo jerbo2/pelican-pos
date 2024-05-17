@@ -15,7 +15,7 @@ const FormConfigContext = createContext<{
 
 const FormConfigProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [formConfig, setFormConfig] = useState<FormComponentConfig[]>([]);
-    const [selected, setSelected] = useState<FormComponentConfig>({ label: '', type: '', order: 0, options: [], pricing_config: {affectsPrice: false} });
+    const [selected, setSelected] = useState<FormComponentConfig>({ label: '', type: '', order: 0, options: [], pricing_config: {affectsPrice: false, dependsOn: {name: '', values: {}}} });
 
     return (
         <FormConfigContext.Provider value={{ formConfig, selected, setFormConfig, setSelected }}>

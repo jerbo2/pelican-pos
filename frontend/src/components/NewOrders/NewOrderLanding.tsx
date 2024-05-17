@@ -1,8 +1,7 @@
 import { useContext, useEffect } from "react";
 import BaseItems from "../BaseComps/BaseItems";
-import { Hidden, Box } from "@mui/material";
+import { Hidden, Box, IconButton } from "@mui/material";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import { Button } from "../Styled";
 import { OrderContext } from "./contexts/OrderContext";
 import axios from "axios";
 import NewOrderModal from "./NewOrderModal";
@@ -11,7 +10,7 @@ import { UIContext } from "../BaseComps/contexts/UIContext";
 
 export default function NewOrderLanding() {
   const { activeOrder, setOrderItems, orderItems } = useContext(OrderContext);
-  const { openPopup, setOpenPopup } = useContext(UIContext);
+  const { setOpenPopup } = useContext(UIContext);
 
   useEffect(() => {
     const get_order_items = async () => {
@@ -32,13 +31,14 @@ export default function NewOrderLanding() {
       <BaseItems pageRoot="new-order" pageName="NEW ORDER" rightIcon=
         {activeOrder.id !== -1 && (
           <Hidden smDown>
-            <Button
+            <IconButton
               color="inherit"
               aria-label="back"
+              size="large"
               onClick={handleRightIconClick}
             >
               <ShoppingCartOutlinedIcon fontSize='large' />
-            </Button>
+            </IconButton>
           </Hidden>
         )} />
       <NewOrderModal />

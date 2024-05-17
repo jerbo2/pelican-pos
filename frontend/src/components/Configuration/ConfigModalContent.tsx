@@ -8,12 +8,16 @@ import { ItemContext } from './contexts/ItemContext';
 import { UIContext } from '../BaseComps/contexts/UIContext';
 import { FormComponentConfig } from '../BaseComps/dbTypes';
 import { WebSocketContext } from '../BaseComps/contexts/WebSocketContext';
-import BasePreviewComponents from '../BaseComps/BasePreviewComponents';
+import BasePreviewComponents from '../BaseComps/BasePreviewComponent';
 import ConfirmationButton from '../BaseComps/ConfirmationButton';
 import ConfigPricingSequence from './ConfigPricingSequence';
+import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
+import { DRAWER_WIDTH } from '../Constants';
+import _ from 'lodash';
 
 const formCompDelConfirm = 'Are you sure you want to delete this form option?'
+const closeWithoutSaving = 'Close without saving?'
 
 export default function ConfigModalContent({ handleClosePopup }: { handleClosePopup: () => void }) {
     const { itemName, storedItems, categoryID, setStoredItems } = useContext(ItemContext);
@@ -22,50 +26,53 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
     const { sendMessage } = useContext(WebSocketContext);
 
     const [formOption, setFormOption] = useState<string>('');
+    const [formOptionNew, setFormOptionNew] = useState<boolean>(false);
+    const [changeMade, setChangeMade] = useState<boolean>(false);
     const [selectedFormOption, setSelectedFormOption] = useState<string>('');
     const [labelOption, setLabelOption] = useState<string>(selected.label || '');
 
     const optionElement = document.getElementById('select-option') as HTMLOptionElement;
 
-    const formOptionNew = storedItems.find((item) => item.name === itemName)?.form_cfg.length !== formConfig.length;
+    useEffect(() => {
+        setFormOptionNew(storedItems.find((item) => item.name === itemName)?.form_cfg.length !== formConfig.length);
+    }, [formConfig]);
 
-    function generateHash(data: FormComponentConfig) {
-        return JSON.stringify(data)
-    }
-
-    async function handleSave(delComp?: boolean) {
-        const currentItem = storedItems.filter(item => item.name === itemName)[0];
-        const itemExists = currentItem !== undefined;
-
-        if (itemExists && !delComp) {
-            const currentConfigHash = generateHash(currentItem.form_cfg[selected.order]);
-            const newConfigHash = generateHash(selected);
-            if (currentConfigHash === newConfigHash) {
-                console.log('No changes detected');
-                handleClosePopup();
-                return;
-            }
-
-        }
-
-        let newConfig = [...formConfig];
-        if (delComp) {
-            newConfig.splice(selected.order, 1);
+    useEffect(() => {
+        const storedItem = storedItems.filter(item => item.name === itemName)[0];
+        if (!storedItem) return;
+        if (_.isEqual(storedItem.form_cfg[selected.order], selected)) {
+            setChangeMade(false);
         }
         else {
-            newConfig[selected.order] = selected;
+            setChangeMade(true);
+        }
+    }, [selected]);
+
+    async function handleSave(newFormConfig: FormComponentConfig[]) {
+        const storedItem = storedItems.filter(item => item.name === itemName)[0];
+        const itemExists = storedItem !== undefined;
+        
+        // if item exists, it isn't new, need to check if they are actually any changes
+        if (itemExists) {
+            // is lengths match, we are not deleting, skip check
+            if (storedItem.form_cfg.length === newFormConfig.length) {
+                // check if there are any changes
+                if (!changeMade) {
+                    console.log('No changes detected');
+                    handleClosePopup();
+                    return;
+                }
+            }
         }
 
-        const url = itemExists ? `/api/v1/items/update/${currentItem.id}/` : '/api/v1/items/create/';
+        const url = itemExists ? `/api/v1/items/update/${storedItem.id}/` : '/api/v1/items/create/';
         const axiosMethod = itemExists ? axios.put : axios.post;
 
         const payload = {
             "name": itemName,
-            "form_cfg": newConfig,
+            "form_cfg": newFormConfig,
             "category_id": categoryID,
         };
-
-        console.log('Payload:', payload);
 
         try {
             const res = await axiosMethod(url, payload);
@@ -75,8 +82,6 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
             setStoredItems(newStoredItems);
             // update entire form config to reflect changes
             setFormConfig(res.data.form_cfg);
-            console.log(res.data.form_cfg)
-
             sendMessage(JSON.stringify({ type: 'items-update', payload: newStoredItems }));
             sendMessage(JSON.stringify({ type: 'config-update', payload: res.data.form_cfg[selected.order] }));
             handleClosePopup();
@@ -131,10 +136,35 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
         handleClosePopup();
     };
 
-    const handleFormComponentDelete = () => {
+    const handleFormComponentDelete = async () => {
+        let newConfig = [...formConfig];
+        newConfig.splice(selected.order, 1);
         handleClosePopup();
-        handleSave(true);
+        await handleSave(newConfig);
     };
+
+    const handleOK = async () => {
+        let newConfig = [...formConfig];
+        newConfig[selected.order] = selected;
+        console.log(newConfig);
+        await handleSave(newConfig);
+    }
+
+    const renderCloseButton = () => {
+        return (
+            <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
+                <ConfirmationButton
+                    aria-label='dec'
+                    buttonType={IconButton}
+                    onConfirmed={handleCancel}
+                    override={!changeMade}
+                    shiftAmount={DRAWER_WIDTH / 2}
+                    dialogContent={closeWithoutSaving}>
+                    <CloseIcon fontSize='large' />
+                </ConfirmationButton>
+            </Box>
+        )
+    }
 
 
     // selected represents the specific form component that is being edited
@@ -142,6 +172,8 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
         case 'single_select':
             return (
                 <CenterGrid container>
+                    {renderCloseButton()}
+
                     <CenterGrid item xs={12}>
                         <Typography variant='h3' fontWeight='bold'>Preview</Typography>
                     </CenterGrid>
@@ -214,16 +246,16 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
 
                     <CenterGrid item xs={6}>
-                        <ButtonWidest variant='contained' onClick={handleSave}>Ok</ButtonWidest>
+                        <ButtonWidest variant='contained' onClick={handleOK}>Ok</ButtonWidest>
                     </CenterGrid>
 
                     <CenterGrid item xs={6}>
-                        <ButtonWidest variant='contained' onClick={handleCancel}>Cancel</ButtonWidest>
+                        <ConfirmationButton onConfirmed={handleCancel} override={!changeMade} dialogContent={closeWithoutSaving} shiftAmount={DRAWER_WIDTH / 2}>Cancel</ConfirmationButton>
                     </CenterGrid>
 
                     {!formOptionNew && (
                         <CenterGrid item xs={12}>
-                            <ConfirmationButton onConfirmed={handleFormComponentDelete} dialogContent={formCompDelConfirm}>Delete</ConfirmationButton>
+                            <ConfirmationButton onConfirmed={handleFormComponentDelete} dialogContent={formCompDelConfirm} shiftAmount={DRAWER_WIDTH / 2}>Delete</ConfirmationButton>
                         </CenterGrid>
                     )}
 
@@ -232,6 +264,12 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
         case 'text':
             return (
                 <CenterGrid container>
+                    <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
+                        <IconButton size='small' onClick={handleCancel}>
+                            <CloseIcon fontSize='large' />
+                        </IconButton>
+                    </Box>
+
                     <CenterGrid item xs={12}>
                         <Typography variant='h3' fontWeight='bold'>Preview</Typography>
                     </CenterGrid>
@@ -263,11 +301,11 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
 
                     <CenterGrid item xs={6}>
-                        <ButtonWidest variant='contained' onClick={handleSave}>Ok</ButtonWidest>
+                        <ButtonWidest variant='contained' onClick={handleOK}>Ok</ButtonWidest>
                     </CenterGrid>
 
                     <CenterGrid item xs={6}>
-                        <ButtonWidest variant='contained' onClick={handleCancel}>Cancel</ButtonWidest>
+                        <ConfirmationButton onConfirmed={handleCancel} override={!changeMade} dialogContent={closeWithoutSaving} shiftAmount={DRAWER_WIDTH / 2}>Cancel</ConfirmationButton>
                     </CenterGrid>
 
                     {!formOptionNew && (

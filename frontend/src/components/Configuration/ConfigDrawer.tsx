@@ -79,7 +79,7 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
 
   const handleOpenPopup = (formObjType: string) => {
     setOpenPopup(true);
-    const newFormObject = { label: '', type: '', order: formConfig.length, options: [], pricing_config: {affectsPrice: false}};
+    const newFormObject = { label: '', type: '', order: formConfig.length, options: [], pricing_config: {affectsPrice: false, dependsOn: {name: '', values: {}}}};
     switch (formObjType) {
       case 'Dropdown':
         newFormObject.label = '';
@@ -124,7 +124,6 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
             <ListItem>
               <ConfirmationButton
                 onConfirmed={onDeleteConfirmed}
-                shiftAmount={0}
               >Delete</ConfirmationButton>
             </ListItem>
           </List>

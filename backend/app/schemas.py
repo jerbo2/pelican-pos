@@ -60,6 +60,9 @@ class Order(BaseModel):
     id: int
     created_at: datetime
     status: str
+    customer_name: Optional[str]
+    customer_phone_number: Optional[str]
+    complete_at: Optional[datetime]
 
     class Config:
         from_attributes = True
@@ -67,9 +70,19 @@ class Order(BaseModel):
 
 # OrderItem model has order & item ids, but item name and configs are most important to return
 class OrderItem(BaseModel):
+    id: int
     item_name: str
+    category_name: str
     configurations: List[Dict]
     quantity: int
+    price: float
+
+    class Config:
+        from_attributes = True
+
+
+class OrderItemUpdate(BaseModel):
+    configurations: List[Dict]
     price: float
 
     class Config:
