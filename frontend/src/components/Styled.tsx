@@ -7,7 +7,6 @@ import {
   IconButton as MUIIconButton,
   Divider as MUIDivider,
   ListItemButton as MUIListItemButton,
-  ListItemIcon as MUIListItemIcon,
   FormControl as MUIFormControl,
   MenuItem as MUIMenuItem,
   DialogTitle as MUIDialogTitle,
@@ -20,8 +19,10 @@ import {
   CardActionArea as MUICardActionArea,
   FormControlLabel as MUIFormControlLabel,
   Checkbox as MUICheckbox,
+  Accordion as MUIAccordion,
 } from '@mui/material';
 import {DateTimePicker as MUIDateTimePicker} from '@mui/x-date-pickers';
+import {DataGrid as MUIDataGrid} from '@mui/x-data-grid';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { DRAWER_WIDTH } from './Constants';
 
@@ -29,7 +30,7 @@ interface DialogProps extends MUIDialogProps {
   shiftamount?: number;
 }
 
-const Button = styled(MuiButton)(({ theme }) => ({
+const Button = styled(MuiButton)({
   height: '40%',
   width: '50%',
   fontSize: '2.15rem',
@@ -46,7 +47,7 @@ const Button = styled(MuiButton)(({ theme }) => ({
     transform: 'scale(0.95)',
   },
   margin: '8px',
-}));
+});
 
 const ButtonWider = styled(Button)({
   width: '66.66%',
@@ -313,6 +314,35 @@ const DateTimePicker = styled(MUIDateTimePicker)({
   },
 });
 
+const DataGrid = styled(MUIDataGrid)({
+
+
+  '& .MuiDataGrid-row': {
+    fontSize: '1.25rem',
+  },
+
+  '& .MuiDataGrid-columnHeader': {
+    fontSize: '1.25rem',
+  },
+
+  '& .MuiTablePagination-root': {
+    fontSize: '1.25rem',
+  },
+
+  '& .MuiTablePagination-displayedRows': {
+    fontSize: '1.25rem',
+  },
+
+  '& .MuiTablePagination-selectLabel': {
+    fontSize: '1.25rem',
+  },
+  
+});
+
+const Accordion = styled(MUIAccordion)(({ theme }) => ({
+  border: `1px solid ${theme.palette.primary.main}`,
+}));
+
 
 export {
   Button,
@@ -343,5 +373,7 @@ export {
   DraggableListBox,
   FormControlLabel,
   Checkbox,
-  DateTimePicker
+  DateTimePicker, 
+  DataGrid,
+  Accordion
 };

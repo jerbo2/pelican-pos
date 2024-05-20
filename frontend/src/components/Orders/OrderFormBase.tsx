@@ -1,17 +1,17 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { FormConfigContext } from "../Configuration/contexts/FormConfigContext";
 import { CenterGrid, Divider } from "../Styled";
 import BasePreviewComponent from "../BaseComps/BasePreviewComponent";
 import BaseToolBar from "../BaseComps/BaseToolBar";
 import ConfirmationButton from "../BaseComps/ConfirmationButton";
-import { FormValue } from "../BaseComps/dbTypes";
+import { FormComponentConfig, FormValue } from "../BaseComps/dbTypes";
+import { OrderContext } from "./contexts/OrderContext";
 
 const confirmCancelOrderText = 'Are you sure you want to cancel?'
 const confirmSubmitWithoutAllFieldsText = 'Some fields are not filled out, is that okay?'
 
 interface NewOrderBaseProps {
     pageName: string;
-    initialValues?: FormValue[];
     handleSubmit: () => void;
     handleCancel: () => void;
     // optionals for base form
@@ -19,37 +19,71 @@ interface NewOrderBaseProps {
     showCards?: boolean;
 }
 
-export default function NewOrderFormBase({ pageName, initialValues, handleSubmit, handleCancel, toolbarLeftIcon, showCards }: NewOrderBaseProps) {
+// populate map with initial value where they exist, otherwise empty string
+const createInitialFormValues = (config: FormComponentConfig[], values: FormValue[]) => {
+    const valuesMap = values.reduce((map, obj) => {
+        map[obj.label] = obj.value;
+        return map;
+    }, {} as Record<string, string>);
+    
+    return config.map(configItem => ({
+        label: configItem.label,
+        value: valuesMap[configItem.label] || ''
+    }));
+};
+
+export default function OrderFormBase({ pageName, handleSubmit, handleCancel, toolbarLeftIcon, showCards }: NewOrderBaseProps) {
     const { formConfig } = useContext(FormConfigContext);
-    const [formValues, setFormValues] = useState<FormValue[]>([]);
+    const { formValues, editItem, setFormValues } = useContext(OrderContext);
     const [emptyFormConfirm, setEmptyFormConfirm] = useState(true);
+    const bottomRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+        let initialFormValues: FormValue[] = [];
+        if (editItem) {
+            initialFormValues = editItem.configurations.map(config => ({
+                label: config.label,
+                value: config.value
+            }));
+        }
+        else {
+            initialFormValues = formConfig.map(config => ({
+                label: config.label,
+                value: ''
+            }));
+        }
+
+        if (initialFormValues.length !== formConfig.length) {
+            // formConfig was changed after an order had been submitted, synchronize form values
+            const synchronizedFormValues = createInitialFormValues(formConfig, initialFormValues);
+            setFormValues(synchronizedFormValues);
+        } else {
+            setFormValues(initialFormValues);
+        }
+    }, [formConfig, editItem]);
 
     useEffect(() => {
         // check if all formValues are filled out
         if (formValues.every(formValue => formValue.value !== '')) {
             setEmptyFormConfirm(true);
+            scrollToBottom();
         } else {
             setEmptyFormConfirm(false);
         }
         console.log(formValues)
     }, [formValues])
 
-    useEffect(() => {
-        // create initial form values from formConfig (label with empty val)
-        const initialFormValues = initialValues || formConfig.map(config => ({
-            label: config.label,
-            value: ''
-        }));
-        setFormValues(initialFormValues);
-    }, [initialValues, formConfig]);
-
-    return (
+    return ( 
         <CenterGrid container>
             <CenterGrid item xs={12}>
                 <BaseToolBar pageName={pageName} leftIcon={showCards ? toolbarLeftIcon : null} />
             </CenterGrid>
             {!showCards && (
-                <>
+                <React.Fragment>                                    
                     {formConfig.map((_, index) => (
                         <React.Fragment key={index}>
                             <CenterGrid item xs={12}>
@@ -66,8 +100,9 @@ export default function NewOrderFormBase({ pageName, initialValues, handleSubmit
                     <CenterGrid item xs={6}>
                         <ConfirmationButton onConfirmed={handleSubmit} override={emptyFormConfirm} dialogContent={confirmSubmitWithoutAllFieldsText}>SUBMIT</ConfirmationButton>
                     </CenterGrid>
-                </>
+                </React.Fragment>
             )}
+            <div ref={bottomRef}/>
         </CenterGrid>
     );
 }

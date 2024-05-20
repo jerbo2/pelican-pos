@@ -1,10 +1,8 @@
-import { CenterGrid, Button } from "../Styled"
-import { Toolbar, Typography, AppBar, Hidden } from "@mui/material"
-import { useNavigate } from "react-router"
+import { CenterGrid } from "../Styled"
+import { Toolbar, Typography, AppBar } from "@mui/material"
 import React from "react"
 
 export default function BaseToolBar({ pageName, leftIcon, rightIcon }: { pageName: string, leftIcon?: React.ReactNode, rightIcon?: React.ReactNode }) {
-    const navigate = useNavigate();
     return (
         <AppBar position="static">
             <Toolbar>

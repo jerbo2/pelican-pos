@@ -1,4 +1,4 @@
-type DependencyType = 'self' | 'external';
+import { Dayjs } from "dayjs";
 
 interface Dependency {
     name: string;
@@ -7,6 +7,7 @@ interface Dependency {
 
 type PricingConfig = {
     affectsPrice: boolean;
+    isBasePrice?: boolean;
     dependsOn?: Dependency;
     priceFactor?: string;
     priceBy?: string;
@@ -32,6 +33,7 @@ type Item = {
     form_cfg: FormComponentConfig[];
     category_id: number;
     id: number;
+    tax_rate: number;
 }
 
 type Category = {
@@ -58,10 +60,16 @@ type OrderItems = {
     price: number;
 }
 
-type Order = {
+interface AdditionalOrderInfo {
+    customer_name?: string;
+    customer_phone_number?: string;
+    complete_at?: Dayjs | null;
+}
+
+type Order = AdditionalOrderInfo & {
     id: number;
     status: string;
     created_at: string;
 }
 
-export type { Dependency, PricingConfig, FormValue, FormComponentConfig, Item, Category, CategoryWithItems, OrderItems, Order}
+export type { Dependency, PricingConfig, FormValue, FormComponentConfig, Item, Category, CategoryWithItems, OrderItems, Order, AdditionalOrderInfo}

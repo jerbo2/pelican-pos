@@ -7,18 +7,22 @@ const ItemContext = createContext<{
     itemName: string;
     storedItems: Item[];
     categoryID: number;
+    taxRate: number;
     setStoredItems: Dispatch<SetStateAction<Item[]>>;
     setCategoryID: Dispatch<SetStateAction<number>>;
     setItemName: Dispatch<SetStateAction<string>>;
     getStoredItems: () => void;
+    setTaxRate: Dispatch<SetStateAction<number>>;
 }>({
     itemName: '',
     storedItems: [],
     categoryID: 0,
+    taxRate: 0,
     setItemName: () => { },
     setStoredItems: () => { },
     setCategoryID: () => { },
     getStoredItems: () => { },
+    setTaxRate: () => { },
 });
 
 
@@ -26,6 +30,7 @@ const ItemProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [itemName, setItemName] = useState<string>('');
     const [storedItems, setStoredItems] = useState<Item[]>([]);
     const [categoryID, setCategoryID] = useState<number>(0);
+    const [taxRate, setTaxRate] = useState<number>(0);
 
     const URL = window.location.pathname;
     const categoryName = URL.split('/').pop();
@@ -55,7 +60,7 @@ const ItemProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     }, []);
 
     return (
-        <ItemContext.Provider value={{ itemName, storedItems, categoryID, setStoredItems, setCategoryID, setItemName, getStoredItems }}>
+        <ItemContext.Provider value={{ itemName, storedItems, categoryID, taxRate, setStoredItems, setCategoryID, setItemName, getStoredItems, setTaxRate }}>
             {children}
         </ItemContext.Provider>
     );

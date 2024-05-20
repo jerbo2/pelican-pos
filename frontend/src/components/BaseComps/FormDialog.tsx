@@ -4,7 +4,18 @@ import { DialogContent } from '@mui/material';
 
 import { DialogContentText, DialogTitle, Dialog } from '../Styled';
 
-export default function FormDialog({ openDialog, handleCloseDialog, setItemName, dialogTitle, dialogContent, dialogActions, dialogExtras, shiftAmount }: { openDialog: boolean, handleCloseDialog: () => void, setItemName: (itemName: string) => void, dialogTitle: string, dialogContent: string, dialogActions: React.ReactNode, dialogExtras?: React.ReactNode, shiftAmount?: number}) {
+interface FormDialogProps {
+  openDialog: boolean;
+  handleCloseDialog: () => void;
+  handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;  
+  dialogTitle: string;
+  dialogContent: string;
+  dialogActions: React.ReactNode;
+  dialogExtras?: React.ReactNode;
+  shiftAmount?: number;
+}
+
+export default function FormDialog({ openDialog, handleCloseDialog, handleSubmit, dialogTitle, dialogContent, dialogActions, dialogExtras, shiftAmount }: FormDialogProps) {
 
   return (
     <Dialog
@@ -14,12 +25,7 @@ export default function FormDialog({ openDialog, handleCloseDialog, setItemName,
       PaperProps={{
         component: 'form',
         onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-          event.preventDefault();
-          const formData = new FormData(event.currentTarget);
-          const formJson = Object.fromEntries((formData as any).entries());
-          const itemName = formJson.itemName;
-          setItemName(itemName);
-          console.log(itemName);
+          handleSubmit(event);
         },
       }}
     >

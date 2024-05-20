@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect, ComponentType } from 'react';
+import { ReactNode, useState, ComponentType } from 'react';
 import { ButtonWidest } from '../Styled';
 import FormDialog from './FormDialog';
 
@@ -41,7 +41,7 @@ function ConfirmationButton({ onConfirmed, dialogContent, shiftAmount, override,
                 openDialog={open}
                 handleCloseDialog={handleClose}
                 shiftAmount={shiftAmount}
-                setItemName={() => { }}
+                handleSubmit={() => {}}
                 dialogTitle='Confirmation'
                 dialogContent={dialogContent || 'Are you sure you want to delete this item?'}
                 dialogActions={

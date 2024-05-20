@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import BaseItems from "../BaseComps/BaseItems";
+import BaseItems from "../BaseComps/BaseNav";
 import { Hidden, Box, IconButton } from "@mui/material";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { OrderContext } from "./contexts/OrderContext";
@@ -28,7 +28,7 @@ export default function NewOrderLanding() {
 
   return (
     <Box sx={{ width: '100vw', height: '100vh', overflowX: 'hidden' }}>
-      <BaseItems pageRoot="new-order" pageName="NEW ORDER" rightIcon=
+      <BaseItems pageRoot="order" pageName="ORDER EDITOR" rightIcon=
         {activeOrder.id !== -1 && (
           <Hidden smDown>
             <IconButton

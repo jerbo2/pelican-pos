@@ -11,5 +11,17 @@ export default defineConfig({
      watch: {
        usePolling: true
      }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // Return the directory name under node_modules
+            return id.toString().split('node_modules/')[1].split('/')[0];
+          }
+        }
+      }
+    }
   }
 })

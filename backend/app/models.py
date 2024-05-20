@@ -1,10 +1,8 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float
 from sqlalchemy.dialects.postgresql import JSONB, ARRAY
 from sqlalchemy.orm import relationship
-
 from .database import Base
-from datetime import datetime
-from zoneinfo import ZoneInfo
+import datetime
 
 
 class Category(Base):
@@ -24,6 +22,7 @@ class Item(Base):
     name = Column(String, index=True, unique=True)
     form_cfg = Column(JSONB, index=True)
     category_id = Column(Integer, ForeignKey("categories.id"))
+    tax_rate = Column(Float, default=0.0)
 
     category = relationship("Category", back_populates="items")
     orders = relationship("OrderItem", back_populates="item")
@@ -33,7 +32,7 @@ class Order(Base):
     __tablename__ = "orders"
 
     id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime, default=datetime.now(ZoneInfo("America/New_York")))
+    created_at = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
     status = Column(
         String, default="pending"
     )  

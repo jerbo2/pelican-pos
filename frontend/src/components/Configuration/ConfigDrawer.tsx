@@ -21,27 +21,36 @@ import ConfirmationButton from '../BaseComps/ConfirmationButton';
 import { FormComponentConfig } from '../BaseComps/dbTypes';
 
 export default function ConfigDrawer({ options, children }: { options: { name: string, icon: React.ReactNode }[], children: React.ReactNode }) {
-  const { openDrawer, handleOpenDrawer, setOpenPopup, setOpenDrawer } = useContext(UIContext);
-  const { itemName, storedItems, setStoredItems, setItemName } = useContext(ItemContext);
+  const { openDrawer, setOpenDialog, handleOpenDrawer, setOpenPopup, setOpenDrawer, setDialogType } = useContext(UIContext);
+  const { itemName, storedItems, setStoredItems, setItemName, setTaxRate } = useContext(ItemContext);
   const { formConfig, setFormConfig, setSelected } = useContext(FormConfigContext);
   const { lastMessage, sendMessage } = useContext(WebSocketContext);
 
   useEffect(() => {
     const messageData = JSON.parse(lastMessage || '{}');
-    if (messageData.type === 'config-update' && formConfig.length !== 0) {
-      console.log('updating form config')
-      const selected = messageData.payload;
-      console.log('selected:', selected)
-      setFormConfig((prevState: FormComponentConfig[]) => {
-        const newConfig = [...prevState];
-        newConfig[selected.order] = selected;
-        console.log('newConfig:', newConfig)
-        return newConfig;
-    });
-    }
-    else if (messageData.type === 'items-update') {
-      console.log('updating stored items')
-      setStoredItems(messageData.payload);
+    switch (messageData.type) {
+      case 'config-update':
+        if (formConfig.length !== 0) {
+          const selected = messageData.payload.config;
+          setFormConfig((prevState: FormComponentConfig[]) => {
+            const newConfig = [...prevState];
+            newConfig[selected.order] = selected;
+            console.log('newConfig:', newConfig)
+            return newConfig;
+          });
+        }
+        break;
+      case 'items-update':
+        setStoredItems(messageData.payload);
+        break;
+      case 'item-tax-rate-update':
+        setTaxRate(messageData.payload);
+        break;
+      case 'item-name-update':
+        setItemName(messageData.payload);
+        break;
+      default:
+        break;
     }
   }, [lastMessage]);
 
@@ -64,6 +73,7 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
   }
 
   const onDeleteConfirmed = async () => {
+    console.log('deleting:', itemName)
     const newStoredItems = await handleDelete(itemName);
     setStoredItems(newStoredItems || []);
     setOpenDrawer(false);
@@ -75,11 +85,12 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
     setOpenDrawer(false);
     setFormConfig([]);
     setItemName('');
+    setTaxRate(0);
   }
 
   const handleOpenPopup = (formObjType: string) => {
     setOpenPopup(true);
-    const newFormObject = { label: '', type: '', order: formConfig.length, options: [], pricing_config: {affectsPrice: false, dependsOn: {name: '', values: {}}}};
+    const newFormObject = { label: '', type: '', order: formConfig.length, options: [], pricing_config: { affectsPrice: false, dependsOn: { name: '', values: {} } } };
     switch (formObjType) {
       case 'Dropdown':
         newFormObject.label = '';
@@ -88,6 +99,10 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
       case 'Text Field':
         newFormObject.label = '';
         newFormObject.type = 'text';
+        break;
+      case 'Number':
+        newFormObject.label = '';
+        newFormObject.type = 'number';
         break;
       default:
         newFormObject.label = '';
@@ -121,6 +136,12 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
             </ListItem>
           </List>
           <List>
+          <ListItem>
+              <ButtonWidest variant='contained' onClick={() => {setDialogType('name');setOpenDialog(true)}}>Name</ButtonWidest>
+            </ListItem>
+            <ListItem>
+              <ButtonWidest variant='contained' onClick={() => {setDialogType('tax-rate');setOpenDialog(true)}}>Tax rate</ButtonWidest>
+            </ListItem>
             <ListItem>
               <ConfirmationButton
                 onConfirmed={onDeleteConfirmed}

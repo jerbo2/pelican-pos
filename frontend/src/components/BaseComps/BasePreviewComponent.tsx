@@ -16,6 +16,7 @@ export default function BasePreviewComponent({ component, formValues, setFormVal
 
     useEffect(() => {
         if (initialValue) {
+            console.log(initialValue)
             const updatedPreviewSelected = [...previewSelected];
             updatedPreviewSelected[component.order] = initialValue;
             setPreviewSelected(updatedPreviewSelected);
@@ -55,6 +56,8 @@ export default function BasePreviewComponent({ component, formValues, setFormVal
                     ))}
                 </TextField>
             );
+        case 'number':
+            return <TextField type='number' variant='filled' {...commonProps} inputProps={{min: '0', step: '0.5'}}/>;
         default:
             return ('Oops. . .');
     }

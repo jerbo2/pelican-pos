@@ -9,7 +9,11 @@ function Landing() {
       <CenterGrid container spacing={2} alignItems="center" justifyContent="center" style={{ height: '100%' }}>
 
         <CenterGrid item xs={12}>
-          <img src="/pelican-logo-1-no-bg-trimmed.png" alt="logo" style={{ height: '12.5rem', width: '12.5rem' }} />
+          <Box 
+            component='img' 
+            src="/pelican-logo-1-no-bg-trimmed.png" 
+            alt="logo" 
+            sx={{ height: '12.5rem', width: '12.5rem', '&:hover': {transform: 'scale(1.05)'}, transition: 'all 0.15s ease-in-out, transform 0.15s ease-in-out', }} />
         </CenterGrid>
 
         <CenterGrid item xs={12}>
@@ -19,7 +23,7 @@ function Landing() {
         </CenterGrid>
 
         <CenterGrid item xs={12}>
-          <Button variant="contained" fullWidth onClick={() => navigate('/new-order')}>
+          <Button variant="contained" fullWidth onClick={() => navigate('/order')}>
             New Order
           </Button>
         </CenterGrid>
@@ -31,13 +35,13 @@ function Landing() {
         </CenterGrid>
 
         <CenterGrid item xs={12} sm={6}>
-          <Button variant="contained" fullWidth>
+          <Button variant="contained" fullWidth sx={{fontSize: '2rem'}}>
             Open Drawer
           </Button>
         </CenterGrid>
 
-        <CenterGrid item xs={12} sm={6}>
-          <Button variant="contained" fullWidth onClick={() => navigate('/config')}>
+        <CenterGrid item xs={12} sm={6} >
+          <Button variant="contained" fullWidth onClick={() => navigate('/config')} sx={{fontSize: '2rem'}}>
             Config
           </Button>
         </CenterGrid>

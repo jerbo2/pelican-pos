@@ -6,6 +6,7 @@ import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import { Popup } from '../Styled';
 import type { DialogProps } from '@mui/material';
+import { POPUP_FADE_DURATION } from '../Constants';
 
 interface TransitionsModalProps {
   children: React.ReactNode;
@@ -15,7 +16,7 @@ interface TransitionsModalProps {
 }
 
 export default function TransitionsModal({ children, openPopup, handleClosePopup, popup_sx }: TransitionsModalProps) {
-  const baseHandleClosePopup: DialogProps['onClose'] = (event, reason) => {
+  const baseHandleClosePopup: DialogProps['onClose'] = (_, reason) => {
     if (reason && reason === 'backdropClick') return;
     handleClosePopup();
   };
@@ -36,7 +37,7 @@ export default function TransitionsModal({ children, openPopup, handleClosePopup
           },
         }}
       >
-        <Fade in={openPopup}>
+        <Fade in={openPopup} timeout={POPUP_FADE_DURATION}>
           <Popup sx={popup_sx}>
             {children}
           </Popup>

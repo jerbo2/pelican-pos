@@ -1,6 +1,6 @@
 import NewOrderCurrentItems from "./NewOrderCurrentItems"
 import NewOrderForm from "./NewOrderForm"
-import NewOrderFormEdit from "./NewOrderFormEdit"
+import NewOrderFormEdit from "./OrderFormEdit"
 import { Box } from "@mui/material"
 import { useState, useContext, useEffect } from "react"
 import { OrderContext } from "./contexts/OrderContext"
@@ -22,7 +22,7 @@ export default function NewOrderCreation() {
         <Box sx={{ width: '100vw', height: '100vh', overflowX: 'hidden' }}>
             {!editItemExists ? (
                 <NewOrderForm showCards={showCards} setShowCards={setShowCards} />) :
-                (<NewOrderFormEdit />)
+                (<NewOrderFormEdit rootPage="order"/>)
             }
             <NewOrderCurrentItems showCards={showCards} setShowCards={setShowCards} />
         </Box>

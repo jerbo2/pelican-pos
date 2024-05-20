@@ -1,5 +1,4 @@
-import { useContext, useState, useEffect, Dispatch, SetStateAction } from "react";
-import { FormConfigContext } from "../Configuration/contexts/FormConfigContext";
+import { useContext, Dispatch, SetStateAction } from "react";
 import { ItemContext } from "../Configuration/contexts/ItemContext";
 import axios from "axios";
 import { UIContext } from "../BaseComps/contexts/UIContext";
@@ -7,8 +6,7 @@ import { useNavigate } from "react-router";
 import { OrderContext } from "./contexts/OrderContext";
 import { Order } from "../BaseComps/dbTypes";
 import BackIcon from "../BaseComps/BackIcon";
-import NewOrderFormBase from "./NewOrderFormBase";
-import { FormValue } from "./NewOrderFormBase";
+import NewOrderFormBase from "./OrderFormBase";
 
 interface NewOrderFormProps {
     showCards: boolean;
@@ -17,24 +15,12 @@ interface NewOrderFormProps {
 }
 
 export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormProps) {
-    const { formConfig } = useContext(FormConfigContext);
     const { itemName, storedItems } = useContext(ItemContext);
     const { setSnackbarMessage, setOpenSnackbar } = useContext(UIContext);
-    const { activeOrder, setActiveOrder } = useContext(OrderContext);
+    const { activeOrder, setActiveOrder, formValues } = useContext(OrderContext);
 
-    const [formValues, setFormValues] = useState<FormValue[]>([]);
-    
     const navigate = useNavigate();
     const pageName = !showCards ? `CREATING NEW ${itemName.toLocaleUpperCase()} ORDER` : 'SELECT AN ITEM'
-
-    useEffect(() => {
-        // create initial form values from formConfig (label with empty val)
-        const initialFormValues = formConfig.map(config => ({
-            label: config.label,
-            value: ''
-        }));
-        setFormValues(initialFormValues);
-    }, [formConfig]);
 
     const createOrder = async () => {
         // GET request to create a new order
@@ -76,7 +62,7 @@ export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormPr
             setActiveOrder(order.data)
             setSnackbarMessage('Item added to order.')
             setOpenSnackbar(true)
-            navigate('/new-order')
+            navigate('/order')
         } catch (err) {
             console.error('Failed to add item to order:', err)
             setSnackbarMessage('Failed to add item to order.')
@@ -87,7 +73,6 @@ export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormPr
     return (
         <NewOrderFormBase
             pageName={pageName}
-            initialValues={formValues}
             handleSubmit={addToOrder}
             handleCancel={()=>setShowCards(true)}
             showCards={showCards}

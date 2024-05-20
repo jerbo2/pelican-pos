@@ -1,6 +1,6 @@
 import { CenterGrid, ButtonWider, ButtonWidest } from "../Styled"
 import { useNavigate } from "react-router"
-import { List, Hidden, Button, Typography, Divider, ListItem } from "@mui/material"
+import { List, Hidden, Button, Divider, ListItem } from "@mui/material"
 import BaseToolBar from "./BaseToolBar"
 import { useEffect, useState } from "react";
 import axios from 'axios';
@@ -13,10 +13,11 @@ interface BaseItems {
     pageRoot: string;
     pageName: string;
     rightIcon?: React.ReactNode;
+    renderItems?: boolean;
 }
 
 
-export default function BaseItems({ pageRoot, pageName, rightIcon }: BaseItems) {
+export default function BaseNav({ pageRoot, pageName, rightIcon, renderItems = true }: BaseItems) {
     const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -30,6 +31,7 @@ export default function BaseItems({ pageRoot, pageName, rightIcon }: BaseItems) 
     }
 
     useEffect(() => {
+        if (!renderItems) return;
         const get_categories = async () => {
             const response = await axios.get('/api/v1/categories?include_items=False');
             setCategories(response.data)
@@ -48,7 +50,7 @@ export default function BaseItems({ pageRoot, pageName, rightIcon }: BaseItems) 
                     <ButtonWidest variant="contained" onClick={() => navigate('/active-orders')}>Active</ButtonWidest>
                 </ListItem>
                 <ListItem>
-                    <ButtonWidest variant="contained" onClick={() => navigate('/new-order')}>New</ButtonWidest>
+                    <ButtonWidest variant="contained" onClick={() => navigate('/order')}>New</ButtonWidest>
                 </ListItem>
                 <ListItem>
                     <ButtonWidest variant="contained" onClick={() => navigate('/past-orders')}>Past</ButtonWidest>
@@ -77,26 +79,26 @@ export default function BaseItems({ pageRoot, pageName, rightIcon }: BaseItems) 
     )
 
     return (
-        <Box sx={{ width: '100vw', height: '100vh' }}>
+        <Box sx={{ width: '100vw', height: renderItems ? '100vh' : toolbarHeight }}>
             <TemporaryDrawer drawerList={DrawerList} openDrawer={openDrawer} toggleDrawer={toggleDrawer} />
             <CenterGrid container>
                 <CenterGrid item xs={12}>
                     <BaseToolBar pageName={pageName} leftIcon={leftIcon} rightIcon={rightIcon} />
                 </CenterGrid>
+                {renderItems && (
+                    <CenterGrid container alignItems="center" justifyContent="center" sx={{ height: `calc(100vh - ${toolbarHeight})` }}>
 
-                <CenterGrid container alignItems="center" justifyContent="center" sx={{ height: `calc(100vh - ${toolbarHeight})` }}>
-
-                    {categories.map((category: Category) => {
-                        return (
-                            <CenterGrid item xs={12} key={category.id}>
-                                <ButtonWider variant="contained" fullWidth onClick={() => handleRedirect(category.name)}>
-                                    {category.proper_name}
-                                </ButtonWider>
-                            </CenterGrid>
-                        )
-                    })}
-
-                </CenterGrid>
+                        {categories.map((category: Category) => {
+                            return (
+                                <CenterGrid item xs={12} key={category.id}>
+                                    <ButtonWider variant="contained" fullWidth onClick={() => handleRedirect(category.name)}>
+                                        {category.proper_name}
+                                    </ButtonWider>
+                                </CenterGrid>
+                            )
+                        })}
+                    </CenterGrid>
+                )}
             </CenterGrid>
         </Box>
     )

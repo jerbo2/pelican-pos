@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { FormConfigContext } from "./contexts/FormConfigContext";
 import { UIContext } from "../BaseComps/contexts/UIContext";
 import { Box, Typography } from '@mui/material';
-import { CenterGrid, Circle, IconButton, Divider, ButtonWidest, ButtonWider } from "../Styled";
+import { CenterGrid, Circle, IconButton, Divider } from "../Styled";
 import EditIcon from '@mui/icons-material/Edit';
 import BasePreviewComponent from "../BaseComps/BasePreviewComponent";
 import { FormValue } from "../BaseComps/dbTypes";
@@ -11,8 +11,8 @@ import { ItemContext } from "./contexts/ItemContext";
 
 export default function ConfigBuildList() {
     const { formConfig, setSelected } = useContext(FormConfigContext);
-    const { storedItems, itemName } = useContext(ItemContext);
-    const { setOpenPopup } = useContext(UIContext);
+    const { storedItems, itemName, taxRate } = useContext(ItemContext);
+    const { setOpenPopup, openDrawer } = useContext(UIContext);
     const [formValues, setFormValues] = useState<FormValue[]>([]);
     const [price, setPrice] = useState<number>(0);
 
@@ -39,16 +39,17 @@ export default function ConfigBuildList() {
         const configurations = formValues.map((formValue, _) => {
             return { label: formValue.label, value: formValue.value }
         })
+        console.log(configurations)
         const response = await axios.post(url, configurations)
         setPrice(response.data)
     }
 
     useEffect(() => {
-        if (formValues.length > 0 && formValues.every(formValue => formValue.value !== '')) {
+        if (formValues.length > 0 && formValues.every(formValue => formValue.value !== '' && openDrawer)) {
             console.log('checking price')
             checkPrice()
         }
-    }, [formValues, formConfig])
+    }, [formValues, formConfig, taxRate])
 
 
     return (

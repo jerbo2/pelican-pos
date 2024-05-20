@@ -1,8 +1,9 @@
-from pydantic import BaseModel, Json
+from pydantic import BaseModel
 from typing import List, Dict, Union, Optional
 from datetime import datetime
 
 
+# Configurations for form elements
 class ConfigBase(BaseModel):
     pricing_config: Dict
     order: int
@@ -20,13 +21,17 @@ class TextConfig(ConfigBase):
     label: Optional[str]
 
 
-FormElementConfig = Union[SelectConfig, TextConfig]  # will add more types later
+FormElementConfig = Union[
+    SelectConfig, TextConfig
+]  # Additional types can be added later
 
 
+# Item schemas
 class ItemBase(BaseModel):
     name: str
     form_cfg: List[FormElementConfig]
     category_id: int
+    tax_rate: float
 
 
 class ItemCreate(ItemBase):
@@ -34,7 +39,10 @@ class ItemCreate(ItemBase):
 
 
 class ItemUpdate(ItemBase):
-    pass
+    name: Optional[str] = None
+    form_cfg: Optional[List[FormElementConfig]] = None
+    category_id: Optional[int] = None
+    tax_rate: Optional[float] = None
 
 
 class ItemDelete(ItemBase):
@@ -48,6 +56,23 @@ class Item(ItemBase):
         from_attributes = True
 
 
+class UpdateItemField(BaseModel):
+    field: str
+    value: Union[str, int, float]
+
+    class Config:
+        from_attributes = True
+
+
+# Tax rate update schema
+class TaxRateUpdate(BaseModel):
+    tax_rate: float
+
+    class Config:
+        from_attributes = True
+
+
+# Order schemas
 class OrderCreate(BaseModel):
     pass
 
@@ -56,23 +81,23 @@ class OrderDelete(BaseModel):
     pass
 
 
-class Order(BaseModel):
-    id: int
-    created_at: datetime
-    status: str
+class OrderUpdate(BaseModel):
+    status: Optional[str]
     customer_name: Optional[str]
     customer_phone_number: Optional[str]
     complete_at: Optional[datetime]
+
+
+class Order(OrderUpdate):
+    id: int
+    created_at: datetime
 
     class Config:
         from_attributes = True
 
 
-# OrderItem model has order & item ids, but item name and configs are most important to return
-class OrderItem(BaseModel):
-    id: int
-    item_name: str
-    category_name: str
+# Order item schemas
+class OrderItemBase(BaseModel):
     configurations: List[Dict]
     quantity: int
     price: float
@@ -81,14 +106,23 @@ class OrderItem(BaseModel):
         from_attributes = True
 
 
+class OrderItem(OrderItemBase):
+    id: int
+    item_name: str
+    category_name: str
+
+
 class OrderItemUpdate(BaseModel):
-    configurations: List[Dict]
-    price: float
-
-    class Config:
-        from_attributes = True
+    configurations: Optional[List[Dict]] = None
+    quantity: Optional[int] = None
+    price: Optional[float] = None  # Include price if it might be updated
 
 
+class OrderItemDelete(OrderItemBase):
+    id: int
+
+
+# Category schemas
 class CategoryCreate(BaseModel):
     pass
 
@@ -103,4 +137,4 @@ class Category(BaseModel):
 
 
 class CategoryWithItems(Category):
-    items: list[Item]
+    items: List[Item]

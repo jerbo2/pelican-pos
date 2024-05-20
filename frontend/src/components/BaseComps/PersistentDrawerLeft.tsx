@@ -6,12 +6,9 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import { Box } from '@mui/material';
-import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
 
 import { DRAWER_WIDTH } from '../Constants';
-import { DrawerAppBar, DrawerHeader, DrawerMain, Button, CenterGrid } from '../Styled';
-
-import { useNavigate } from 'react-router';
+import { DrawerAppBar, DrawerHeader, DrawerMain, CenterGrid } from '../Styled';
 import BackIcon from './BackIcon';
 
 export default function PersistentDrawerLeft({
@@ -32,8 +29,6 @@ export default function PersistentDrawerLeft({
     open: boolean,
     handleOpenDrawer: () => void,
   }) {
-
-  const navigate = useNavigate();
 
   return (
     <CenterGrid container>

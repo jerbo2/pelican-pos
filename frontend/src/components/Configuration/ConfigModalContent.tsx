@@ -15,12 +15,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 import { DRAWER_WIDTH } from '../Constants';
 import _ from 'lodash';
+import CloseButton from '../BaseComps/CloseButton';
 
 const formCompDelConfirm = 'Are you sure you want to delete this form option?'
 const closeWithoutSaving = 'Close without saving?'
 
 export default function ConfigModalContent({ handleClosePopup }: { handleClosePopup: () => void }) {
-    const { itemName, storedItems, categoryID, setStoredItems } = useContext(ItemContext);
+    const { itemName, storedItems, categoryID, taxRate, setStoredItems } = useContext(ItemContext);
     const { formConfig, setFormConfig, selected, setSelected } = useContext(FormConfigContext);
     const { setSnackbarMessage, setOpenSnackbar } = useContext(UIContext);
     const { sendMessage } = useContext(WebSocketContext);
@@ -30,6 +31,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
     const [changeMade, setChangeMade] = useState<boolean>(false);
     const [selectedFormOption, setSelectedFormOption] = useState<string>('');
     const [labelOption, setLabelOption] = useState<string>(selected.label || '');
+    const [originalLabel, setOriginalLabel] = useState<string>('');
 
     const optionElement = document.getElementById('select-option') as HTMLOptionElement;
 
@@ -48,21 +50,18 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
         }
     }, [selected]);
 
+    useEffect(() => {
+        setOriginalLabel(selected.label);
+    }, []);
+
     async function handleSave(newFormConfig: FormComponentConfig[]) {
+        console.log('saving')
         const storedItem = storedItems.filter(item => item.name === itemName)[0];
-        const itemExists = storedItem !== undefined;
-        
-        // if item exists, it isn't new, need to check if they are actually any changes
-        if (itemExists) {
-            // is lengths match, we are not deleting, skip check
-            if (storedItem.form_cfg.length === newFormConfig.length) {
-                // check if there are any changes
-                if (!changeMade) {
-                    console.log('No changes detected');
-                    handleClosePopup();
-                    return;
-                }
-            }
+        const itemExists = !!storedItem;
+
+        if (itemExists && storedItem!.form_cfg.length === newFormConfig.length && !changeMade) {
+            handleClosePopup();
+            return;
         }
 
         const url = itemExists ? `/api/v1/items/update/${storedItem.id}/` : '/api/v1/items/create/';
@@ -72,6 +71,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
             "name": itemName,
             "form_cfg": newFormConfig,
             "category_id": categoryID,
+            "tax_rate": taxRate
         };
 
         try {
@@ -79,11 +79,12 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
             setSnackbarMessage(`${itemName} ${itemExists ? 'Updated' : 'Saved'}!`);
             setOpenSnackbar(true);
             const newStoredItems = itemExists ? storedItems.map(item => item.name === itemName ? res.data : item) : [...storedItems, res.data];
+            console.log('storing new items')
             setStoredItems(newStoredItems);
             // update entire form config to reflect changes
             setFormConfig(res.data.form_cfg);
             sendMessage(JSON.stringify({ type: 'items-update', payload: newStoredItems }));
-            sendMessage(JSON.stringify({ type: 'config-update', payload: res.data.form_cfg[selected.order] }));
+            sendMessage(JSON.stringify({ type: 'config-update', payload: res.data.form_cfg[selected.order]}));
             handleClosePopup();
         } catch (err) {
             console.log(err);
@@ -123,48 +124,38 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
 
     }, [labelOption]);
 
-
     const handleCancel = () => {
         // mismatch in lengths mean the form option is new / not yet saved. cancelling should remove it
         if (formOptionNew) {
             setFormConfig((prevFormConfig: FormComponentConfig[]) => {
-                const newConfig = [...prevFormConfig];
-                newConfig.pop();
-                return newConfig;
+                return prevFormConfig.slice(0, -1);
             });
         }
         handleClosePopup();
     };
 
     const handleFormComponentDelete = async () => {
-        let newConfig = [...formConfig];
-        newConfig.splice(selected.order, 1);
+        const newConfig = formConfig.filter((_, index) => index !== selected.order);
         handleClosePopup();
         await handleSave(newConfig);
     };
 
     const handleOK = async () => {
-        let newConfig = [...formConfig];
+        const newConfig = [...formConfig];
         newConfig[selected.order] = selected;
-        console.log(newConfig);
+        if (originalLabel !== "") {
+            const dependentComps = formConfig.filter((comp) => comp.pricing_config.dependsOn?.name === originalLabel);
+            if (dependentComps.length > 0) {
+                dependentComps.forEach((comp) => {
+                    newConfig[comp.order].pricing_config.dependsOn!.name = selected.label;
+                });
+            }
+        }
+        // remove whitespace from options and label
+        newConfig[selected.order].options = newConfig[selected.order].options.map((option: string) => option.trim());
+        newConfig[selected.order].label = newConfig[selected.order].label.trim();
         await handleSave(newConfig);
-    }
-
-    const renderCloseButton = () => {
-        return (
-            <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
-                <ConfirmationButton
-                    aria-label='dec'
-                    buttonType={IconButton}
-                    onConfirmed={handleCancel}
-                    override={!changeMade}
-                    shiftAmount={DRAWER_WIDTH / 2}
-                    dialogContent={closeWithoutSaving}>
-                    <CloseIcon fontSize='large' />
-                </ConfirmationButton>
-            </Box>
-        )
-    }
+    };
 
 
     // selected represents the specific form component that is being edited
@@ -172,7 +163,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
         case 'single_select':
             return (
                 <CenterGrid container>
-                    {renderCloseButton()}
+                    <CloseButton override={!changeMade} handleOnConfirmed={handleCancel} dialogContent={closeWithoutSaving} shiftAmount={DRAWER_WIDTH/2} />
 
                     <CenterGrid item xs={12}>
                         <Typography variant='h3' fontWeight='bold'>Preview</Typography>
@@ -246,11 +237,11 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
 
                     <CenterGrid item xs={6}>
-                        <ButtonWidest variant='contained' onClick={handleOK}>Ok</ButtonWidest>
+                        <ConfirmationButton onConfirmed={handleCancel} override={!changeMade} dialogContent={closeWithoutSaving} shiftAmount={DRAWER_WIDTH / 2}>Cancel</ConfirmationButton>
                     </CenterGrid>
 
                     <CenterGrid item xs={6}>
-                        <ConfirmationButton onConfirmed={handleCancel} override={!changeMade} dialogContent={closeWithoutSaving} shiftAmount={DRAWER_WIDTH / 2}>Cancel</ConfirmationButton>
+                        <ButtonWidest variant='contained' onClick={handleOK}>Ok</ButtonWidest>
                     </CenterGrid>
 
                     {!formOptionNew && (
@@ -262,6 +253,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
                 </CenterGrid>
             );
         case 'text':
+        case 'number':
             return (
                 <CenterGrid container>
                     <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
@@ -301,11 +293,11 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
 
                     <CenterGrid item xs={6}>
-                        <ButtonWidest variant='contained' onClick={handleOK}>Ok</ButtonWidest>
+                        <ConfirmationButton onConfirmed={handleCancel} override={!changeMade} dialogContent={closeWithoutSaving} shiftAmount={DRAWER_WIDTH / 2}>Cancel</ConfirmationButton>
                     </CenterGrid>
 
                     <CenterGrid item xs={6}>
-                        <ConfirmationButton onConfirmed={handleCancel} override={!changeMade} dialogContent={closeWithoutSaving} shiftAmount={DRAWER_WIDTH / 2}>Cancel</ConfirmationButton>
+                        <ButtonWidest variant='contained' onClick={handleOK}>Ok</ButtonWidest>
                     </CenterGrid>
 
                     {!formOptionNew && (
