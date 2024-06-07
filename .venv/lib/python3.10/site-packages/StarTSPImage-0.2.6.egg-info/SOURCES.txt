@@ -1,0 +1,11 @@
+LICENCE.txt
+README.md
+setup.cfg
+setup.py
+StarTSPImage/StarTSPImage.py
+StarTSPImage/__init__.py
+StarTSPImage.egg-info/PKG-INFO
+StarTSPImage.egg-info/SOURCES.txt
+StarTSPImage.egg-info/dependency_links.txt
+StarTSPImage.egg-info/requires.txt
+StarTSPImage.egg-info/top_level.txt

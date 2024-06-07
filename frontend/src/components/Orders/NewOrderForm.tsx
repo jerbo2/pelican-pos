@@ -7,6 +7,8 @@ import { OrderContext } from "./contexts/OrderContext";
 import { Order } from "../BaseComps/dbTypes";
 import BackIcon from "../BaseComps/BackIcon";
 import NewOrderFormBase from "./OrderFormBase";
+import { updateItemWithFormConfig } from "../Configuration/ConfigBuildList";
+import { FormConfigContext } from "../Configuration/contexts/FormConfigContext";
 
 interface NewOrderFormProps {
     showCards: boolean;
@@ -16,6 +18,7 @@ interface NewOrderFormProps {
 
 export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormProps) {
     const { itemName, storedItems } = useContext(ItemContext);
+    const { formConfig } = useContext(FormConfigContext)
     const { setSnackbarMessage, setOpenSnackbar } = useContext(UIContext);
     const { activeOrder, setActiveOrder, formValues } = useContext(OrderContext);
 
@@ -38,6 +41,8 @@ export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormPr
             console.error(`Couldn't find ${itemName} in storedItems.`);
             return;
         }
+
+        await updateItemWithFormConfig(item_to_add.id, formConfig, formValues)
 
         let orderID = activeOrder.id
 

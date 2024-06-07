@@ -7,10 +7,11 @@ import { OrderContext, defaultOrderItem } from "./contexts/OrderContext";
 import { OrderItems, Order } from "../BaseComps/dbTypes";
 import NewOrderFormBase from "./OrderFormBase";
 import axios from "axios";
+import { updateItemWithFormConfig } from "../Configuration/ConfigBuildList";
 
 
 export default function OrderFormEdit({rootPage}: {rootPage: string}) {
-    const { setFormConfig } = useContext(FormConfigContext);
+    const { setFormConfig, formConfig } = useContext(FormConfigContext);
     const { editItem, formValues, setEditItem, setOrderItems } = useContext(OrderContext);
     const { storedItems } = useContext(ItemContext);
     const { setOpenPopup, setOpenSnackbar, setSnackbarMessage } = useContext(UIContext);
@@ -41,6 +42,8 @@ export default function OrderFormEdit({rootPage}: {rootPage: string}) {
             const payload = {
                 configurations: configurations,
             }
+            
+            await updateItemWithFormConfig(editItem.item_id, formConfig, formValues)
 
             console.log('edit payload', payload)
 

@@ -9,9 +9,14 @@ interface ConfirmationButtonProps {
     override?: boolean;
     children: ReactNode;
     buttonType?: ComponentType<any>; // Accept any button component
+    disabled?: boolean;
+    color?: 'primary' | 'secondary';
+    type?: 'button' | 'submit' | 'reset';
+    variant?: string;
+    onUnconfirmed?: () => void;
 }
 
-function ConfirmationButton({ onConfirmed, dialogContent, shiftAmount, override, children, buttonType: ButtonType = ButtonWidest }: ConfirmationButtonProps) {
+function ConfirmationButton({ onConfirmed, dialogContent, shiftAmount = 0, override, children, buttonType: ButtonType = ButtonWidest, disabled, color, type, onUnconfirmed, variant = 'contained' }: ConfirmationButtonProps) {
     const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
@@ -24,6 +29,9 @@ function ConfirmationButton({ onConfirmed, dialogContent, shiftAmount, override,
     };
 
     const handleClose = () => {
+        if (onUnconfirmed) {
+            onUnconfirmed();
+        }
         setOpen(false);
     };
 
@@ -34,7 +42,7 @@ function ConfirmationButton({ onConfirmed, dialogContent, shiftAmount, override,
 
     return (
         <>
-            <ButtonType variant='contained' onClick={handleClickOpen}>
+            <ButtonType variant={variant} onClick={handleClickOpen} disabled={disabled} color={color} type={type}>
                 {children}
             </ButtonType>
             <FormDialog

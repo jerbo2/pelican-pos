@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 from typing import List, Dict, Union, Optional
 from datetime import datetime
 
@@ -81,16 +81,43 @@ class OrderDelete(BaseModel):
     pass
 
 
-class OrderUpdate(BaseModel):
-    status: Optional[str]
-    customer_name: Optional[str]
-    customer_phone_number: Optional[str]
-    complete_at: Optional[datetime]
+class Transaction(BaseModel):
+    id: Optional[int] = None
+    payment_method: Optional[str] = None
+    total_non_taxable: Optional[float] = None
+    total_taxable: Optional[float] = None
+    collected_tax: Optional[float] = None
+    total_amount: Optional[float] = None
+    cash_paid: Optional[float] = None
+    card_paid: Optional[float] = None
+    change_given: Optional[float] = None
+    transaction_date: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+        exclude = {"order_id"}
 
 
-class Order(OrderUpdate):
-    id: int
-    created_at: datetime
+class TransactionTotals(BaseModel):
+    id: Optional[int] = None
+    date: Optional[str] = None
+    total_sales: Optional[str] = None
+    total_taxable: Optional[str] = None
+    total_non_taxable: Optional[str] = None
+    total_tax: Optional[str] = None
+    total_cash: Optional[str] = None
+    total_card: Optional[str] = None
+
+
+
+class Order(BaseModel):
+    id: Optional[int] = None
+    created_at: Optional[datetime] = None
+    status: Optional[str] = None
+    customer_name: Optional[str] = None
+    customer_phone_number: Optional[str] = None
+    complete_at: Optional[datetime] = None
+    transaction: Optional[Transaction] = None
 
     class Config:
         from_attributes = True
@@ -101,6 +128,8 @@ class OrderItemBase(BaseModel):
     configurations: List[Dict]
     quantity: int
     price: float
+    tax: float
+    printed: bool
 
     class Config:
         from_attributes = True
@@ -109,13 +138,15 @@ class OrderItemBase(BaseModel):
 class OrderItem(OrderItemBase):
     id: int
     item_name: str
+    item_id: int
     category_name: str
 
 
 class OrderItemUpdate(BaseModel):
     configurations: Optional[List[Dict]] = None
     quantity: Optional[int] = None
-    price: Optional[float] = None  # Include price if it might be updated
+    price: Optional[float] = None
+    printed: Optional[bool] = None
 
 
 class OrderItemDelete(OrderItemBase):
@@ -138,3 +169,12 @@ class Category(BaseModel):
 
 class CategoryWithItems(Category):
     items: List[Item]
+
+
+class TicketData(BaseModel):
+    order_item_id: int
+    eat_in: bool
+
+
+class Ticket(RootModel[List[TicketData]]):
+    pass

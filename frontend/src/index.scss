@@ -67,3 +67,19 @@ h1 {
     background-color: #f9f9f9;
   }
 }
+
+@media screen {
+	.ticket {
+		display: none;
+    margin: 0;
+    padding: 0;
+	}
+}
+
+@media print {
+  .ticket {
+    margin: 0;
+    padding: 0;
+    size: 297mm 210mm;
+  }
+}

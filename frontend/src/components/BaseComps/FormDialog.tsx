@@ -21,7 +21,7 @@ export default function FormDialog({ openDialog, handleCloseDialog, handleSubmit
     <Dialog
       open={openDialog}
       onClose={handleCloseDialog}
-      shiftamount={shiftAmount}
+      shiftamount={shiftAmount ?? 0}
       PaperProps={{
         component: 'form',
         onSubmit: (event: React.FormEvent<HTMLFormElement>) => {

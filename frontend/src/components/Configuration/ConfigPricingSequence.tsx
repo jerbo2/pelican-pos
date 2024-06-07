@@ -177,7 +177,7 @@ function ConfigPricingSequence() {
 
     const [selectedFormOptions, setSelectedFormOptions] = useState<Record<string, string>>({ 'Self': '', 'Per Option': '' });
 
-    const priceByOptions = useMemo(() => selected.type.includes('select') ? ["Per Option", "Option Value", "Constant", "Scaled Option Value"] : ["Constant"], [selected.type]);
+    const priceByOptions = useMemo(() => selected.type.includes('select') ? ["Per Option", "Option Value", "Constant", "Scaled Option Value"] : ["Constant", "Input"], [selected.type]);
 
     const commonNumberFieldProps = useMemo(() => ({
         inputRef: inputRef,
@@ -216,7 +216,7 @@ function ConfigPricingSequence() {
     useEffect(() => {
         if (state.priceBy) {
             let priceFactor = '';
-            if (state.priceBy !== 'Dependency') {
+            if (state.priceBy !== 'Dependency' && state.priceBy !== 'Input') {
                 const substrings = ["Option Value"];
                 const included = substrings.some((option) => state.priceBy.includes(option));
                 priceFactor = included ? '×' : '+';
@@ -299,10 +299,24 @@ function ConfigPricingSequence() {
     }, []);
 
     const requiresConstantValue = useMemo(() => state.priceBy === 'Constant' || state.priceBy === 'Scaled Option Value', [state.priceBy]);
-    const isBasePriceOption = useMemo(() => state.affectsPrice && !['Option Value', 'Dependency'].some(option => state.priceBy.includes(option)), [state.affectsPrice, state.priceBy]);
+    const isBasePriceOption = useMemo(() => (state.affectsPrice && state.priceBy) && !['Option Value', 'Dependency'].some(option => state.priceBy.includes(option)), [state.affectsPrice, state.priceBy]);
 
     const gridConfig = useMemo(() => ({ affectsPrice: state.affectsPrice, dependsOn: state.dependsOn, priceBy: state.priceBy }), [state.affectsPrice, state.dependsOn, state.priceBy]);
     const { dependsOnGridSize, priceByGridSize } = useGridSizes(gridConfig);
+
+    const renderPriceFactorSelect = (xs: number) => {
+        return (
+            <CenterGrid item xs={xs}>
+                <BaseTextField
+                    label={`Price Factor`}
+                    value={state.priceFactor || '+'}
+                    select
+                    onChange={(e) => dispatch({ type: ActionType.SetPriceFactor, payload: e.target.value })}
+                    options={['+', '×'].map(option => ({ value: option, label: option }))}
+                />
+            </CenterGrid>
+        )
+    }
 
     return (
         <CenterGrid container>
@@ -312,6 +326,7 @@ function ConfigPricingSequence() {
                         <FormControlLabel
                             control={<ControlledCheckbox checked={state.affectsPrice} onChange={(e) => dispatch({ type: ActionType.SetAffectsPrice, payload: e.target.checked })} />}
                             label="Affects Price?"
+                            disabled={selected.type === 'price'}
                         />
                     </FormGroup>
                 </Box>
@@ -323,6 +338,7 @@ function ConfigPricingSequence() {
                         <FormControlLabel
                             control={<ControlledCheckbox disabled={false} checked={state.isBasePrice} onChange={(e) => dispatch({ type: ActionType.SetIsBasePrice, payload: e.target.checked })} />}
                             label="Base Price?"
+                            disabled={selected.type === 'price'}
                         />
                     </FormGroup>
                 </Box>
@@ -334,6 +350,7 @@ function ConfigPricingSequence() {
                     label="Depends on"
                     value={state.dependsOn.name || ''}
                     onChange={handleDependsOnChange}
+                    disabled={!(selected.type.includes('select'))}
                     options={[
                         { value: '', label: '—' },
                         ...formConfig.filter(config => config.label !== selected.label).map(config => ({
@@ -375,15 +392,7 @@ function ConfigPricingSequence() {
                         InputProps={{ ...commonNumberFieldProps.InputProps, startAdornment: <InputAdornment position="start"><Typography variant='h4'>{state.priceFactor || '+'}</Typography></InputAdornment> }}
                     />
                 </CenterGrid>
-                <CenterGrid item xs={6}>
-                    <BaseTextField
-                        label={`Price Factor`}
-                        value={state.priceFactor || '+'}
-                        select
-                        onChange={(e) => dispatch({ type: ActionType.SetPriceFactor, payload: e.target.value })}
-                        options={['+', '×'].map(option => ({ value: option, label: option }))}
-                    />
-                </CenterGrid>
+                {renderPriceFactorSelect(6)}
             </FadeWrapper>
 
             <FadeWrapper condition={state.affectsPrice && !state.dependsOn.name} timeout={500} xs={priceByGridSize}>
@@ -393,7 +402,12 @@ function ConfigPricingSequence() {
                     value={state.priceBy}
                     onChange={(e) => dispatch({ type: ActionType.SetPriceBy, payload: e.target.value })}
                     options={priceByOptions.map(option => ({ value: option, label: option }))}
+                    disabled={selected.type === 'price'}
                 />
+            </FadeWrapper>
+
+            <FadeWrapper condition={state.priceBy === 'Input'} timeout={500} xs={4}>
+                {renderPriceFactorSelect(12)}
             </FadeWrapper>
 
             <FadeWrapper condition={requiresConstantValue} timeout={500} xs={4}>

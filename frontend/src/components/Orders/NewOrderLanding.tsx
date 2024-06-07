@@ -6,10 +6,11 @@ import { OrderContext } from "./contexts/OrderContext";
 import axios from "axios";
 import NewOrderModal from "./NewOrderModal";
 import { UIContext } from "../BaseComps/contexts/UIContext";
+import SelectPendingOrder from "./SelectPendingOrder";
 
 
 export default function NewOrderLanding() {
-  const { activeOrder, setOrderItems, orderItems } = useContext(OrderContext);
+  const { activeOrder, setOrderItems } = useContext(OrderContext);
   const { setOpenPopup } = useContext(UIContext);
 
   useEffect(() => {
@@ -23,13 +24,12 @@ export default function NewOrderLanding() {
 
   const handleRightIconClick = () => {
     setOpenPopup(true);
-    console.log(orderItems)
   }
 
   return (
     <Box sx={{ width: '100vw', height: '100vh', overflowX: 'hidden' }}>
       <BaseItems pageRoot="order" pageName="ORDER EDITOR" rightIcon=
-        {activeOrder.id !== -1 && (
+        {!(activeOrder.id === -1) ?
           <Hidden smDown>
             <IconButton
               color="inherit"
@@ -39,8 +39,8 @@ export default function NewOrderLanding() {
             >
               <ShoppingCartOutlinedIcon fontSize='large' />
             </IconButton>
-          </Hidden>
-        )} />
+          </Hidden> : <SelectPendingOrder />
+        } />
       <NewOrderModal />
     </Box>
   );

@@ -10,6 +10,8 @@ import { useParams } from "react-router"
 import Snackbar from "../BaseComps/Snackbar"
 import { Box } from "@mui/material"
 import { WEBSOCKET_URL } from "../Constants"
+import PrintDialog from "./PrintDialog"
+import { OriginalOrderInfoProvider } from "./contexts/OriginalOrderInfoContext"
 
 
 export default function NewOrder() {
@@ -18,17 +20,19 @@ export default function NewOrder() {
         <Box sx={{ width: '100vw', height: '100vh' }}>
             <UIProvider>
                 <OrderProvider>
-                    <WebSocketProvider url={WEBSOCKET_URL}>
-                        {params.category ?
-                            <FormConfigProvider>
-                                <ItemProvider>
-                                    <NewOrderCreation />
-                                </ItemProvider>
-                            </FormConfigProvider> :
-                            <NewOrderLanding />
-                        }
-                        <Snackbar />
-                    </WebSocketProvider>
+                    <OriginalOrderInfoProvider>
+                        <WebSocketProvider url={WEBSOCKET_URL}>
+                            {params.category ?
+                                <FormConfigProvider>
+                                    <ItemProvider>
+                                        <NewOrderCreation />
+                                    </ItemProvider>
+                                </FormConfigProvider> :
+                                <NewOrderLanding />
+                            }
+                            <Snackbar />
+                        </WebSocketProvider>
+                    </OriginalOrderInfoProvider>
                 </OrderProvider>
             </UIProvider >
         </Box>

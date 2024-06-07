@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { TextField, MenuItem } from "../Styled"
 import { FormComponentConfig, FormValue } from "./dbTypes";
+import { Typography } from "@mui/material";
 
 interface BasePreviewComponentProps {
     component: FormComponentConfig;
@@ -16,7 +17,6 @@ export default function BasePreviewComponent({ component, formValues, setFormVal
 
     useEffect(() => {
         if (initialValue) {
-            console.log(initialValue)
             const updatedPreviewSelected = [...previewSelected];
             updatedPreviewSelected[component.order] = initialValue;
             setPreviewSelected(updatedPreviewSelected);
@@ -58,6 +58,8 @@ export default function BasePreviewComponent({ component, formValues, setFormVal
             );
         case 'number':
             return <TextField type='number' variant='filled' {...commonProps} inputProps={{min: '0', step: '0.5'}}/>;
+        case 'price':
+            return <Typography variant="h6">This is a fixed price, it won't be shown when editing this item in orders. . . .</Typography>
         default:
             return ('Oops. . .');
     }

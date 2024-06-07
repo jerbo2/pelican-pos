@@ -14,34 +14,36 @@ import Snackbar from "../BaseComps/Snackbar"
 import Checkout from "./Checkout"
 import { WebSocketProvider } from "../BaseComps/contexts/WebSocketContext"
 import { WEBSOCKET_URL } from "../Constants"
+import PrintDialog from "./PrintDialog"
+import { OriginalOrderInfoProvider } from "./contexts/OriginalOrderInfoContext"
 
 export default function ActiveOrders() {
     const params = useParams()
-    const checkout = window.location.href.includes('checkout')
+    //const checkout = window.location.href.includes('checkout')
     return (
         <Box sx={{ width: '100vw', height: '100vh', overflowX: 'hidden' }}>
             <UIProvider>
                 <OrderProvider>
-                    <WebSocketProvider url={WEBSOCKET_URL}>
-                        {params.category ? (
-                            <FormConfigProvider>
-                                <ItemProvider>
-                                    <NewOrderFormEdit rootPage="active-orders" />
-                                </ItemProvider>
-                            </FormConfigProvider>
-                        ) : checkout ? (
-                            <Checkout />
-                        ) :
-                            <React.Fragment>
-                                <BaseNav pageRoot="active-orders" pageName="ACTIVE ORDERS" renderItems={false} />
-                                <CenterGrid item xs={12}>
-                                    <OrdersTable status='submitted' />
-                                    <OrdersModal />
-                                </CenterGrid>
-                            </React.Fragment>
-                        }
-                        <Snackbar />
-                    </WebSocketProvider>
+                    <OriginalOrderInfoProvider>
+                        <WebSocketProvider url={WEBSOCKET_URL}>
+                            {params.category ? (
+                                <FormConfigProvider>
+                                    <ItemProvider>
+                                        <NewOrderFormEdit rootPage="active-orders" />
+                                    </ItemProvider>
+                                </FormConfigProvider>
+                            ) :
+                                <React.Fragment>
+                                    <BaseNav pageRoot="active-orders" pageName="ACTIVE ORDERS" renderItems={false} />
+                                    <CenterGrid item xs={12}>
+                                        <OrdersTable status='submitted' />
+                                        <OrdersModal />
+                                    </CenterGrid>
+                                </React.Fragment>
+                            }
+                            <Snackbar />
+                        </WebSocketProvider>
+                    </OriginalOrderInfoProvider>
                 </OrderProvider>
             </UIProvider>
         </Box>

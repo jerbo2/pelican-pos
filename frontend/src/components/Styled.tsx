@@ -20,9 +20,13 @@ import {
   FormControlLabel as MUIFormControlLabel,
   Checkbox as MUICheckbox,
   Accordion as MUIAccordion,
+  Typography as MUITypography,
+  ToggleButton as MUIToggleButton,
+  ToggleButtonGroup as MUIToggleButtonGroup,
+  ToggleButtonProps as MUIToggleButtonProps,
 } from '@mui/material';
-import {DateTimePicker as MUIDateTimePicker} from '@mui/x-date-pickers';
-import {DataGrid as MUIDataGrid} from '@mui/x-data-grid';
+import { DateTimePicker as MUIDateTimePicker } from '@mui/x-date-pickers';
+import { DataGrid as MUIDataGrid } from '@mui/x-data-grid';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { DRAWER_WIDTH } from './Constants';
 
@@ -47,6 +51,11 @@ const Button = styled(MuiButton)({
     transform: 'scale(0.95)',
   },
   margin: '8px',
+});
+
+const ButtonSmaller = styled(Button)({
+  fontSize: '1.5rem',
+  fontWeight: 400,
 });
 
 const ButtonWider = styled(Button)({
@@ -151,6 +160,9 @@ const TextField = styled(MUITextField)<TextFieldProps>({
   '& .MuiInputBase-root': {
     fontSize: '2.15rem',
   },
+  '& .MuiSelect-select': {
+    backgroundColor: 'transparent',
+  }
 });
 
 const TextFieldSmaller = styled(TextField)({
@@ -171,6 +183,10 @@ const TextFieldSmaller = styled(TextField)({
 
 const MenuItem = styled(MUIMenuItem)({
   fontSize: '2.15rem',
+});
+
+const MenuItemSmaller = styled(MUIMenuItem)({
+  fontSize: '1.5rem',
 });
 
 const Select = styled(MUISelect)({
@@ -279,12 +295,13 @@ const DraggableListBox = styled(Box)({
   touchAction: 'none',
 });
 
-const Dialog = styled(MUIDialog)<DialogProps>(({shiftamount = 0}) => ({
+const Dialog = styled(MUIDialog)<DialogProps>(({ shiftamount }) => ({
   '& .MuiDialog-container': {
     position: 'fixed',
     top: '50%',
     left: `calc(50% + ${shiftamount}px)`, // Centering dialog in the available space
     transform: 'translate(-50%, -50%)',
+    width: '100vh',
   },
 }));
 
@@ -336,11 +353,43 @@ const DataGrid = styled(MUIDataGrid)({
   '& .MuiTablePagination-selectLabel': {
     fontSize: '1.25rem',
   },
-  
+
 });
 
 const Accordion = styled(MUIAccordion)(({ theme }) => ({
   border: `1px solid ${theme.palette.primary.main}`,
+}));
+
+const ItemPriceLine = styled(MUITypography)({
+  flex: 1,
+  display: 'flex',
+  borderBottom: '1px dotted',
+  margin: '0 6px 6px',
+});
+
+interface ToggleButtonProps extends MUIToggleButtonProps {
+  selectedcolor: string;
+}
+
+const ToggleButton = styled(MUIToggleButton)<ToggleButtonProps>(({ selectedcolor }) => ({
+  minWidth: '3rem',
+  minHeight: '3rem',
+  color: 'primary',
+  '&.Mui-selected, &.Mui-selected:hover': {
+    color: 'primary',
+    backgroundColor: selectedcolor,
+  },
+  '&.Mui-disabled': {
+    color: '#e8e4e4',
+    backgroundColor: 'transparent',
+  },
+}));
+
+const ToggleButtonGroup = styled(MUIToggleButtonGroup)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  border: `2px solid ${theme.palette.primary.main}`,
+  borderRadius: '0.375rem',
 }));
 
 
@@ -362,6 +411,7 @@ export {
   ListItemButton,
   FormControl,
   MenuItem,
+  MenuItemSmaller,
   DialogTitle,
   DialogContentText,
   Dialog,
@@ -373,7 +423,11 @@ export {
   DraggableListBox,
   FormControlLabel,
   Checkbox,
-  DateTimePicker, 
+  DateTimePicker,
   DataGrid,
-  Accordion
+  Accordion,
+  ItemPriceLine,
+  ButtonSmaller,
+  ToggleButton,
+  ToggleButtonGroup
 };

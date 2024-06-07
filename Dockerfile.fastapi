@@ -1,9 +1,20 @@
 FROM python:3.10
 
+# Set the working directory
 WORKDIR /app
 
+# Copy requirements.txt
 COPY ./requirements.txt /code/requirements.txt
 
+# Install necessary dependencies for wkhtmltopdf
+RUN apt-get update && apt-get install -y \
+    wkhtmltopdf --fix-missing
+
+# Install Python dependencies
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
+# Copy the rest of the application code
+COPY . /app
+
+# Expose the port and start the application
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]

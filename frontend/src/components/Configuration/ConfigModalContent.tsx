@@ -43,9 +43,11 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
         const storedItem = storedItems.filter(item => item.name === itemName)[0];
         if (!storedItem) return;
         if (_.isEqual(storedItem.form_cfg[selected.order], selected)) {
+            console.log(false)
             setChangeMade(false);
         }
         else {
+            console.log(true)
             setChangeMade(true);
         }
     }, [selected]);
@@ -65,7 +67,8 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
         }
 
         const url = itemExists ? `/api/v1/items/update/${storedItem.id}/` : '/api/v1/items/create/';
-        const axiosMethod = itemExists ? axios.put : axios.post;
+        const axiosMethod = itemExists ? axios.patch : axios.post;
+        console.log('newformconfig', newFormConfig)
 
         const payload = {
             "name": itemName,
@@ -80,11 +83,12 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
             setOpenSnackbar(true);
             const newStoredItems = itemExists ? storedItems.map(item => item.name === itemName ? res.data : item) : [...storedItems, res.data];
             console.log('storing new items')
+            console.log(res.data)
             setStoredItems(newStoredItems);
             // update entire form config to reflect changes
             setFormConfig(res.data.form_cfg);
             sendMessage(JSON.stringify({ type: 'items-update', payload: newStoredItems }));
-            sendMessage(JSON.stringify({ type: 'config-update', payload: res.data.form_cfg[selected.order]}));
+            sendMessage(JSON.stringify({ type: 'config-update', payload: res.data.form_cfg[selected.order] }));
             handleClosePopup();
         } catch (err) {
             console.log(err);
@@ -157,16 +161,41 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
         await handleSave(newConfig);
     };
 
+    const renderActionButtons = () => {
+        return (
+            <>
+                <CenterGrid item xs={6}>
+                    <ConfirmationButton onConfirmed={handleCancel} override={!changeMade} dialogContent={closeWithoutSaving} shiftAmount={DRAWER_WIDTH / 2}>Cancel</ConfirmationButton>
+                </CenterGrid>
+
+                <CenterGrid item xs={6}>
+                    <ButtonWidest variant='contained' onClick={handleOK}>Ok</ButtonWidest>
+                </CenterGrid>
+
+                {!formOptionNew && (
+                    <CenterGrid item xs={12}>
+                        <ConfirmationButton onConfirmed={handleFormComponentDelete} dialogContent={formCompDelConfirm} shiftAmount={DRAWER_WIDTH / 2}>Delete</ConfirmationButton>
+                    </CenterGrid>
+                )}
+            </>
+        );
+    }
+
+    const renderCloseButton = () => {
+        return (
+            <CloseButton override={!changeMade} handleOnConfirmed={handleCancel} dialogContent={closeWithoutSaving} shiftAmount={DRAWER_WIDTH / 2} />
+        )
+    }
 
     // selected represents the specific form component that is being edited
     switch (selected.type) {
         case 'single_select':
             return (
                 <CenterGrid container>
-                    <CloseButton override={!changeMade} handleOnConfirmed={handleCancel} dialogContent={closeWithoutSaving} shiftAmount={DRAWER_WIDTH/2} />
+                    {renderCloseButton()}
 
                     <CenterGrid item xs={12}>
-                        <Typography variant='h3' fontWeight='bold'>Preview</Typography>
+                        <Typography variant='h3' fontWeight='bold' mt={'8px'}>Preview</Typography>
                     </CenterGrid>
 
                     <CenterGrid item xs={12}>
@@ -196,6 +225,12 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
                             label='Option'
                             onChange={(e) => setFormOption(e.target.value)}
                             variant="filled"
+                            inputProps={{
+                                style: {
+                                    textOverflow: 'ellipsis',
+                                    width: 'calc(100% - 5rem)' // Adjust this value as needed
+                                }
+                            }}
                         />
                         <IconButton
                             aria-label='add'
@@ -215,6 +250,11 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
                             variant='filled'
                             value={selectedFormOption}
                             onChange={(e) => setSelectedFormOption(e.target.value)}
+                            SelectProps={{
+                                style: {
+                                    paddingRight: '4rem'
+                                }
+                            }}
                         >
                             {selected.options.map((option: any) => (
                                 <MenuItem key={option} value={option}>{option}</MenuItem>
@@ -236,19 +276,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
 
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
 
-                    <CenterGrid item xs={6}>
-                        <ConfirmationButton onConfirmed={handleCancel} override={!changeMade} dialogContent={closeWithoutSaving} shiftAmount={DRAWER_WIDTH / 2}>Cancel</ConfirmationButton>
-                    </CenterGrid>
-
-                    <CenterGrid item xs={6}>
-                        <ButtonWidest variant='contained' onClick={handleOK}>Ok</ButtonWidest>
-                    </CenterGrid>
-
-                    {!formOptionNew && (
-                        <CenterGrid item xs={12}>
-                            <ConfirmationButton onConfirmed={handleFormComponentDelete} dialogContent={formCompDelConfirm} shiftAmount={DRAWER_WIDTH / 2}>Delete</ConfirmationButton>
-                        </CenterGrid>
-                    )}
+                    {renderActionButtons()}
 
                 </CenterGrid>
             );
@@ -256,14 +284,10 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
         case 'number':
             return (
                 <CenterGrid container>
-                    <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
-                        <IconButton size='small' onClick={handleCancel}>
-                            <CloseIcon fontSize='large' />
-                        </IconButton>
-                    </Box>
+                    {renderCloseButton()}
 
                     <CenterGrid item xs={12}>
-                        <Typography variant='h3' fontWeight='bold'>Preview</Typography>
+                        <Typography variant='h3' fontWeight='bold' mt={'8px'}>Preview</Typography>
                     </CenterGrid>
 
                     <CenterGrid item xs={12}>
@@ -292,24 +316,25 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
 
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
 
-                    <CenterGrid item xs={6}>
-                        <ConfirmationButton onConfirmed={handleCancel} override={!changeMade} dialogContent={closeWithoutSaving} shiftAmount={DRAWER_WIDTH / 2}>Cancel</ConfirmationButton>
-                    </CenterGrid>
-
-                    <CenterGrid item xs={6}>
-                        <ButtonWidest variant='contained' onClick={handleOK}>Ok</ButtonWidest>
-                    </CenterGrid>
-
-                    {!formOptionNew && (
-                        <CenterGrid item xs={12}>
-                            <ConfirmationButton onConfirmed={handleFormComponentDelete} dialogContent={formCompDelConfirm}>Delete</ConfirmationButton>
-                        </CenterGrid>
-                    )}
+                    {renderActionButtons()}
 
                 </CenterGrid>
             );
+        case 'price':
+            return (
+                <CenterGrid container>
+                    {renderCloseButton()}
+                    <CenterGrid item xs={12} mt={'8px'} color='white'>-</CenterGrid>
+
+                    <ConfigPricingSequence />
+
+                    <CenterGrid item xs={12}><Divider /></CenterGrid>
+
+                    {renderActionButtons()}
+                </CenterGrid>
+            );
         default:
-            return <Box><span></span></Box>;
+            return <CenterGrid container></CenterGrid>
 
     }
 }

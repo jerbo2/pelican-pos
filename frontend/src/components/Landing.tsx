@@ -1,20 +1,59 @@
 import { useNavigate } from 'react-router';
-import { Box } from '@mui/material';
+import { Box, Fab, Fade, Stack, Typography } from '@mui/material';
 import { Button, CenterGrid } from './Styled';
+import axios from 'axios';
+import ConfirmationButton from './BaseComps/ConfirmationButton';
+import { LogoutOutlined } from '@mui/icons-material';
+import Login from './Login';
+import { UserContext } from './BaseComps/contexts/UserContext';
+import React, { useContext } from 'react';
+import { TransitionGroup } from 'react-transition-group';
+import Logo from './BaseComps/Logo';
+import NotesOutlinedIcon from '@mui/icons-material/NotesOutlined';
+
+const handleOpenCashDrawer = async () => {
+  try {
+    await axios.post('/api/v1/open-drawer/');
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 
 function Landing() {
   const navigate = useNavigate();
+  const { user, token, logout } = useContext(UserContext);
+
   return (
     <Box sx={{ width: '100vw', height: '100vh' }}>
-      <CenterGrid container spacing={2} alignItems="center" justifyContent="center" style={{ height: '100%' }}>
+      <CenterGrid container spacing={'auto'} flex={1} height={'100%'}>
 
         <CenterGrid item xs={12}>
-          <Box 
-            component='img' 
-            src="/pelican-logo-1-no-bg-trimmed.png" 
-            alt="logo" 
-            sx={{ height: '12.5rem', width: '12.5rem', '&:hover': {transform: 'scale(1.05)'}, transition: 'all 0.15s ease-in-out, transform 0.15s ease-in-out', }} />
+          <Logo />
         </CenterGrid>
+
+        <Stack sx={{ position: 'fixed', top: 10, right: 10, zIndex: 1000, display: 'flex', alignItems: 'center' }}>
+          {user?.username && (
+            <Fab onClick={logout} color='primary' sx={{ m: 1, minWidth: user?.is_admin ? '11.5rem' : '13rem' }} variant='extended'>
+              <CenterGrid item xs={2}>
+                <LogoutOutlined sx={{ mr: 1 }} />
+              </CenterGrid>
+              <CenterGrid item xs={10}>
+                {`Logout (${user.username})`}
+              </CenterGrid>
+            </Fab>
+          )}
+          {user?.is_admin && (
+            <Fab onClick={() => navigate('/reports')} color='primary' sx={{ m: 1, minWidth: '11.5rem' }} variant='extended'>
+              <CenterGrid item xs={2}>
+                <NotesOutlinedIcon sx={{ mr: 1 }} />
+              </CenterGrid>
+              <CenterGrid item xs={10}>
+                Reports
+              </CenterGrid>
+            </Fab>
+          )}
+        </Stack>
 
         <CenterGrid item xs={12}>
           <Button variant="contained" fullWidth onClick={() => navigate('/active-orders')}>
@@ -35,19 +74,20 @@ function Landing() {
         </CenterGrid>
 
         <CenterGrid item xs={12} sm={6}>
-          <Button variant="contained" fullWidth sx={{fontSize: '2rem'}}>
+          <Button variant="contained" fullWidth sx={{ fontSize: '2rem' }} onClick={handleOpenCashDrawer}>
             Open Drawer
           </Button>
         </CenterGrid>
 
-        <CenterGrid item xs={12} sm={6} >
-          <Button variant="contained" fullWidth onClick={() => navigate('/config')} sx={{fontSize: '2rem'}}>
+        <CenterGrid item xs={12} sm={6}>
+          <Button variant="contained" fullWidth onClick={() => navigate('/config')} sx={{ fontSize: '2rem' }} disabled={!user?.is_admin}>
             Config
           </Button>
         </CenterGrid>
       </CenterGrid>
-    </Box>
+    </Box >
   );
 }
 
 export default Landing;
+export { handleOpenCashDrawer };

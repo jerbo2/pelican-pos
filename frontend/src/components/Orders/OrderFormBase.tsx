@@ -1,11 +1,12 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { FormConfigContext } from "../Configuration/contexts/FormConfigContext";
-import { CenterGrid, Divider } from "../Styled";
+import { CenterGrid, Checkbox, Divider, FormControlLabel, TextField } from "../Styled";
 import BasePreviewComponent from "../BaseComps/BasePreviewComponent";
 import BaseToolBar from "../BaseComps/BaseToolBar";
 import ConfirmationButton from "../BaseComps/ConfirmationButton";
 import { FormComponentConfig, FormValue } from "../BaseComps/dbTypes";
 import { OrderContext } from "./contexts/OrderContext";
+import { FormGroup } from "@mui/material";
 
 const confirmCancelOrderText = 'Are you sure you want to cancel?'
 const confirmSubmitWithoutAllFieldsText = 'Some fields are not filled out, is that okay?'
@@ -25,7 +26,7 @@ const createInitialFormValues = (config: FormComponentConfig[], values: FormValu
         map[obj.label] = obj.value;
         return map;
     }, {} as Record<string, string>);
-    
+
     return config.map(configItem => ({
         label: configItem.label,
         value: valuesMap[configItem.label] || ''
@@ -44,20 +45,21 @@ export default function OrderFormBase({ pageName, handleSubmit, handleCancel, to
 
     useEffect(() => {
         let initialFormValues: FormValue[] = [];
-        if (editItem) {
+        const filteredFormConfig = formConfig.filter(config => config.type !== 'price');
+        if (editItem.id !== -1) {
+            console.log(editItem)
             initialFormValues = editItem.configurations.map(config => ({
                 label: config.label,
                 value: config.value
             }));
-        }
-        else {
-            initialFormValues = formConfig.map(config => ({
+        } else {
+            initialFormValues = filteredFormConfig.map(config => ({
                 label: config.label,
                 value: ''
             }));
         }
 
-        if (initialFormValues.length !== formConfig.length) {
+        if (initialFormValues.length !== filteredFormConfig.length) {
             // formConfig was changed after an order had been submitted, synchronize form values
             const synchronizedFormValues = createInitialFormValues(formConfig, initialFormValues);
             setFormValues(synchronizedFormValues);
@@ -77,32 +79,35 @@ export default function OrderFormBase({ pageName, handleSubmit, handleCancel, to
         console.log(formValues)
     }, [formValues])
 
-    return ( 
+    return (
         <CenterGrid container>
             <CenterGrid item xs={12}>
                 <BaseToolBar pageName={pageName} leftIcon={showCards ? toolbarLeftIcon : null} />
             </CenterGrid>
             {!showCards && (
-                <React.Fragment>                                    
-                    {formConfig.map((_, index) => (
-                        <React.Fragment key={index}>
-                            <CenterGrid item xs={12}>
-                                <BasePreviewComponent component={formConfig[index]} formValues={formValues} setFormValues={setFormValues} index={index} initialValue={formValues[index]?.value} />
-                            </CenterGrid>
-                            <CenterGrid item key={`${index}_divider`} xs={12}>
-                                <Divider />
-                            </CenterGrid>
-                        </React.Fragment>
-                    ))}
+                <React.Fragment>
+                    {formConfig.map((config, index) => {
+                        if (config.type === 'price') return null;
+                        return (
+                            <React.Fragment key={index}>
+                                <CenterGrid item xs={12}>
+                                    <BasePreviewComponent component={formConfig[index]} formValues={formValues} setFormValues={setFormValues} index={index} initialValue={formValues[index]?.value} />
+                                </CenterGrid>
+                                <CenterGrid item key={`${index}_divider`} xs={12}>
+                                    <Divider />
+                                </CenterGrid>
+                            </React.Fragment>
+                        )
+                    })}
                     <CenterGrid item xs={6}>
-                        <ConfirmationButton onConfirmed={handleCancel} dialogContent={confirmCancelOrderText}>CANCEL</ConfirmationButton>
+                        <ConfirmationButton onConfirmed={handleCancel} dialogContent={confirmCancelOrderText} override={formValues.every(formValue => formValue.value === '')}>CANCEL</ConfirmationButton>
                     </CenterGrid>
                     <CenterGrid item xs={6}>
                         <ConfirmationButton onConfirmed={handleSubmit} override={emptyFormConfirm} dialogContent={confirmSubmitWithoutAllFieldsText}>SUBMIT</ConfirmationButton>
                     </CenterGrid>
                 </React.Fragment>
             )}
-            <div ref={bottomRef}/>
+            <div ref={bottomRef} />
         </CenterGrid>
     );
 }

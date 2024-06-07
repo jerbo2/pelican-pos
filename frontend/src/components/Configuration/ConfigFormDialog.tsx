@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import FormDialog from '../BaseComps/FormDialog';
 import { Button, CenterGrid, TextField } from '../Styled';
 import { ItemContext } from './contexts/ItemContext';
@@ -11,10 +11,15 @@ export default function ConfigFormDialog() {
   const { itemName, taxRate, storedItems, setItemName, setTaxRate, setStoredItems } = useContext(ItemContext);
   const { openDialog, dialogType, setOpenDrawer, setSnackbarMessage, setOpenSnackbar, setOpenDialog, setDialogType } = useContext(UIContext);
   const { sendMessage } = useContext(WebSocketContext);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
+
+  useEffect(() => {
+    setTaxRate(6.625);
+  }, []);
 
   useEffect(() => {
     if (!openDialog && itemName !== '') {
@@ -150,6 +155,8 @@ export default function ConfigFormDialog() {
             <CenterGrid item xs={12}>
               <TextField
                 autoFocus={!itemName}
+                inputRef={inputRef}
+                onFocus={() => inputRef.current?.select()}
                 required
                 margin="dense"
                 id="tax-rate"
@@ -158,7 +165,7 @@ export default function ConfigFormDialog() {
                 type="number"
                 fullWidth
                 variant="filled"
-                defaultValue={taxRate ?? 6.625}
+                defaultValue={6.625}
                 InputProps={{
                   startAdornment: <InputAdornment position="start"><Typography variant='h5'>%</Typography></InputAdornment>,
                   inputProps: { step: 'any' }

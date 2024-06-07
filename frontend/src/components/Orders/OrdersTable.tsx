@@ -8,6 +8,27 @@ import { OrderContext } from './contexts/OrderContext';
 import { Fade } from '@mui/material';
 import { WebSocketContext } from '../BaseComps/contexts/WebSocketContext';
 
+export const fetchOrders = async (status: string) => {
+    try {
+        const response = await axios.get(`/api/v1/orders?status=${status}`);
+        let data = response.data;
+        data = data.map((order: Order, _: number) => {
+            return {
+                id: order.id,
+                status: order.status,
+                customer_name: order.customer_name,
+                customer_phone_number: order.customer_phone_number,
+                complete_at: dayjs.utc(order.complete_at),
+                transaction: order.transaction,
+            };
+        });
+        return data;
+    } catch (error) {
+        console.error('Failed to fetch active orders:', error);
+        return [];
+    }
+}
+
 const formatDate = (date: Dayjs) => {
     const localDate = date.tz(dayjs.tz.guess());
 
@@ -49,11 +70,14 @@ export default function OrdersTable({ status }: { status: string }) {
         switch (messageData.type) {
             case 'order-update':
                 const orderToUpdate = orders.find(order => order.id === messageData.payload.id);
+                if (!orderToUpdate) return;
+                console.log(messageData.payload)
                 const updatedOrder = {
                     ...orderToUpdate,
-                    customer_name: messageData.payload.customer_name,
-                    customer_phone_number: messageData.payload.customer_phone_number,
-                    complete_at: dayjs.utc(messageData.payload.complete_at),
+                    customer_name: messageData.payload.customer_name || orderToUpdate.customer_name,
+                    customer_phone_number: messageData.payload.customer_phone_number || orderToUpdate.customer_phone_number,
+                    complete_at: dayjs.utc(messageData.payload.complete_at || orderToUpdate.complete_at),
+                    transaction: messageData.payload.transaction || orderToUpdate.transaction,
                 } as Order;
                 setOrders((prevOrders) => prevOrders.map(order => order.id === updatedOrder.id ? updatedOrder : order));
                 break;
@@ -76,26 +100,7 @@ export default function OrdersTable({ status }: { status: string }) {
 
     useEffect(() => {
         if (openPopup && orders.length !== 0) return;
-        const fetchActiveOrders = async () => {
-            try {
-                const response = await axios.get(`/api/v1/orders?status=${status}`);
-                let data = response.data;
-                data = data.map((order: Order, _: number) => {
-                    return {
-                        id: order.id,
-                        customer_name: order.customer_name,
-                        customer_phone_number: order.customer_phone_number,
-                        complete_at: dayjs.utc(order.complete_at),
-                    };
-                });
-                setOrders(data);
-            } catch (error) {
-                console.error('Failed to fetch active orders:', error);
-                setOrders([]);
-            }
-        };
-
-        fetchActiveOrders();
+        fetchOrders(status).then((data) => setOrders(data));
     }, []); // could make new changed state but this is fine
 
     const handleRowClick = async (table_comp: any) => {

@@ -29,7 +29,8 @@ function Configuration() {
                                 options={[
                                     { name: 'Dropdown', icon: icon },
                                     { name: 'Text Field', icon: icon },
-                                    { name: 'Number', icon: icon },
+                                    { name: 'Number Field', icon: icon },
+                                    { name: 'Price', icon: icon },
                                 ]}
                                 children={
                                     <>

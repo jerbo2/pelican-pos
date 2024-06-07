@@ -20,7 +20,12 @@ import ConfirmationButton from '../BaseComps/ConfirmationButton';
 
 import { FormComponentConfig } from '../BaseComps/dbTypes';
 
-export default function ConfigDrawer({ options, children }: { options: { name: string, icon: React.ReactNode }[], children: React.ReactNode }) {
+interface ConfigDrawerProps {
+  options: { name: string, icon: React.ReactNode }[],
+  children: React.ReactNode
+}
+
+export default function ConfigDrawer({ options, children }: ConfigDrawerProps) {
   const { openDrawer, setOpenDialog, handleOpenDrawer, setOpenPopup, setOpenDrawer, setDialogType } = useContext(UIContext);
   const { itemName, storedItems, setStoredItems, setItemName, setTaxRate } = useContext(ItemContext);
   const { formConfig, setFormConfig, setSelected } = useContext(FormConfigContext);
@@ -78,6 +83,7 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
     setStoredItems(newStoredItems || []);
     setOpenDrawer(false);
     setFormConfig([]);
+    setItemName('');
     sendMessage(JSON.stringify({ type: 'items-update', payload: newStoredItems }))
   }
 
@@ -90,22 +96,25 @@ export default function ConfigDrawer({ options, children }: { options: { name: s
 
   const handleOpenPopup = (formObjType: string) => {
     setOpenPopup(true);
-    const newFormObject = { label: '', type: '', order: formConfig.length, options: [], pricing_config: { affectsPrice: false, dependsOn: { name: '', values: {} } } };
+    const newFormObject = { label: '', type: '', order: formConfig.length, options: [], pricing_config: { affectsPrice: false, isBasePrice: false, priceBy: '', dependsOn: { name: '', values: {} } } };
+    newFormObject.label = '';
     switch (formObjType) {
       case 'Dropdown':
-        newFormObject.label = '';
         newFormObject.type = 'single_select';
         break;
       case 'Text Field':
-        newFormObject.label = '';
         newFormObject.type = 'text';
         break;
       case 'Number':
-        newFormObject.label = '';
         newFormObject.type = 'number';
         break;
+      case 'Price':
+        newFormObject.type = 'price';
+        newFormObject.pricing_config.affectsPrice = true;
+        newFormObject.pricing_config.isBasePrice = true;
+        newFormObject.pricing_config.priceBy = 'Constant';
+        break;
       default:
-        newFormObject.label = '';
         newFormObject.type = 'error';
         break;
     }

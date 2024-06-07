@@ -70,7 +70,7 @@ export default function BaseNav({ pageRoot, pageName, rightIcon, renderItems = t
         <Hidden smDown>
             <Button
                 color="inherit"
-                aria-label="back"
+                aria-label="toggleDrawer"
                 onClick={toggleDrawer(true)}
             >
                 <MenuOutlinedIcon fontSize='large' />
