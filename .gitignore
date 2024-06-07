@@ -4,7 +4,6 @@ node_modules
 nginx.crt
 nginx.key
 test.ipynb
-__pycache__
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
