@@ -50,7 +50,7 @@ def get_style(font_size):
         """
 
 
-# Fetch items with pagination
+# Fetch items
 def get_items(db: Session):
     return db.query(models.Item).order_by(models.Item.id.asc()).all()
 
@@ -60,7 +60,7 @@ def get_item(db: Session, item_id: int):
     return db.query(models.Item).filter(models.Item.id == item_id).first()
 
 
-# Fetch categories with optional item inclusion and pagination
+# Fetch categories with optional item inclusion
 def get_categories(db: Session, include_items: bool = False):
     query = db.query(models.Category).order_by(models.Category.id.asc())
     if include_items:
@@ -87,43 +87,25 @@ def create_item(db: Session, item: schemas.ItemCreate):
 
 
 # Update an existing item by its ID
-def update_item(db: Session, item_id: int, item: schemas.ItemUpdate):
-    db_item = get_item(db, item_id)
-    if db_item:
-        item_data = item.model_dump(exclude_unset=True)
-        print("item data", item_data)
-        for key, value in item_data.items():
-            setattr(db_item, key, value)
-        db.commit()
-        db.refresh(db_item)
+def update_item(db: Session, db_item: schemas.Item, item: schemas.ItemUpdate):
+    item_data = item.model_dump(exclude_unset=True)
+    print("item data", item_data)
+    for key, value in item_data.items():
+        setattr(db_item, key, value)
+    db.commit()
+    db.refresh(db_item)
+    print("db_item", db_item)
     return db_item
-
-
-def update_item_field(db: Session, item_id: int, field: str, value: str):
-    db_item = db.query(models.Item).filter(models.Item.id == item_id).first()
-    if not db_item:
-        return None
-
-    # Ensure the field is valid
-    if hasattr(db_item, field):
-        setattr(db_item, field, value)
-        db.commit()
-        db.refresh(db_item)
-        return db_item
-    else:
-        raise ValueError(f"Invalid field: {field}")
 
 
 # Delete an item by its ID
-def delete_item(db: Session, item_id: int):
-    db_item = get_item(db, item_id)
-    if db_item:
-        db.delete(db_item)
-        db.commit()
+def delete_item(db: Session, db_item: schemas.Item):
+    db.delete(db_item)
+    db.commit()
     return db_item
 
 
-def create_order(db: Session, order: schemas.OrderCreate):
+def create_order(db: Session):
     db_order = models.Order()
     db.add(db_order)
     db.commit()
@@ -135,42 +117,40 @@ def create_order(db: Session, order: schemas.OrderCreate):
     return db_order
 
 
-def add_to_active_order(db: Session, order_id: int, item_id: int, configurations: list):
-    # Retrieve the existing Order and Item from the database
-    db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
-    db_item = db.query(models.Item).filter(models.Item.id == item_id).first()
+def add_to_active_order(
+    db: Session, db_order: schemas.Order, db_item: schemas.Item, configurations: list
+):
 
-    if db_order and db_item:
-        # Check if the item is already in the order with the same configurations
-        order_item = (
-            db.query(models.OrderItem)
-            .filter(
-                models.OrderItem.order_id == order_id,
-                models.OrderItem.item_id == item_id,
-                models.OrderItem.configurations == cast(configurations, ARRAY(JSONB)),
-            )
-            .first()
+    # Check if the item is already in the order with the same configurations
+    matched_order_item = (
+        db.query(models.OrderItem)
+        .filter(
+            models.OrderItem.order_id == db_order.id,
+            models.OrderItem.item_id == db_item.id,
+            models.OrderItem.configurations == cast(configurations, ARRAY(JSONB)),
         )
+        .first()
+    )
 
-        if order_item:
-            order_item.quantity += 1
-        else:
-            # If not, create and add new OrderItem
-            price, taxed = calculate_prices(
-                db_item.form_cfg, configurations, db_item.tax_rate
-            )
-            new_order_item = models.OrderItem(
-                order_id=db_order.id,
-                item_id=db_item.id,
-                configurations=cast(configurations, ARRAY(JSONB)),
-                quantity=1,
-                price=price,
-                tax=taxed,
-            )
-            db.add(new_order_item)
+    if matched_order_item:
+        matched_order_item.quantity += 1
+    else:
+        # If not, create and add new OrderItem
+        price, taxed = calculate_prices(
+            db_item.form_cfg, configurations, db_item.tax_rate
+        )
+        new_order_item = models.OrderItem(
+            order_id=db_order.id,
+            item_id=db_item.id,
+            configurations=cast(configurations, ARRAY(JSONB)),
+            quantity=1,
+            price=price,
+            tax=taxed,
+        )
+        db.add(new_order_item)
 
-        db.commit()
-        db.refresh(db_order)
+    db.commit()
+    db.refresh(db_order)
     return db_order
 
 
@@ -218,22 +198,27 @@ def get_orders(db: Session, status: str):
     return orders
 
 
-def delete_order(db: Session, order_id: int):
-    db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
-    if db_order:
-        db.delete(db_order)
-        db.commit()
+def delete_order(db: Session, db_order: schemas.Order):
+    db.delete(db_order)
+    db_transaction = (
+        db.query(models.Transaction)
+        .filter(models.Transaction.order_id == db_order.id)
+        .first()
+    )
+    if db_transaction.payment_method: 
+        raise HTTPException(status_code=400, detail="Cannot delete an order with a payment")
+    db.delete(db_transaction)
+    db.commit()
     return db_order
 
 
-def print_receipt(db: Session, order_id: int):
-    db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
+def print_receipt(db: Session, db_order: schemas.Order):
     db_transaction = (
         db.query(models.Transaction)
-        .filter(models.Transaction.order_id == order_id)
+        .filter(models.Transaction.order_id == db_order.id)
         .first()
     )
-    db_order_items = get_order_items(db, order_id)
+    db_order_items = get_order_items(db, db_order.id)
     db_restaurant = db.query(models.Restaurant).first()
     db_printer = db.query(models.Printer).filter(models.Printer.name == "front").first()
     receipt_style = get_style(16)
@@ -368,13 +353,11 @@ def raster_print(content, db_printer, res_factor):
         with socket.create_connection(
             (db_printer.ip, db_printer.port), timeout=10
         ) as sock:
-            # Send raw data in smaller chunks if necessary
-            chunk_size = 16384  # Adjust the chunk size if needed
+            # Send raw data in chunks
+            chunk_size = 16384
             for i in range(0, len(raster), chunk_size):
                 sock.sendall(raster[i : i + chunk_size])
-                time.sleep(
-                    0.1
-                )  # Add a small delay to allow the printer to process data
+                time.sleep(0.01)
         print("Data sent to printer successfully.")
     except Exception as e:
         print(f"Failed to send data to printer: {e}")
@@ -473,12 +456,6 @@ def print_tickets(db: Session, order_id: int, tickets: List[schemas.Ticket]):
         </div>
         """
 
-        # imgkit.from_string(
-        #     html_content,
-        #     f"ticket.png",
-        #     options={"format": "png", "width": res_factor * 80},
-        # )
-
         raster_print(html_content, db_printer, res_factor)
 
     return tickets
@@ -499,6 +476,9 @@ def get_order_items(db: Session, order_id: int):
         .all()
     )
 
+    if not order_items:
+        return []
+
     result = [
         schemas.OrderItem(
             id=order_item.id,
@@ -517,20 +497,24 @@ def get_order_items(db: Session, order_id: int):
     return result
 
 
+def get_order_item(db: Session, order_item_id: int):
+    order_item = (
+        db.query(models.OrderItem).filter(models.OrderItem.id == order_item_id).first()
+    )
+    return order_item
+
+
 def update_order_item(
     db: Session, order_item_id: int, order_item_update: schemas.OrderItemUpdate
 ):
-    db_order_item = (
-        db.query(models.OrderItem).filter(models.OrderItem.id == order_item_id).first()
-    )
-    if not db_order_item:
-        return None
-    db_item = (
-        db.query(models.Item).filter(models.Item.id == db_order_item.item_id).first()
-    )
-    if not db_item:
+
+    db_order_item = get_order_item(db, order_item_id)
+    db_item = get_item(db, db_order_item.item_id)
+
+    if any([db_order_item is None, db_item is None]):
         return None
 
+    # Update configurations, if provided
     if order_item_update.configurations is not None:
         db_order_item.configurations = cast(
             order_item_update.configurations, ARRAY(JSONB)
@@ -540,23 +524,20 @@ def update_order_item(
         )
         db_order_item.price = price
         db_order_item.tax = taxed
-    if order_item_update.quantity is not None:
-        db_order_item.quantity = order_item_update.quantity
-    if order_item_update.printed is not None:
-        db_order_item.printed = order_item_update.printed
+
+    # Update other fields, if provided
+    for field in ["quantity", "printed"]:
+        if getattr(order_item_update, field) is not None:
+            setattr(db_order_item, field, getattr(order_item_update, field))
 
     db.commit()
     db.refresh(db_order_item)
     return db_order_item
 
 
-def delete_order_item(db: Session, order_item_id: int):
-    db_order_item = (
-        db.query(models.OrderItem).filter(models.OrderItem.id == order_item_id).first()
-    )
-    if db_order_item:
-        db.delete(db_order_item)
-        db.commit()
+def delete_order_item(db: Session, db_order_item: schemas.OrderItem):
+    db.delete(db_order_item)
+    db.commit()
     return db_order_item
 
 
@@ -593,9 +574,11 @@ def calculate_prices(item_config, order_item_config, tax_rate):
     adders = []
     selected_values = {}  # To keep track of selected values for dependencies
     tax_rate = tax_rate / 100
-
+    print("ITEM CONFIG", item_config)
+    print("ORDER ITEM CONFIG", order_item_config)
     # Pair each item configuration with its corresponding form configuration
     configs = list(zip(item_config, order_item_config))
+    print("CONFIGS", configs)
 
     # Sort configurations so that multipliers are processed last
     configs.sort(
@@ -688,17 +671,19 @@ def get_reports(db: Session):
     )
 
     reports = []
-    for i, result in enumerate(query.all()):
-        date_string = result.date.strftime("%m/%d/%Y")
+    for i, transaction in enumerate(query.all()):
+        if not transaction.date:
+            continue
+        date_string = transaction.date.strftime("%m/%d/%Y")
         report = {
             "id": i + 1,
             "date": date_string,
-            "total_sales": f"${result.total_sales or 0:.2f}",
-            "total_taxable": f"${result.total_taxable or 0:.2f}",
-            "total_non_taxable": f"${result.total_non_taxable or 0:.2f}",
-            "total_tax": f"${result.total_tax or 0:.2f}",
-            "total_cash": f"${result.total_cash or 0:.2f}",
-            "total_card": f"${result.total_card or 0:.2f}",
+            "total_sales": f"${transaction.total_sales or 0:.2f}",
+            "total_taxable": f"${transaction.total_taxable or 0:.2f}",
+            "total_non_taxable": f"${transaction.total_non_taxable or 0:.2f}",
+            "total_tax": f"${transaction.total_tax or 0:.2f}",
+            "total_cash": f"${transaction.total_cash or 0:.2f}",
+            "total_card": f"${transaction.total_card or 0:.2f}",
         }
         reports.append(report)
 

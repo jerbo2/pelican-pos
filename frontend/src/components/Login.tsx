@@ -19,8 +19,6 @@ export default function Login() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    console.log(user)
-
     const handleGetAvailableUsers = async () => {
         try {
             const res = await axios.get('/api/v1/users/');
@@ -32,7 +30,6 @@ export default function Login() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        console.log(name, value);
         setCredentials({ ...credentials, [name]: value });
     };
 

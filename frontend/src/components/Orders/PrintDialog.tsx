@@ -72,28 +72,6 @@ function shuffle(array: Array<any>) {
     return array;
 }
 
-const pastelColors = shuffle([
-    "#AEC6CF", // pastel blue
-    "#77DD77", // pastel green
-    "#FFB347", // pastel orange
-    "#FF6961", // pastel red
-    "#F49AC2", // pastel pink
-    "#CFCFC4", // pastel grey
-    "#FDFD96", // pastel yellow
-    "#B39EB5", // pastel purple
-    "#FFB3BA", // light pastel red
-    "#FFDFBA", // light pastel orange
-    "#FFFFBA", // light pastel yellow
-    "#BAFFC9", // light pastel green
-    "#BAE1FF", // light pastel blue
-    "#FFCCE5", // light pastel pink
-    "#D4A5A5", // light pastel brown
-    "#E2F0CB", // light pastel lime
-    "#C5E1A5", // light pastel olive
-    "#FFECB3", // light pastel cream
-    "#D1C4E9", // light pastel lavender
-    "#CE93D8"  // light pastel mauve
-]);
 
 export default function PrintDialog() {
     const { openDialog, setOpenDialog } = useContext(UIContext);
@@ -102,6 +80,29 @@ export default function PrintDialog() {
     const [tickets, setTickets] = useState<number[]>([]);
     const [printTickets, setPrintTickets] = useState<number[]>([]);
     const ticketsPrinted = useMemo(() => orderItems.filter(item => item.printed), [orderItems]);
+
+    const pastelColors = useMemo(() => shuffle([
+        "#AEC6CF", // pastel blue
+        "#77DD77", // pastel green
+        "#FFB347", // pastel orange
+        "#FF6961", // pastel red
+        "#F49AC2", // pastel pink
+        "#CFCFC4", // pastel grey
+        "#FDFD96", // pastel yellow
+        "#B39EB5", // pastel purple
+        "#FFB3BA", // light pastel red
+        "#FFDFBA", // light pastel orange
+        "#FFFFBA", // light pastel yellow
+        "#BAFFC9", // light pastel green
+        "#BAE1FF", // light pastel blue
+        "#FFCCE5", // light pastel pink
+        "#D4A5A5", // light pastel brown
+        "#E2F0CB", // light pastel lime
+        "#C5E1A5", // light pastel olive
+        "#FFECB3", // light pastel cream
+        "#D1C4E9", // light pastel lavender
+        "#CE93D8"  // light pastel mauve
+    ]), []);
 
     const [rowVals, setRowVals] = useState<RowVal[]>([]);
 
@@ -126,6 +127,7 @@ export default function PrintDialog() {
         newTickets.forEach((ticket) => {
             newColors[ticket] = pastelColors.pop();
         });
+        console.log('newColors:', newColors);
         setColors(newColors);
 
     }, [categories]);

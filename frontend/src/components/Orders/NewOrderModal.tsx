@@ -9,9 +9,7 @@ export default function NewOrderModal() {
     return (
         <TransitionsModal children={<OrderModalContentBase
             overrideSubmit={false}
-            pageName="order"
-            submitButtonText="confirm"
-            status="pending"/>
+            submitButtonText="confirm"/>
         }
             openPopup={openPopup} handleClosePopup={()=>setOpenPopup(false)} popup_sx={{ left: '50%' }} />
     )

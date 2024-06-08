@@ -42,9 +42,9 @@ export default function ConfigFormDialog() {
   const handleSetTaxRate = async (rate: number) => {
     const item = storedItems.find(item => item.name === itemName);
     if (!item) return;
-    const url = `/api/v1/items/update/${item.id}/field`;
+    const url = `/api/v1/items/update/${item.id}`;
     try {
-      await axios.patch(url, { field: 'tax_rate', value: rate });
+      await axios.patch(url, { tax_rate: rate });
       setTaxRate(rate);
       sendMessage(JSON.stringify({ type: 'item-tax-rate-update', payload: rate }));
       sendMessage(JSON.stringify({ type: 'items-update', payload: storedItems.map(item => item.name === itemName ? { ...item, tax_rate: rate } : item) }));
@@ -58,9 +58,9 @@ export default function ConfigFormDialog() {
   const handleUpdateItemName = async (name: string) => {
     const item = storedItems.find(item => item.name === itemName);
     if (!item) return;
-    const url = `/api/v1/items/update/${item.id}/field`;
+    const url = `/api/v1/items/update/${item.id}`;
     try {
-      await axios.patch(url, { field: 'name', value: name });
+      await axios.patch(url, { name: name });
       setItemName(name);
       sendMessage(JSON.stringify({ type: 'item-name-update', payload: name }));
       sendMessage(JSON.stringify({ type: 'items-update', payload: storedItems.map(item => item.name === itemName ? { ...item, name } : item) }));
@@ -165,7 +165,7 @@ export default function ConfigFormDialog() {
                 type="number"
                 fullWidth
                 variant="filled"
-                defaultValue={6.625}
+                defaultValue={taxRate}
                 InputProps={{
                   startAdornment: <InputAdornment position="start"><Typography variant='h5'>%</Typography></InputAdornment>,
                   inputProps: { step: 'any' }

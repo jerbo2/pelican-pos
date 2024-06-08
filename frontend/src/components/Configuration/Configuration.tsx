@@ -22,7 +22,6 @@ function Configuration() {
             <UIProvider>
                 <FormConfigProvider>
                     <ItemProvider>
-                        <WebSocketProvider url={WEBSOCKET_URL}>
                             <Snackbar />
                             <ConfigFormDialog />
                             <ConfigDrawer
@@ -40,7 +39,6 @@ function Configuration() {
                                     </>
                                 }
                             />
-                        </WebSocketProvider>
                     </ItemProvider>
                 </FormConfigProvider>
             </UIProvider>

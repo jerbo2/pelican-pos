@@ -8,14 +8,10 @@ import { OrderProvider } from "./contexts/OrderContext"
 import OrdersModal from "./OrdersModal"
 import { FormConfigProvider } from "../Configuration/contexts/FormConfigContext"
 import { ItemProvider } from "../Configuration/contexts/ItemContext"
-import NewOrderFormEdit from "./OrderFormEdit"
 import { useParams } from "react-router"
 import Snackbar from "../BaseComps/Snackbar"
-import Checkout from "./Checkout"
-import { WebSocketProvider } from "../BaseComps/contexts/WebSocketContext"
-import { WEBSOCKET_URL } from "../Constants"
-import PrintDialog from "./PrintDialog"
 import { OriginalOrderInfoProvider } from "./contexts/OriginalOrderInfoContext"
+import OrderFormEdit from "./OrderFormEdit"
 
 export default function ActiveOrders() {
     const params = useParams()
@@ -25,11 +21,10 @@ export default function ActiveOrders() {
             <UIProvider>
                 <OrderProvider>
                     <OriginalOrderInfoProvider>
-                        <WebSocketProvider url={WEBSOCKET_URL}>
                             {params.category ? (
                                 <FormConfigProvider>
                                     <ItemProvider>
-                                        <NewOrderFormEdit rootPage="active-orders" />
+                                        <OrderFormEdit rootPage="active-orders" />
                                     </ItemProvider>
                                 </FormConfigProvider>
                             ) :
@@ -42,7 +37,6 @@ export default function ActiveOrders() {
                                 </React.Fragment>
                             }
                             <Snackbar />
-                        </WebSocketProvider>
                     </OriginalOrderInfoProvider>
                 </OrderProvider>
             </UIProvider>

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TextFieldSmaller, DateTimePicker } from '../Styled';
 import { CenterGrid } from '../Styled';
-import { AdditionalOrderInfo } from '../BaseComps/dbTypes';
+import { AdditionalOrderInfo, Transaction } from '../BaseComps/dbTypes';
 import dayjs, { Dayjs } from 'dayjs';
 import { validatePhoneNumber, validateDate } from './utils/orderUtils';
 
@@ -10,9 +10,11 @@ interface OrderInfoInputProps {
     handleChangeAdditionalOrderInfo: (key: string, value: string | Dayjs | unknown) => void;
     status: string;
     overrideSubmit?: boolean;
+    disableCondition: any;
 }
 
-const OrderInfoInput: React.FC<OrderInfoInputProps> = ({ additionalOrderInfo, handleChangeAdditionalOrderInfo, status, overrideSubmit }) => {
+const OrderInfoInput: React.FC<OrderInfoInputProps> = ({ additionalOrderInfo, handleChangeAdditionalOrderInfo, status, overrideSubmit, disableCondition }) => {
+
     return (
         <>
             <CenterGrid item xs={3.5}>
@@ -23,7 +25,7 @@ const OrderInfoInput: React.FC<OrderInfoInputProps> = ({ additionalOrderInfo, ha
                     fullWidth
                     onChange={(e) => handleChangeAdditionalOrderInfo('customer_name', e.target.value)}
                     error={additionalOrderInfo.customer_name === ''}
-                    disabled={status === 'completed'}
+                    disabled={disableCondition}
                 />
             </CenterGrid>
             <CenterGrid item xs={3.5}>
@@ -35,7 +37,7 @@ const OrderInfoInput: React.FC<OrderInfoInputProps> = ({ additionalOrderInfo, ha
                     fullWidth
                     onChange={(e) => handleChangeAdditionalOrderInfo('customer_phone_number', e.target.value)}
                     error={!validatePhoneNumber(additionalOrderInfo.customer_phone_number || '')}
-                    disabled={status === 'completed'}
+                    disabled={disableCondition}
                 />
             </CenterGrid>
             <CenterGrid item xs={5}>
@@ -47,7 +49,7 @@ const OrderInfoInput: React.FC<OrderInfoInputProps> = ({ additionalOrderInfo, ha
                     views={['month', 'day', 'hours', 'minutes']}
                     onChange={(date) => handleChangeAdditionalOrderInfo('complete_at', date)}
                     timezone={dayjs.tz.guess()}
-                    disabled={status === 'completed'}
+                    disabled={disableCondition}
                 />
             </CenterGrid>
         </>

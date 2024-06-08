@@ -112,7 +112,7 @@ export default function OrdersTable({ status }: { status: string }) {
             complete_at: row.complete_at.tz(dayjs.tz.guess()),
         });
 
-        const url = `/api/v1/orders-items/${table_comp.id}/`;
+        const url = `/api/v1/orders-items/items/${table_comp.id}/`;
         const response = await axios.get(url);
         setOpenPopup(true);
         console.log(response.data)

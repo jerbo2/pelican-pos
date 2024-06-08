@@ -21,47 +21,31 @@ const OrderContext = createContext<{
     setActiveOrder: Dispatch<SetStateAction<Order>>,
     orderItems: OrderItems[],
     setOrderItems: Dispatch<SetStateAction<OrderItems[]>>
-    editItem: OrderItems,
-    setEditItem: Dispatch<SetStateAction<OrderItems>>,
     additionalOrderInfo: AdditionalOrderInfo,
     setAdditionalOrderInfo: Dispatch<SetStateAction<AdditionalOrderInfo>>
     formValues: FormValue[],
     setFormValues: Dispatch<SetStateAction<FormValue[]>>
     orders: Order[],
     setOrders: Dispatch<SetStateAction<Order[]>>
-    originalOrderItems: OrderItems[]
-    setOriginalOrderItems: Dispatch<SetStateAction<OrderItems[]>>
-    originalAdditionalOrderInfo: AdditionalOrderInfo
-    setOriginalAdditionalOrderInfo: Dispatch<SetStateAction<AdditionalOrderInfo>>
 }>({
     activeOrder: { id: -1, status: '', created_at: '', transaction: {} },
     setActiveOrder: () => { },
     orderItems: [],
     setOrderItems: () => { },
-    editItem: defaultOrderItem,
-    setEditItem: () => { },
     additionalOrderInfo: {},
     setAdditionalOrderInfo: () => { },
     formValues: [],
     setFormValues: () => { },
     orders: [],
-    setOrders: () => { },
-    originalOrderItems: [],
-    setOriginalOrderItems: () => { },
-    originalAdditionalOrderInfo: {},
-    setOriginalAdditionalOrderInfo: () => { },
-
+    setOrders: () => { }
 });
 
 const OrderProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [activeOrder, setActiveOrder] = useState<Order>({ id: -1, status: '', created_at: '', transaction: {} });
     const [orderItems, setOrderItems] = useState<OrderItems[]>([]);
-    const [editItem, setEditItem] = useState<OrderItems>(defaultOrderItem);
     const [additionalOrderInfo, setAdditionalOrderInfo] = useState<AdditionalOrderInfo>({customer_name: '', customer_phone_number: '', complete_at: dayjs()});
     const [formValues, setFormValues] = useState<FormValue[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
-    const [originalOrderItems, setOriginalOrderItems] = useState<OrderItems[]>([]);
-    const [originalAdditionalOrderInfo, setOriginalAdditionalOrderInfo] = useState<AdditionalOrderInfo>({});
 
     useEffect(() => {
         // retreive active order from session storage if available
@@ -88,18 +72,12 @@ const OrderProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             setActiveOrder, 
             orderItems, 
             setOrderItems, 
-            editItem, 
-            setEditItem, 
             additionalOrderInfo, 
             setAdditionalOrderInfo, 
             formValues, 
             setFormValues, 
             orders, 
-            setOrders,
-            originalOrderItems,
-            setOriginalOrderItems,
-            originalAdditionalOrderInfo,
-            setOriginalAdditionalOrderInfo }}>
+            setOrders }}>
             {children}
         </OrderContext.Provider>
     );

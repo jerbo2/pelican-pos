@@ -6,12 +6,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import RemoveOutlineIcon from '@mui/icons-material/RemoveOutlined';
 import ConfirmationButton from '../BaseComps/ConfirmationButton';
-import { OrderItems } from '../BaseComps/dbTypes';
+import { OrderItems, Transaction } from '../BaseComps/dbTypes';
 
 interface OrderItemDetailsProps {
     item: OrderItems;
     index: number;
-    status: string;
+    disableCondition: boolean;
     handleEdit: (index: number) => void;
     handleChangeQuantity: (index: number, mode: string) => void;
 }
@@ -26,7 +26,7 @@ const OrderInfoAccordion = ({ item }: {item: OrderItems}) => {
                 <List sx={{ m: 0, p: 0 }}>
                     {item.configurations.map((config, idx) => (
                         <ListItem key={idx} sx={{ m: 0, p: 0 }}>
-                            <ListItemText primary={`${config.label}: ${config.value}`} />
+                            <ListItemText primary={config.label && `${config.label}: ${config.value}`} />
                         </ListItem>
                     ))}
                 </List>
@@ -35,7 +35,7 @@ const OrderInfoAccordion = ({ item }: {item: OrderItems}) => {
     );
 }
 
-const OrderItemDetails: React.FC<OrderItemDetailsProps> = ({ item, index, status, handleEdit, handleChangeQuantity }) => {
+const OrderItemDetails: React.FC<OrderItemDetailsProps> = ({ item, index, disableCondition, handleEdit, handleChangeQuantity }) => {
     return (
         <ListItem key={index}>
             <CenterGrid item xs={3}>
@@ -44,14 +44,14 @@ const OrderItemDetails: React.FC<OrderItemDetailsProps> = ({ item, index, status
                 </Box>
             </CenterGrid>
             <CenterGrid item xs={3}>
-                <IconButton aria-label="edit" color="primary" onClick={() => handleEdit(index)} disabled={status === 'completed'}>
+                <IconButton aria-label="edit" color="primary" onClick={() => handleEdit(index)} disabled={disableCondition}>
                     <EditIcon fontSize="large" />
                 </IconButton>
             </CenterGrid>
             <CenterGrid item xs={3}>
                 <ConfirmationButton
                     color='primary'
-                    disabled={status === 'completed'}
+                    disabled={disableCondition}
                     aria-label='dec'
                     buttonType={IconButton}
                     override={item.quantity > 1}
@@ -60,7 +60,7 @@ const OrderItemDetails: React.FC<OrderItemDetailsProps> = ({ item, index, status
                     <RemoveOutlineIcon fontSize='inherit' />
                 </ConfirmationButton>
                 <Typography variant='h5'>{item.quantity}</Typography>
-                <IconButton color="primary" aria-label='inc' size='large' onClick={() => handleChangeQuantity(index, 'inc')} disabled={status === 'completed'}>
+                <IconButton color="primary" aria-label='inc' size='large' onClick={() => handleChangeQuantity(index, 'inc')} disabled={disableCondition}>
                     <AddOutlinedIcon fontSize='inherit' />
                 </IconButton>
             </CenterGrid>

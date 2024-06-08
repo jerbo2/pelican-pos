@@ -10,7 +10,9 @@ import Login from './components/Login'
 import { UserContext } from './components/BaseComps/contexts/UserContext'
 import Reports from './components/Reports'
 import { TransitionGroup } from 'react-transition-group'
-import { Fade } from '@mui/material'
+import { Box, Fade } from '@mui/material'
+import { WebSocketProvider } from './components/BaseComps/contexts/WebSocketContext'
+import { WEBSOCKET_URL } from './components/Constants'
 
 const AppRoutes = () => {
   const { token } = useContext(UserContext)
@@ -33,7 +35,7 @@ const AppRoutes = () => {
   return (
     <TransitionGroup>
       <Fade key={location.pathname}>
-        <div>
+        <Box sx={{ width: '100vw', height: '100vh', overflowX: 'hidden' }}>
           <Routes location={location}>
             <Route element={<PrivateRoutes />}>
               <Route path="/" element={<Landing />} />
@@ -41,7 +43,6 @@ const AppRoutes = () => {
               <Route path="/order/:category" element={<NewOrder />} />
               <Route path="/active-orders" element={<ActiveOrders />} />
               <Route path="/active-orders/:category" element={<ActiveOrders />} />
-              <Route path="/active-orders/checkout" element={<ActiveOrders />} />
               <Route path="/past-orders" element={<PastOrders />} />
             </Route>
             <Route element={<AdminRoutes />}>
@@ -51,7 +52,7 @@ const AppRoutes = () => {
             </Route>
             <Route path="/login" element={<Login />} />
           </Routes>
-        </div>
+          </Box>
       </Fade>
     </TransitionGroup>
   )
@@ -60,9 +61,11 @@ const AppRoutes = () => {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <WebSocketProvider url={WEBSOCKET_URL}>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </WebSocketProvider>
   )
 }
 

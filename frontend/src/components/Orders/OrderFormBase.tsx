@@ -1,23 +1,23 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { FormConfigContext } from "../Configuration/contexts/FormConfigContext";
-import { CenterGrid, Checkbox, Divider, FormControlLabel, TextField } from "../Styled";
+import { CenterGrid, Divider } from "../Styled";
 import BasePreviewComponent from "../BaseComps/BasePreviewComponent";
 import BaseToolBar from "../BaseComps/BaseToolBar";
 import ConfirmationButton from "../BaseComps/ConfirmationButton";
-import { FormComponentConfig, FormValue } from "../BaseComps/dbTypes";
+import { FormComponentConfig, FormValue, OrderItems } from "../BaseComps/dbTypes";
 import { OrderContext } from "./contexts/OrderContext";
-import { FormGroup } from "@mui/material";
 
 const confirmCancelOrderText = 'Are you sure you want to cancel?'
 const confirmSubmitWithoutAllFieldsText = 'Some fields are not filled out, is that okay?'
 
-interface NewOrderBaseProps {
+interface OrderBaseProps {
     pageName: string;
     handleSubmit: () => void;
     handleCancel: () => void;
     // optionals for base form
     toolbarLeftIcon?: React.ReactNode;
     showCards?: boolean;
+    editItem?: OrderItems;
 }
 
 // populate map with initial value where they exist, otherwise empty string
@@ -33,33 +33,32 @@ const createInitialFormValues = (config: FormComponentConfig[], values: FormValu
     }));
 };
 
-export default function OrderFormBase({ pageName, handleSubmit, handleCancel, toolbarLeftIcon, showCards }: NewOrderBaseProps) {
+const checkOrderFormEmpty = (formValues: FormValue[]) => {
+    return formValues.every(formValue => formValue.value === '');
+}
+
+export default function OrderFormBase({ pageName, handleSubmit, handleCancel, toolbarLeftIcon, showCards, editItem }: OrderBaseProps) {
     const { formConfig } = useContext(FormConfigContext);
-    const { formValues, editItem, setFormValues } = useContext(OrderContext);
+    const { formValues, setFormValues } = useContext(OrderContext);
     const [emptyFormConfirm, setEmptyFormConfirm] = useState(true);
     const bottomRef = useRef<HTMLDivElement>(null);
 
-    const scrollToBottom = () => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
     useEffect(() => {
         let initialFormValues: FormValue[] = [];
-        const filteredFormConfig = formConfig.filter(config => config.type !== 'price');
-        if (editItem.id !== -1) {
+        if (editItem) {
             console.log(editItem)
             initialFormValues = editItem.configurations.map(config => ({
                 label: config.label,
                 value: config.value
             }));
         } else {
-            initialFormValues = filteredFormConfig.map(config => ({
+            initialFormValues = formConfig.map(config => ({
                 label: config.label,
                 value: ''
             }));
         }
 
-        if (initialFormValues.length !== filteredFormConfig.length) {
+        if (initialFormValues.length !== formConfig.length) {
             // formConfig was changed after an order had been submitted, synchronize form values
             const synchronizedFormValues = createInitialFormValues(formConfig, initialFormValues);
             setFormValues(synchronizedFormValues);
@@ -70,9 +69,9 @@ export default function OrderFormBase({ pageName, handleSubmit, handleCancel, to
 
     useEffect(() => {
         // check if all formValues are filled out
-        if (formValues.every(formValue => formValue.value !== '')) {
+        if (checkOrderFormEmpty(formValues)) {
+            console.log('empty form')
             setEmptyFormConfirm(true);
-            scrollToBottom();
         } else {
             setEmptyFormConfirm(false);
         }
@@ -100,10 +99,10 @@ export default function OrderFormBase({ pageName, handleSubmit, handleCancel, to
                         )
                     })}
                     <CenterGrid item xs={6}>
-                        <ConfirmationButton onConfirmed={handleCancel} dialogContent={confirmCancelOrderText} override={formValues.every(formValue => formValue.value === '')}>CANCEL</ConfirmationButton>
+                        <ConfirmationButton onConfirmed={handleCancel} dialogContent={confirmCancelOrderText} override={Boolean(editItem) || checkOrderFormEmpty(formValues)}>CANCEL</ConfirmationButton>
                     </CenterGrid>
                     <CenterGrid item xs={6}>
-                        <ConfirmationButton onConfirmed={handleSubmit} override={emptyFormConfirm} dialogContent={confirmSubmitWithoutAllFieldsText}>SUBMIT</ConfirmationButton>
+                        <ConfirmationButton onConfirmed={handleSubmit} override={!emptyFormConfirm} dialogContent={confirmSubmitWithoutAllFieldsText}>SUBMIT</ConfirmationButton>
                     </CenterGrid>
                 </React.Fragment>
             )}

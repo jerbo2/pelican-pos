@@ -1,4 +1,4 @@
-import { useContext, Dispatch, SetStateAction } from "react";
+import { useContext, Dispatch, SetStateAction, useEffect } from "react";
 import { ItemContext } from "../Configuration/contexts/ItemContext";
 import axios from "axios";
 import { UIContext } from "../BaseComps/contexts/UIContext";
@@ -6,7 +6,7 @@ import { useNavigate } from "react-router";
 import { OrderContext } from "./contexts/OrderContext";
 import { Order } from "../BaseComps/dbTypes";
 import BackIcon from "../BaseComps/BackIcon";
-import NewOrderFormBase from "./OrderFormBase";
+import OrderFormBase from "./OrderFormBase";
 import { updateItemWithFormConfig } from "../Configuration/ConfigBuildList";
 import { FormConfigContext } from "../Configuration/contexts/FormConfigContext";
 
@@ -18,7 +18,7 @@ interface NewOrderFormProps {
 
 export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormProps) {
     const { itemName, storedItems } = useContext(ItemContext);
-    const { formConfig } = useContext(FormConfigContext)
+    const { formConfig, setFormConfig } = useContext(FormConfigContext)
     const { setSnackbarMessage, setOpenSnackbar } = useContext(UIContext);
     const { activeOrder, setActiveOrder, formValues } = useContext(OrderContext);
 
@@ -32,6 +32,13 @@ export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormPr
         sessionStorage.setItem('activeOrder', JSON.stringify(order.data.id))
         return order.data.id
     }
+
+    useEffect(() => {
+        if (formConfig.length === 0) return;
+        if (formConfig.every(config => config.type === 'price')) {
+            addToOrder();
+        }
+    }, [formConfig])
 
     const addToOrder = async () => {
         // PUT request to add item to order
@@ -48,17 +55,23 @@ export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormPr
 
         if (orderID === -1) {
             // client is not currently working on an order, create one
+            console.log('Creating new order')
             orderID = await createOrder()
         }
 
         const putUrl = `/api/v1/orders/${orderID}/add/${item_to_add.id}`
 
-        const configurations = formValues.map((formValue, _) => {
+        let configurations = formValues.map((formValue, _) => {
             return {
                 label: formValue.label,
                 value: formValue.value,
             }
         });
+
+        if (configurations.length === 0) {
+            console.log('No configurations found, filling with empty values')
+            configurations = Array(formConfig.length).fill({ label: '', value: '' });
+        }
 
         console.log(configurations)
 
@@ -66,7 +79,9 @@ export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormPr
             const order = await axios.put(putUrl, configurations)
             setActiveOrder(order.data)
             setSnackbarMessage('Item added to order.')
+            console.log('Item added to order:', order.data)
             setOpenSnackbar(true)
+            setFormConfig([]);
             navigate('/order')
         } catch (err) {
             console.error('Failed to add item to order:', err)
@@ -76,10 +91,10 @@ export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormPr
     }
 
     return (
-        <NewOrderFormBase
+        <OrderFormBase
             pageName={pageName}
             handleSubmit={addToOrder}
-            handleCancel={()=>setShowCards(true)}
+            handleCancel={() => setShowCards(true)}
             showCards={showCards}
             toolbarLeftIcon={<BackIcon />}
         />

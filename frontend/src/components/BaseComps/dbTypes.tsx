@@ -89,4 +89,4 @@ type Order = AdditionalOrderInfo & {
     transaction: Transaction;
 }
 
-export type { Dependency, PricingConfig, FormValue, FormComponentConfig, Item, Category, CategoryWithItems, OrderItems, Order, AdditionalOrderInfo}
+export type { Dependency, PricingConfig, FormValue, FormComponentConfig, Item, Category, CategoryWithItems, OrderItems, Order, AdditionalOrderInfo, Transaction}

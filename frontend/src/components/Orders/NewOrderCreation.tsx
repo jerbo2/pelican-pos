@@ -2,25 +2,22 @@ import NewOrderCurrentItems from "./NewOrderCurrentItems"
 import NewOrderForm from "./NewOrderForm"
 import NewOrderFormEdit from "./OrderFormEdit"
 import { Box } from "@mui/material"
-import { useState, useContext, useEffect } from "react"
-import { OrderContext } from "./contexts/OrderContext"
+import { useState, useEffect } from "react"
+import { useLocation } from "react-router"
 
 export default function NewOrderCreation() {
     const [showCards, setShowCards] = useState(true)
-    const { editItem } = useContext(OrderContext)
-
-    const editItemExists = editItem.item_name !== ''
+    const editItem = useLocation().state?.editItem
 
     useEffect(() => {
-        console.log(editItem)
-        if (editItemExists) {
+        if (editItem) {
             setShowCards(false)
         }
     }, [editItem])
 
     return (
         <Box sx={{ width: '100vw', height: '100vh', overflowX: 'hidden' }}>
-            {!editItemExists ? (
+            {!editItem ? (
                 <NewOrderForm showCards={showCards} setShowCards={setShowCards} />) :
                 (<NewOrderFormEdit rootPage="order"/>)
             }

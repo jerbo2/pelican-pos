@@ -4,13 +4,10 @@ import NewOrderLanding from "./NewOrderLanding"
 import { ItemProvider } from "../Configuration/contexts/ItemContext"
 import { FormConfigProvider } from "../Configuration/contexts/FormConfigContext"
 import { UIProvider } from "../BaseComps/contexts/UIContext"
-import { WebSocketProvider } from "../BaseComps/contexts/WebSocketContext"
 import { OrderProvider } from "./contexts/OrderContext"
 import { useParams } from "react-router"
 import Snackbar from "../BaseComps/Snackbar"
 import { Box } from "@mui/material"
-import { WEBSOCKET_URL } from "../Constants"
-import PrintDialog from "./PrintDialog"
 import { OriginalOrderInfoProvider } from "./contexts/OriginalOrderInfoContext"
 
 
@@ -21,7 +18,6 @@ export default function NewOrder() {
             <UIProvider>
                 <OrderProvider>
                     <OriginalOrderInfoProvider>
-                        <WebSocketProvider url={WEBSOCKET_URL}>
                             {params.category ?
                                 <FormConfigProvider>
                                     <ItemProvider>
@@ -31,7 +27,6 @@ export default function NewOrder() {
                                 <NewOrderLanding />
                             }
                             <Snackbar />
-                        </WebSocketProvider>
                     </OriginalOrderInfoProvider>
                 </OrderProvider>
             </UIProvider >

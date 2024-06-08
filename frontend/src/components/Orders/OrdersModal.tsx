@@ -8,10 +8,8 @@ export default function OrdersModal() {
 
     return (
         <TransitionsModal children={<OrderModalContentBase
-            pageName="active-orders"
-            submitButtonText="save info"
+            submitButtonText="save"
             overrideSubmit={true}
-            status="submitted"
             />
         }
             openPopup={openPopup} handleClosePopup={()=>setOpenPopup(false)} popup_sx={{ left: '50%' }} />

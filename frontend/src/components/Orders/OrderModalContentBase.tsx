@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useCallback } from 'react';
+import { useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { List, Typography } from '@mui/material';
 import { CenterGrid, IconButton, Divider } from '../Styled';
 import { OrderContext } from './contexts/OrderContext';
@@ -7,9 +7,9 @@ import { WebSocketContext } from '../BaseComps/contexts/WebSocketContext';
 import dayjs, { Dayjs } from 'dayjs';
 
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import CloseButton from '../BaseComps/CloseButton';
-import { AdditionalOrderInfo, OrderItems } from '../BaseComps/dbTypes';
+import { OrderItems } from '../BaseComps/dbTypes';
 import axios from 'axios';
 import _ from 'lodash';
 import { POPUP_FADE_DURATION } from '../Constants';
@@ -24,23 +24,30 @@ import PrintDialog, { showPrintDialog } from './PrintDialog';
 import { OriginalOrderInfoContext } from './contexts/OriginalOrderInfoContext';
 
 interface OrderModalContentProps {
-    pageName: string;
     submitButtonText: string;
     overrideSubmit?: boolean;
-    status: string;
 }
 
-export default function OrderModalContent({ pageName, submitButtonText, overrideSubmit, status }: OrderModalContentProps) {
-    const { orderItems, activeOrder, additionalOrderInfo, setOrderItems, setEditItem, setActiveOrder, setAdditionalOrderInfo, setOrders } = useContext(OrderContext);
+export default function OrderModalContent({ submitButtonText, overrideSubmit }: OrderModalContentProps) {
+    const { orderItems, activeOrder, additionalOrderInfo, setOrderItems, setActiveOrder, setAdditionalOrderInfo, setOrders } = useContext(OrderContext);
     const { originalOrderItems, setOriginalOrderItems, originalAdditionalOrderInfo, setOriginalAdditionalOrderInfo } = useContext(OriginalOrderInfoContext);
     const { openPopup, setOpenSnackbar, setSnackbarMessage, setOpenPopup, setOpenDialog } = useContext(UIContext);
     const { sendMessage } = useContext(WebSocketContext);
     const navigate = useNavigate();
     const [shouldCloseOrder, setShouldCloseOrder] = useState(false);
     const [checkoutOpen, setCheckoutOpen] = useState(false);
+    const pathname = useLocation().pathname;
+
+    console.log(orderItems)
+
+    const disableCondition = useMemo(() => {
+        return activeOrder.status === 'completed' || Boolean(activeOrder.transaction.payment_method);
+    }, [activeOrder]);
 
     const handleClosePopup = () => {
         setOpenPopup(false);
+        setOriginalAdditionalOrderInfo({})
+        setOriginalOrderItems([])
     }
 
     useEffect(() => {
@@ -67,6 +74,7 @@ export default function OrderModalContent({ pageName, submitButtonText, override
     }, [openPopup]);
 
     const checkForUnsavedChanges = () => {
+        if (activeOrder.status === 'completed') return false;
         if (!_.isEqual(orderItems, originalOrderItems) || !_.isEqual(additionalOrderInfo, originalAdditionalOrderInfo)) {
             return true;
         } else {
@@ -105,9 +113,8 @@ export default function OrderModalContent({ pageName, submitButtonText, override
 
     const handleEdit = (index: number) => {
         const orderItem = orderItems[index];
-        console.log(orderItem);
-        setEditItem(orderItem);
-        navigate(`/${pageName}/${orderItem.category_name}`)
+        console.log('orderItem', orderItem);
+        navigate(orderItem.category_name, { state: { editItem: orderItem } })
     }
 
     const saveQuantityChange = async (orderItem: OrderItems) => {
@@ -138,36 +145,25 @@ export default function OrderModalContent({ pageName, submitButtonText, override
     const handleAddNewItem = () => {
         sessionStorage.setItem('activeOrder', JSON.stringify(activeOrder.id));
         setOpenPopup(false);
-        navigate(`/order`);
+        if (pathname !== '/order') navigate(`/order`);
     }
 
     const noSave = () => {
         resetContent();
         setActiveOrder({ ...activeOrder, ...additionalOrderInfo });
-        if (activeOrder.status === 'submitted') {
-            closeOrder();
-        }
-        else {
-            handleClosePopup();
-        }
+        handleClosePopup();
     }
 
 
-    const save = async (newStatus: string) => {
-        console.log(status, newStatus)
-        if (!checkForUnsavedChanges() && (newStatus === 'pending' || newStatus === 'submitted')) {
-            if (status === 'submitted') {
-                console.log('closing order')
-                closeOrder();
-            }
-            else {
-                handleClosePopup();
-            }
+    const save = async (newStatus: string, action?: string) => {
+        console.log(activeOrder.status, newStatus)
+        if (!checkForUnsavedChanges() && !(activeOrder.status === 'pending' && newStatus === 'submitted')) {
+            action === 'close' ? hardCloseOrder() : handleClosePopup();
             return;
         }
 
-        const validationError = validateAdditionalOrderInfo(additionalOrderInfo, status);
-        if (validationError && (!overrideSubmit || validationError === 'Invalid date.')) {
+        const validationError = validateAdditionalOrderInfo(additionalOrderInfo, activeOrder.status);
+        if (validationError && (!overrideSubmit || validationError === 'Invalid date.') && newStatus !== 'pending') {
             setSnackbarMessage(validationError);
             setOpenSnackbar(true);
             return;
@@ -186,7 +182,7 @@ export default function OrderModalContent({ pageName, submitButtonText, override
             const order_res = await axios.patch(url, payload);
 
             if (newStatus !== 'pending') {
-                if (status !== 'submitted') {
+                if (activeOrder.status !== 'submitted') {
                     sendMessage(JSON.stringify({ type: 'order-submit', payload: order_res.data }));
                 }
                 else {
@@ -194,7 +190,7 @@ export default function OrderModalContent({ pageName, submitButtonText, override
                 }
             }
 
-            if (status === 'pending' && newStatus === 'submitted') {
+            if (activeOrder.status === 'pending' && newStatus === 'submitted') {
                 setOpenDialog(true);
                 await showPrintDialog();
             }
@@ -208,13 +204,13 @@ export default function OrderModalContent({ pageName, submitButtonText, override
                 setOpenSnackbar(true);
             }
 
-            if (newStatus === 'submitted' || newStatus === 'completed') {
-                console.log('closing order')
-                closeOrder();
+            if (activeOrder.status === 'pending') {
+                hardCloseOrder();
             }
             else {
                 handleClosePopup();
             }
+
         } catch (error) {
             console.error('Failed to save order:', error);
             setSnackbarMessage('Failed to save order.');
@@ -222,7 +218,7 @@ export default function OrderModalContent({ pageName, submitButtonText, override
         }
     };
 
-    const closeOrder = () => {
+    const hardCloseOrder = () => {
         handleClosePopup();
         setShouldCloseOrder(true);
     }
@@ -233,7 +229,7 @@ export default function OrderModalContent({ pageName, submitButtonText, override
             await axios.delete(delUrl);
             setOrders((prevOrders) => prevOrders.filter(order => order.id !== activeOrder.id));
             sendMessage(JSON.stringify({ type: 'order-delete', payload: { id: activeOrder.id } }));
-            closeOrder();
+            hardCloseOrder();
         } catch (error) {
             console.error(error);
         }
@@ -242,7 +238,7 @@ export default function OrderModalContent({ pageName, submitButtonText, override
     return (
         <CenterGrid container>
             <PrintDialog />
-            <CloseButton override={!checkForUnsavedChanges()} dialogContent='Keep changes?' handleOnConfirmed={() => save(status)} handleOnUnConfirmed={noSave} />
+            <CloseButton override={!checkForUnsavedChanges()} dialogContent='Keep changes?' handleOnConfirmed={() => save(activeOrder.status)} handleOnUnConfirmed={noSave} />
             <CenterGrid item xs={12}>
                 <Typography variant='h3' fontWeight='bold' mt={'8px'}>Order Summary</Typography>
             </CenterGrid>
@@ -255,14 +251,14 @@ export default function OrderModalContent({ pageName, submitButtonText, override
                             key={index}
                             item={item}
                             index={index}
-                            status={activeOrder.status}
+                            disableCondition={disableCondition}
                             handleEdit={handleEdit}
                             handleChangeQuantity={handleChangeQuantity}
                         />
                     ))}
                 </List>
             </CenterGrid>
-            {!(activeOrder.status === 'completed') && (
+            {!disableCondition && (
                 <>
                     <CenterGrid item xs={3}>
                         <IconButton aria-label='inc' size='small' onClick={handleAddNewItem} sx={{ m: 0, p: 0 }}>
@@ -282,9 +278,9 @@ export default function OrderModalContent({ pageName, submitButtonText, override
                 handleChangeAdditionalOrderInfo={handleChangeAdditionalOrderInfo}
                 status={activeOrder.status}
                 overrideSubmit={overrideSubmit}
+                disableCondition={disableCondition}
             />
             <OrderActionButtons
-                closeOrder={closeOrder}
                 deleteOrder={deleteOrder}
                 save={save}
                 setCheckoutOpen={setCheckoutOpen}

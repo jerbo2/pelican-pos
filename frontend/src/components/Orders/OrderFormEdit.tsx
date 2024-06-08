@@ -2,31 +2,40 @@ import { useContext, useEffect } from "react";
 import { FormConfigContext } from "../Configuration/contexts/FormConfigContext";
 import { ItemContext } from "../Configuration/contexts/ItemContext";
 import { UIContext } from "../BaseComps/contexts/UIContext";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { OrderContext, defaultOrderItem } from "./contexts/OrderContext";
 import { OrderItems, Order } from "../BaseComps/dbTypes";
-import NewOrderFormBase from "./OrderFormBase";
+import OrderFormBase from "./OrderFormBase";
 import axios from "axios";
 import { updateItemWithFormConfig } from "../Configuration/ConfigBuildList";
 
 
 export default function OrderFormEdit({rootPage}: {rootPage: string}) {
     const { setFormConfig, formConfig } = useContext(FormConfigContext);
-    const { editItem, formValues, setEditItem, setOrderItems } = useContext(OrderContext);
+    const { formValues, setOrderItems } = useContext(OrderContext);
     const { storedItems } = useContext(ItemContext);
     const { setOpenPopup, setOpenSnackbar, setSnackbarMessage } = useContext(UIContext);
 
     const navigate = useNavigate();
-    const pageName = `EDITING ${editItem.item_name.toLocaleUpperCase()}`
+    const editItem = useLocation().state?.editItem;
+    const pageName = editItem && (`EDITING ${editItem.item_name.toLocaleUpperCase()}`)
 
     useEffect(() => {
+        if (!editItem || formConfig.every(config => config.type === 'price')) {
+            console.error('No item to edit');
+            navigate(`/${rootPage}`);
+        }
+    }, [editItem])
+
+    useEffect(() => {
+        if (!editItem) return;
         const item = storedItems.find(item => item.name === editItem.item_name);
         setFormConfig(item?.form_cfg || []);
     }, [storedItems])
 
     const handleCancel = () => {
-        setOpenPopup(true)
-        setEditItem(defaultOrderItem)
+        console.log('cancelling edit')
+        setOpenPopup(true);
         navigate(`/${rootPage}`)
     }
 
@@ -72,12 +81,12 @@ export default function OrderFormEdit({rootPage}: {rootPage: string}) {
 
 
     return (
-
-        <NewOrderFormBase
+        <OrderFormBase
             pageName={pageName}
             handleSubmit={handleSubmit}
             handleCancel={handleCancel}
             showCards={false}
+            editItem={editItem}
         />
     )
 }

@@ -5,9 +5,8 @@ import { getTotalPrice } from './utils/orderUtils';
 import { OrderItems, Order } from '../BaseComps/dbTypes';
 
 interface ActionButtonsProps {
-    closeOrder: () => void;
     deleteOrder: () => void;
-    save: (newStatus: string) => Promise<void>;
+    save: (newStatus: string, action?: string) => Promise<void>;
     setCheckoutOpen: (open: boolean) => void;
     setOpenDialog: (open: boolean) => void;
     orderItems: OrderItems[];
@@ -16,7 +15,7 @@ interface ActionButtonsProps {
     activeOrder: Order;
 }
 
-const OrderActionButtons: React.FC<ActionButtonsProps> = ({ closeOrder, deleteOrder, save, setCheckoutOpen, setOpenDialog, orderItems, overrideSubmit, submitButtonText, activeOrder }) => {
+const OrderActionButtons: React.FC<ActionButtonsProps> = ({ deleteOrder, save, setCheckoutOpen, setOpenDialog, orderItems, overrideSubmit, submitButtonText, activeOrder }) => {
     const cancelOrder = "Cancel this order?";
     const submitConfirmDialog = "Submit this order? ";
 
@@ -25,10 +24,10 @@ const OrderActionButtons: React.FC<ActionButtonsProps> = ({ closeOrder, deleteOr
             {!(activeOrder.status === 'completed') && (
                 <>
                     <CenterGrid item xs={6}>
-                        <ConfirmationButton onConfirmed={() => { closeOrder(); deleteOrder() }} dialogContent={cancelOrder}>CANCEL</ConfirmationButton>
+                        <ConfirmationButton onConfirmed={() => deleteOrder() } dialogContent={cancelOrder} disabled={activeOrder.transaction.payment_method !== null}>CANCEL</ConfirmationButton>
                     </CenterGrid>
                     <CenterGrid item xs={6}>
-                        <ConfirmationButton onConfirmed={() => save('submitted')} override={overrideSubmit} dialogContent={submitConfirmDialog + `The total is $${getTotalPrice(orderItems)}.`}>{submitButtonText}</ConfirmationButton>
+                        <ConfirmationButton onConfirmed={() => save('submitted', 'close')} override={overrideSubmit} disabled={activeOrder.transaction.payment_method !== null} dialogContent={submitConfirmDialog + `The total is $${getTotalPrice(orderItems)}.`}>{submitButtonText}</ConfirmationButton>
                     </CenterGrid>
                 </>
             )}

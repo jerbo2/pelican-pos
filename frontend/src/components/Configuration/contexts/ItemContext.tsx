@@ -30,7 +30,7 @@ const ItemProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [itemName, setItemName] = useState<string>('');
     const [storedItems, setStoredItems] = useState<Item[]>([]);
     const [categoryID, setCategoryID] = useState<number>(0);
-    const [taxRate, setTaxRate] = useState<number>(0);
+    const [taxRate, setTaxRate] = useState<number>(6.625);
 
     const URL = window.location.pathname;
     const categoryName = URL.split('/').pop();
@@ -44,6 +44,7 @@ const ItemProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                 setStoredItems(match.items);
                 setCategoryID(match.id);
                 console.log(`Category found: ${categoryName}`);
+                console.log(match);
             }
             else {
                 console.error(`Category not found: ${categoryName}`);
