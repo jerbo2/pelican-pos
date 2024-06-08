@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import { CenterGrid, TextField, IconButton, Divider, MenuItem, ButtonWidest } from '../Styled';
@@ -11,7 +11,6 @@ import { WebSocketContext } from '../BaseComps/contexts/WebSocketContext';
 import BasePreviewComponents from '../BaseComps/BasePreviewComponent';
 import ConfirmationButton from '../BaseComps/ConfirmationButton';
 import ConfigPricingSequence from './ConfigPricingSequence';
-import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 import { DRAWER_WIDTH } from '../Constants';
 import _ from 'lodash';

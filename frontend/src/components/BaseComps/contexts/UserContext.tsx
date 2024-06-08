@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Dispatch, createContext, useState, SetStateAction } from 'react';
 import axios from 'axios';
 import qs from 'qs';
-import { useNavigate, useLocation } from 'react-router-dom';
 
 interface User {
     id: number;

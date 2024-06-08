@@ -5,7 +5,6 @@ import { OrderContext } from "./contexts/OrderContext";
 import { fetchOrders } from "./OrdersTable";
 import { Order } from "../BaseComps/dbTypes";
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import { UIContext } from "../BaseComps/contexts/UIContext";
 
 
 export default function SelectPendingOrder() {

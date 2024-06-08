@@ -34,7 +34,7 @@ const getCategoryTicketMap = (categories: Map<string, number>) => {
     let ticketCounter = 1;
 
     // Initialize category ticket numbers
-    categories.forEach((value, key) => {
+    categories.forEach((_, key) => {
         categoryTicketMap.set(key, ticketCounter++);
     });
     return categoryTicketMap;

@@ -1,13 +1,10 @@
 import { useNavigate } from 'react-router';
-import { Box, Fab, Fade, Stack, Typography } from '@mui/material';
+import { Box, Fab, Stack } from '@mui/material';
 import { Button, CenterGrid } from './Styled';
 import axios from 'axios';
-import ConfirmationButton from './BaseComps/ConfirmationButton';
 import { LogoutOutlined } from '@mui/icons-material';
-import Login from './Login';
 import { UserContext } from './BaseComps/contexts/UserContext';
-import React, { useContext } from 'react';
-import { TransitionGroup } from 'react-transition-group';
+import { useContext } from 'react';
 import Logo from './BaseComps/Logo';
 import NotesOutlinedIcon from '@mui/icons-material/NotesOutlined';
 
