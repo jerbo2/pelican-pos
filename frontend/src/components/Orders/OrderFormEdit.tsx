@@ -21,7 +21,7 @@ export default function OrderFormEdit({rootPage}: {rootPage: string}) {
     const pageName = editItem && (`EDITING ${editItem.item_name.toLocaleUpperCase()}`)
 
     useEffect(() => {
-        if (!editItem || formConfig.every(config => config.type === 'price')) {
+        if (!editItem) {
             console.error('No item to edit');
             navigate(`/${rootPage}`);
         }

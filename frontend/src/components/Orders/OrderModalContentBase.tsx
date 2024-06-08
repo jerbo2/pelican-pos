@@ -114,6 +114,11 @@ export default function OrderModalContent({ submitButtonText, overrideSubmit }: 
     const handleEdit = (index: number) => {
         const orderItem = orderItems[index];
         console.log('orderItem', orderItem);
+        if (orderItem.configurations.every(config => config.label === '' && config.value === '')) {
+            setOpenSnackbar(true);
+            setSnackbarMessage('Item has no configurations to edit.');
+            return;
+        }
         navigate(orderItem.category_name, { state: { editItem: orderItem } })
     }
 
