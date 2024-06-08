@@ -25,7 +25,7 @@ import {
   ToggleButtonGroup as MUIToggleButtonGroup,
   ToggleButtonProps as MUIToggleButtonProps,
 } from '@mui/material';
-import { DateTimePicker as MUIDateTimePicker } from '@mui/x-date-pickers';
+import { DateTimePicker as MUIDateTimePicker, MobileDateTimePicker as MUIMobileDateTimePicker } from '@mui/x-date-pickers';
 import { DataGrid as MUIDataGrid } from '@mui/x-data-grid';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { DRAWER_WIDTH } from './Constants';
@@ -331,6 +331,20 @@ const DateTimePicker = styled(MUIDateTimePicker)({
   },
 });
 
+const MobileDateTimePicker = styled(MUIMobileDateTimePicker)({
+  width: '100%',
+  margin: '8px',
+  '& .MuiInputBase-input': {
+    fontSize: '1.5rem',
+  },
+  '& .MuiFormLabel-root': {
+    fontSize: '1.5rem',
+  },
+  '& label.MuiInputLabel-shrink': {
+    fontSize: '1rem',
+  },
+});
+
 const DataGrid = styled(MUIDataGrid)({
 
 
@@ -424,6 +438,7 @@ export {
   FormControlLabel,
   Checkbox,
   DateTimePicker,
+  MobileDateTimePicker,
   DataGrid,
   Accordion,
   ItemPriceLine,

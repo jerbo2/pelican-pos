@@ -49,6 +49,7 @@ const OrderProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     useEffect(() => {
         // retreive active order from session storage if available
+        if (activeOrder.id !== -1) return;
         if (sessionStorage.getItem('activeOrder')) {
             const getOrder = async () => {
                 const orderID = JSON.parse(sessionStorage.getItem('activeOrder') || '{}');

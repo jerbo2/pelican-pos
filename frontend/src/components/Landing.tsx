@@ -22,8 +22,7 @@ function Landing() {
   const { user, logout } = useContext(UserContext);
 
   return (
-    <Box sx={{ width: '100vw', height: '100vh' }}>
-      <CenterGrid container spacing={'auto'} flex={1} height={'100%'}>
+      <CenterGrid container sx={{height: '100vh'}}>
 
         <CenterGrid item xs={12}>
           <Logo />
@@ -82,7 +81,6 @@ function Landing() {
           </Button>
         </CenterGrid>
       </CenterGrid>
-    </Box >
   );
 }
 

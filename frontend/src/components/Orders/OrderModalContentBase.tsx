@@ -162,7 +162,12 @@ export default function OrderModalContent({ submitButtonText, overrideSubmit }: 
 
     const save = async (newStatus: string, action?: string) => {
         console.log(activeOrder.status, newStatus)
-        if (!checkForUnsavedChanges() && !(activeOrder.status === 'pending' && newStatus === 'submitted')) {
+        if (activeOrder.status === 'completed') {
+            handleClosePopup();
+            return;
+        }
+        if (!checkForUnsavedChanges() && !(activeOrder.status === 'pending' && newStatus === 'submitted') && !(newStatus === 'completed')) {
+            console.log('no changes')
             action === 'close' ? hardCloseOrder() : handleClosePopup();
             return;
         }
@@ -209,7 +214,7 @@ export default function OrderModalContent({ submitButtonText, overrideSubmit }: 
                 setOpenSnackbar(true);
             }
 
-            if (activeOrder.status === 'pending') {
+            if (activeOrder.status === 'pending' && action === 'close') {
                 hardCloseOrder();
             }
             else {

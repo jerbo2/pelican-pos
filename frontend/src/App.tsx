@@ -10,7 +10,7 @@ import Login from './components/Login'
 import { UserContext } from './components/BaseComps/contexts/UserContext'
 import Reports from './components/Reports'
 import { TransitionGroup } from 'react-transition-group'
-import { Box, Fade } from '@mui/material'
+import { Box, Fade, Slide, Zoom } from '@mui/material'
 import { WebSocketProvider } from './components/BaseComps/contexts/WebSocketContext'
 import { WEBSOCKET_URL } from './components/Constants'
 
@@ -33,9 +33,7 @@ const AppRoutes = () => {
   }
 
   return (
-    <TransitionGroup>
-      <Fade key={location.pathname}>
-        <Box sx={{ width: '100vw', height: '100vh', overflowX: 'hidden' }}>
+
           <Routes location={location}>
             <Route element={<PrivateRoutes />}>
               <Route path="/" element={<Landing />} />
@@ -52,9 +50,7 @@ const AppRoutes = () => {
             </Route>
             <Route path="/login" element={<Login />} />
           </Routes>
-          </Box>
-      </Fade>
-    </TransitionGroup>
+
   )
 }
 

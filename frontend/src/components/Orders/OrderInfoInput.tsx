@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextFieldSmaller, DateTimePicker } from '../Styled';
+import { TextFieldSmaller, MobileDateTimePicker } from '../Styled';
 import { CenterGrid } from '../Styled';
 import { AdditionalOrderInfo } from '../BaseComps/dbTypes';
 import dayjs, { Dayjs } from 'dayjs';
@@ -41,7 +41,7 @@ const OrderInfoInput: React.FC<OrderInfoInputProps> = ({ additionalOrderInfo, ha
                 />
             </CenterGrid>
             <CenterGrid item xs={5}>
-                <DateTimePicker
+                <MobileDateTimePicker
                     label='Complete at'
                     value={additionalOrderInfo.complete_at}
                     minutesStep={5}
