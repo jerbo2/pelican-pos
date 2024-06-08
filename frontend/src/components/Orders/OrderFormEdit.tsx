@@ -3,7 +3,7 @@ import { FormConfigContext } from "../Configuration/contexts/FormConfigContext";
 import { ItemContext } from "../Configuration/contexts/ItemContext";
 import { UIContext } from "../BaseComps/contexts/UIContext";
 import { useNavigate, useLocation } from "react-router";
-import { OrderContext, defaultOrderItem } from "./contexts/OrderContext";
+import { OrderContext } from "./contexts/OrderContext";
 import { OrderItems, Order } from "../BaseComps/dbTypes";
 import OrderFormBase from "./OrderFormBase";
 import axios from "axios";

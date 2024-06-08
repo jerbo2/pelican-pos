@@ -6,7 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import RemoveOutlineIcon from '@mui/icons-material/RemoveOutlined';
 import ConfirmationButton from '../BaseComps/ConfirmationButton';
-import { OrderItems, Transaction } from '../BaseComps/dbTypes';
+import { OrderItems } from '../BaseComps/dbTypes';
 
 interface OrderItemDetailsProps {
     item: OrderItems;

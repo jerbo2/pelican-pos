@@ -1,9 +1,9 @@
-import React, { useState, useContext, useCallback, Dispatch, SetStateAction, useEffect, useMemo } from 'react';
+import React, { useState, useContext, useEffect, useMemo } from 'react';
 import FormDialog from '../BaseComps/FormDialog';
-import { Button, CenterGrid, Checkbox, Divider, FormControl, TextFieldSmaller, MenuItemSmaller, ToggleButton, ToggleButtonGroup, ButtonWidest } from '../Styled';
+import { Button, CenterGrid, Checkbox, Divider,TextFieldSmaller, MenuItemSmaller, ToggleButton, ToggleButtonGroup } from '../Styled';
 import { UIContext } from '../BaseComps/contexts/UIContext';
 import { OrderContext } from './contexts/OrderContext';
-import { FormGroup, List, ListItem, Typography, TextField, ButtonGroup, Stack } from '@mui/material';
+import { List, ListItem, Typography, Stack } from '@mui/material';
 import { OrderItems } from '../BaseComps/dbTypes';
 import axios from 'axios';
 import { OrderInfoAccordion } from './OrderItemDetails';
@@ -27,16 +27,6 @@ const getUniqueCategories = (orderItems: OrderItems[]) => {
         acc.set(categoryName, (acc.get(categoryName) || 0) + 1);
         return acc;
     }, new Map<string, number>());
-};
-
-const getCategoryIndices = (orderItems: OrderItems[], category: string) => {
-    const normalizedCategory = category.toLowerCase();
-    return orderItems.reduce((indices, item) => {
-        if (item.category_name === normalizedCategory) {
-            indices.push(item.id);
-        }
-        return indices;
-    }, [] as number[]);
 };
 
 const getCategoryTicketMap = (categories: Map<string, number>) => {

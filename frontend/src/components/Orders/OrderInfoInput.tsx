@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { TextFieldSmaller, DateTimePicker } from '../Styled';
 import { CenterGrid } from '../Styled';
-import { AdditionalOrderInfo, Transaction } from '../BaseComps/dbTypes';
+import { AdditionalOrderInfo } from '../BaseComps/dbTypes';
 import dayjs, { Dayjs } from 'dayjs';
 import { validatePhoneNumber, validateDate } from './utils/orderUtils';
 
