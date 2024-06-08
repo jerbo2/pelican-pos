@@ -15,7 +15,7 @@ interface User {
 export default function Login() {
     const [availableUsers, setAvailableUsers] = useState<User[]>([]);
     const [credentials, setCredentials] = useState({ username: '', password: '' });
-    const { login, getUser, user, badPassword } = useContext(UserContext);
+    const { login, getUser, badPassword } = useContext(UserContext);
     const navigate = useNavigate();
     const location = useLocation();
 

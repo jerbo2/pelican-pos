@@ -19,7 +19,7 @@ const handleOpenCashDrawer = async () => {
 
 function Landing() {
   const navigate = useNavigate();
-  const { user, token, logout } = useContext(UserContext);
+  const { user, logout } = useContext(UserContext);
 
   return (
     <Box sx={{ width: '100vw', height: '100vh' }}>

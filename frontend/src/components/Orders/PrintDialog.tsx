@@ -323,7 +323,7 @@ export default function PrintDialog() {
                     </CenterGrid>
                     <CenterGrid item xs={12}>
                         <Typography variant='h5' mr='8px'> Print Tickets: </Typography>
-                        <ToggleButtonGroup value={printTickets} onChange={(e, newTickets) => setPrintTickets(newTickets)}>
+                        <ToggleButtonGroup value={printTickets} onChange={(_, newTickets) => setPrintTickets(newTickets)}>
                             {tickets.map((ticket) => (
                                 <ToggleButton key={ticket} value={ticket} disabled={!inSelectedTickets(ticket, rowVals)} selectedcolor={colors[ticket]}>
                                     <Typography variant='h5' fontStyle={!inSelectedTickets(ticket, rowVals) ? 'italic' : 'normal'}>{ticket}</Typography>

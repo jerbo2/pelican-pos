@@ -1,4 +1,4 @@
-import { useRef, useState, useContext, useEffect, useReducer } from 'react';
+import { useRef, useContext, useReducer } from 'react';
 import { CenterGrid, Divider, MenuItemSmaller, TextFieldSmaller } from '../Styled';
 import { Typography, InputAdornment, Fade } from '@mui/material';
 import CloseButton from '../BaseComps/CloseButton';
@@ -98,7 +98,7 @@ const commonPaidProps = {
 
 export default function Checkout({ open, onClose, pricingTotals }: CheckoutProps) {
     const { setSnackbarMessage, setOpenSnackbar, setOpenPopup } = useContext(UIContext);
-    const { activeOrder, orderItems, setOrders, orders, setActiveOrder } = useContext(OrderContext)
+    const { activeOrder, setOrders, orders, setActiveOrder } = useContext(OrderContext)
     const { sendMessage } = useContext(WebSocketContext)
 
     const cardPaidRef = useRef<HTMLInputElement>(null);
