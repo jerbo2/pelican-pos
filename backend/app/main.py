@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 import logging, json
 from typing import List, Dict, Union
 
-from . import crud, models, schemas, auth
-from .database import engine, get_db
+import crud, models, schemas, auth
+from database import engine, get_db
 from typing import Annotated
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta

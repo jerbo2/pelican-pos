@@ -9,8 +9,6 @@ import { Configuration } from './components/Configuration/Configuration'
 import Login from './components/Login'
 import { UserContext } from './components/BaseComps/contexts/UserContext'
 import Reports from './components/Reports'
-import { TransitionGroup } from 'react-transition-group'
-import { Box, Fade, Slide, Zoom } from '@mui/material'
 import { WebSocketProvider } from './components/BaseComps/contexts/WebSocketContext'
 import { WEBSOCKET_URL } from './components/Constants'
 
@@ -33,24 +31,22 @@ const AppRoutes = () => {
   }
 
   return (
-
-          <Routes location={location}>
-            <Route element={<PrivateRoutes />}>
-              <Route path="/" element={<Landing />} />
-              <Route path="/order" element={<NewOrder />} />
-              <Route path="/order/:category" element={<NewOrder />} />
-              <Route path="/active-orders" element={<ActiveOrders />} />
-              <Route path="/active-orders/:category" element={<ActiveOrders />} />
-              <Route path="/past-orders" element={<PastOrders />} />
-            </Route>
-            <Route element={<AdminRoutes />}>
-              <Route path="/config" element={<ConfigLanding />} />
-              <Route path="/config/:category" element={<Configuration />} />
-              <Route path="/reports" element={<Reports />} />
-            </Route>
-            <Route path="/login" element={<Login />} />
-          </Routes>
-
+    <Routes location={location}>
+      <Route element={<PrivateRoutes />}>
+        <Route path="/" element={<Landing />} />
+        <Route path="/order" element={<NewOrder />} />
+        <Route path="/order/:category" element={<NewOrder />} />
+        <Route path="/active-orders" element={<ActiveOrders />} />
+        <Route path="/active-orders/:category" element={<ActiveOrders />} />
+        <Route path="/past-orders" element={<PastOrders />} />
+      </Route>
+      <Route element={<AdminRoutes />}>
+        <Route path="/config" element={<ConfigLanding />} />
+        <Route path="/config/:category" element={<Configuration />} />
+        <Route path="/reports" element={<Reports />} />
+      </Route>
+      <Route path="/login" element={<Login />} />
+    </Routes>
   )
 }
 

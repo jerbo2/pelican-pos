@@ -98,6 +98,7 @@ export default function ConfigDrawer({ options, children }: ConfigDrawerProps) {
     setOpenPopup(true);
     const newFormObject = { label: '', type: '', order: formConfig.length, options: [], pricing_config: { affectsPrice: false, isBasePrice: false, priceBy: '', dependsOn: { name: '', values: {} } } };
     newFormObject.label = '';
+    console.log('formObjType:', formObjType)
     switch (formObjType) {
       case 'Dropdown':
         newFormObject.type = 'single_select';
@@ -105,7 +106,7 @@ export default function ConfigDrawer({ options, children }: ConfigDrawerProps) {
       case 'Text Field':
         newFormObject.type = 'text';
         break;
-      case 'Number':
+      case 'Number Field':
         newFormObject.type = 'number';
         break;
       case 'Price':

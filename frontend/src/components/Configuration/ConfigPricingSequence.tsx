@@ -177,7 +177,16 @@ function ConfigPricingSequence() {
 
     const [selectedFormOptions, setSelectedFormOptions] = useState<Record<string, string>>({ 'Self': '', 'Per Option': '' });
 
-    const priceByOptions = useMemo(() => selected.type.includes('select') ? ["Per Option", "Option Value", "Constant", "Scaled Option Value"] : ["Constant", "Input"], [selected.type]);
+    const priceByOptions = useMemo(() => {
+        switch (true) {
+          case selected.type.includes('select'):
+            return ["Per Option", "Option Value", "Constant", "Scaled Option Value"];
+          case selected.type.includes('number'):
+            return ["Constant", "Input"];
+          default:
+            return ["Constant"];
+        }
+      }, [selected.type]);
 
     const commonNumberFieldProps = useMemo(() => ({
         inputRef: inputRef,

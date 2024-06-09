@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { Box, Fab, Stack } from '@mui/material';
+import { Fab, Stack } from '@mui/material';
 import { Button, CenterGrid } from './Styled';
 import axios from 'axios';
 import { LogoutOutlined } from '@mui/icons-material';
@@ -22,7 +22,7 @@ function Landing() {
   const { user, logout } = useContext(UserContext);
 
   return (
-      <CenterGrid container sx={{height: '100vh'}}>
+      <CenterGrid container sx={{height: '100vh', width: '100vw'}}>
 
         <CenterGrid item xs={12}>
           <Logo />

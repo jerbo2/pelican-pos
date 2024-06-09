@@ -11,7 +11,7 @@ import StarTSPImage
 import math
 from fastapi import HTTPException
 from typing import List
-from . import models, schemas
+import models, schemas
 from tzlocal import get_localzone
 import pytz
 

@@ -8,9 +8,9 @@ from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from .database import get_db
+from database import get_db
 import os
-from .models import User
+from models import User
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"

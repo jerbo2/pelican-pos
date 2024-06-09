@@ -246,6 +246,7 @@ const Circle = styled('div')(({ theme }) => ({
   borderRadius: '50%',
   border: '4px solid',
   borderColor: theme.palette.primary.main,
+  color: theme.palette.primary.main,
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',

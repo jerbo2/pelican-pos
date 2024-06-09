@@ -1,49 +1,31 @@
 services:
   nginx:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: Dockerfile.react-prod
     ports:
       - "80:80"
       - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx.crt:/etc/nginx/nginx.crt
-      - ./nginx.key:/etc/nginx/nginx.key
     depends_on:
       - fastapi
-      - react
+    environment:
+      - TZ=America/New_York
 
   fastapi:
     build:
       context: .
       dockerfile: Dockerfile.fastapi
-    command: uvicorn main:app --host 0.0.0.0 --port 8080 --reload
+    command: uvicorn main:app --host 0.0.0.0 --port 8080
     ports:
       - "8080:8080"
-    volumes:
-      - ./backend/app:/app
-    depends_on:
-      - db
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/postgres
       - TZ=America/New_York
-
-  react:
-    image: node:alpine
-    entrypoint: /bin/sh
-    command: -c "npm i && npm run dev"
-    ports:
-      - 8000:8000
-    working_dir: /srv/app
-    volumes:
-      - type: bind
-        source: ./frontend
-        target: /srv/app
-    tty: true
     depends_on:
-      - fastapi
-      
+      - db
+
   db:
     image: postgres
     restart: always
@@ -59,4 +41,3 @@ services:
 volumes:
   postgres_data:
     driver: local
-    
