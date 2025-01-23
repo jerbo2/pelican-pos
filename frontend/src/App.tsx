@@ -14,7 +14,7 @@ import { WEBSOCKET_URL } from './components/Constants'
 
 const AppRoutes = () => {
   const { token } = useContext(UserContext)
-  let location = useLocation();
+  const location = useLocation();
 
   const PrivateRoutes = () => {
     const location = useLocation();

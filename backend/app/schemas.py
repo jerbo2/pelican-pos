@@ -25,6 +25,19 @@ FormElementConfig = Union[
     SelectConfig, TextConfig
 ]  # Additional types can be added later
 
+class InventoryConfigDependsOn(BaseModel):
+    name: str
+    amounts: Dict[str, str]
+
+class InventoryConfigDecrementDependsOn(BaseModel):
+    names: List[str]
+    amounts: Dict[str, Union[str, Dict[str, str]]]
+
+class InventoryConfig(BaseModel):
+    dependsOn: InventoryConfigDependsOn
+    decrementer: str
+    decrementDependsOn: InventoryConfigDecrementDependsOn
+    manageItemInventory: bool
 
 # Item schemas
 class ItemBase(BaseModel):
@@ -32,6 +45,7 @@ class ItemBase(BaseModel):
     form_cfg: List[FormElementConfig]
     category_id: int
     tax_rate: float
+    inventory_config: Union[Dict, InventoryConfig]
 
 
 class ItemCreate(ItemBase):
@@ -43,6 +57,7 @@ class ItemUpdate(ItemBase):
     form_cfg: Optional[List[FormElementConfig]] = None
     category_id: Optional[int] = None
     tax_rate: Optional[float] = None
+    inventory_config: Optional[InventoryConfig] = None
 
 
 class ItemDelete(ItemBase):
@@ -147,6 +162,11 @@ class OrderItemUpdate(BaseModel):
     quantity: Optional[int] = None
     price: Optional[float] = None
     printed: Optional[bool] = None
+
+class OrderItemConfig(BaseModel):
+    configurations: Optional[List[Dict]] = None
+    item_id: Optional[int] = None
+
 
 
 class OrderItemDelete(OrderItemBase):

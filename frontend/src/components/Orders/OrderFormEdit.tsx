@@ -13,7 +13,7 @@ import { updateItemWithFormConfig } from "../Configuration/ConfigBuildList";
 export default function OrderFormEdit({rootPage}: {rootPage: string}) {
     const { setFormConfig, formConfig } = useContext(FormConfigContext);
     const { formValues, setOrderItems } = useContext(OrderContext);
-    const { storedItems } = useContext(ItemContext);
+    const { storedItems, setInventory } = useContext(ItemContext);
     const { setOpenPopup, setOpenSnackbar, setSnackbarMessage } = useContext(UIContext);
 
     const navigate = useNavigate();
@@ -28,9 +28,12 @@ export default function OrderFormEdit({rootPage}: {rootPage: string}) {
     }, [editItem])
 
     useEffect(() => {
-        if (!editItem) return;
+        if (!editItem || !storedItems.length) return;
         const item = storedItems.find(item => item.name === editItem.item_name);
-        setFormConfig(item?.form_cfg || []);
+        console.log('storedItems', storedItems, 'editItem', editItem)
+        if (!item) return navigate(`/${rootPage}`);
+        setFormConfig(item.form_cfg);
+        setInventory(item.inventory_config);
     }, [storedItems])
 
     const handleCancel = () => {
@@ -78,8 +81,7 @@ export default function OrderFormEdit({rootPage}: {rootPage: string}) {
             console.error("Error updating item:", error);
         }
     };
-
-
+    
     return (
         <OrderFormBase
             pageName={pageName}
@@ -87,6 +89,7 @@ export default function OrderFormEdit({rootPage}: {rootPage: string}) {
             handleCancel={handleCancel}
             showCards={false}
             editItem={editItem}
+            itemId={editItem.item_id}
         />
     )
 }

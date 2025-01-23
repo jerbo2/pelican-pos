@@ -18,12 +18,23 @@ import { WebSocketContext } from '../BaseComps/contexts/WebSocketContext';
 
 import ConfirmationButton from '../BaseComps/ConfirmationButton';
 
-import { FormComponentConfig } from '../BaseComps/dbTypes';
+import { FormComponentConfig, PricingConfig } from '../BaseComps/dbTypes';
 
 interface ConfigDrawerProps {
   options: { name: string, icon: React.ReactNode }[],
   children: React.ReactNode
 }
+
+const emptyPricingConfig: PricingConfig = {
+  affectsPrice: false,   
+  isBasePrice: undefined,
+  dependsOn: { name: '', values: {} },  
+  priceFactor: "",       
+  priceBy: "",           
+  constantValue: "",     
+  perOptionMapping: {}   
+};
+
 
 export default function ConfigDrawer({ options, children }: ConfigDrawerProps) {
   const { openDrawer, setOpenDialog, handleOpenDrawer, setOpenPopup, setOpenDrawer, setDialogType } = useContext(UIContext);
@@ -96,7 +107,7 @@ export default function ConfigDrawer({ options, children }: ConfigDrawerProps) {
 
   const handleOpenPopup = (formObjType: string) => {
     setOpenPopup(true);
-    const newFormObject = { label: '', type: '', order: formConfig.length, options: [], pricing_config: { affectsPrice: false, isBasePrice: false, priceBy: '', dependsOn: { name: '', values: {} } } };
+    const newFormObject = { label: '', type: '', order: formConfig.length, options: [], pricing_config: emptyPricingConfig };
     newFormObject.label = '';
     console.log('formObjType:', formObjType)
     switch (formObjType) {
@@ -146,11 +157,14 @@ export default function ConfigDrawer({ options, children }: ConfigDrawerProps) {
             </ListItem>
           </List>
           <List>
-          <ListItem>
-              <ButtonWidest variant='contained' onClick={() => {setDialogType('name');setOpenDialog(true)}}>Name</ButtonWidest>
+            <ListItem>
+              <ButtonWidest variant='contained' onClick={() => { setDialogType('inventory'); setOpenDialog(true) }}>Inventory</ButtonWidest>
             </ListItem>
             <ListItem>
-              <ButtonWidest variant='contained' onClick={() => {setDialogType('tax-rate');setOpenDialog(true)}}>Tax rate</ButtonWidest>
+              <ButtonWidest variant='contained' onClick={() => { setDialogType('name'); setOpenDialog(true) }}>Name</ButtonWidest>
+            </ListItem>
+            <ListItem>
+              <ButtonWidest variant='contained' onClick={() => { setDialogType('tax-rate'); setOpenDialog(true) }}>Tax rate</ButtonWidest>
             </ListItem>
             <ListItem>
               <ConfirmationButton

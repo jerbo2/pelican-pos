@@ -3,7 +3,8 @@ import { FormGroup, InputAdornment, Box, Fade, Typography } from '@mui/material'
 import { CenterGrid, FormControlLabel, TextField, MenuItem, Divider } from '../Styled';
 import ControlledCheckbox from '../BaseComps/ControlledCheckbox';
 import { FormConfigContext } from './contexts/FormConfigContext';
-import { Dependency, FormComponentConfig, PricingConfig } from '../BaseComps/dbTypes';
+import { PricingDependency, FormComponentConfig, PricingConfig } from '../BaseComps/dbTypes';
+import { validateNumberOrRatio } from '../BaseComps/utils';
 import _ from 'lodash';
 
 type FormOption = {
@@ -27,9 +28,10 @@ interface BaseTextFieldProps {
 
 interface FadeWrapperProps {
     condition: boolean;
-    timeout: number;
+    timeout?: number;
     children: React.ReactNode;
-    xs: number;
+    xs?: number;
+    container?: boolean;
 }
 
 const ActionType: Record<string, string> = {
@@ -73,12 +75,19 @@ const BaseTextField = ({ label, value, onChange, fullWidth = true, variant = 'fi
     </TextField>
 );
 
-const FadeWrapper = ({ condition, timeout, children, xs }: FadeWrapperProps) => (
+export const FadeWrapper = ({ condition, timeout = 500, children, xs = 12, container = false }: FadeWrapperProps) => (
     condition ? (
         <Fade in={condition} timeout={timeout}>
-            <CenterGrid item xs={xs}>
-                {children}
-            </CenterGrid>
+            {container
+                ?
+                <CenterGrid container>
+                    {children}
+                </CenterGrid>
+                :
+                <CenterGrid item xs={xs}>
+                    {children}
+                </CenterGrid>
+            }
         </Fade>
     ) : null
 );
@@ -111,39 +120,13 @@ function pricingReducer(state: PricingConfig, action: { type: string, payload?: 
     }
 }
 
-const calculateGridSizes = (config: { dependsOn?: Dependency, priceBy?: string }) => {
+const calculateGridSizes = (config: { dependsOn?: PricingDependency, priceBy?: string }) => {
     const { dependsOn, priceBy } = config;
 
     return {
         dependsOnGridSize: dependsOn?.name ? 12 : (!(dependsOn?.name) && !(priceBy === 'Per Option' || priceBy === 'Option Value') && priceBy) ? 4 : 6,
         priceByGridSize: priceBy !== 'Per Option' && priceBy !== 'Option Value' && priceBy ? 4 : 6,
     };
-};
-
-const validateNumberOrRatio = (input: string) => {
-    const numberRegex = /^\d*\.?\d*$/;
-    const ratioRegex = /^\((\d*\.?\d+)\s*\/\s*(\d*\.?\d+)\)$/;
-    const partialRatioRegex = /^\((\d*\.?\d*)\s*\/?\s*(\d*\.?\d*)\)?$/;
-
-    if (numberRegex.test(input)) {
-        return { isValid: true, isPartial: false, value: input };
-    }
-
-    const ratioMatch = input.match(ratioRegex);
-    if (ratioMatch) {
-        const numerator = parseFloat(ratioMatch[1]);
-        const denominator = parseFloat(ratioMatch[2]);
-        if (denominator !== 0) {
-            return { isValid: true, isPartial: false, value: (numerator / denominator).toString() };
-        }
-    }
-
-    const partialRatioMatch = input.match(partialRatioRegex);
-    if (partialRatioMatch) {
-        return { isValid: true, isPartial: true, value: null };
-    }
-
-    return { isValid: false, isPartial: false, value: null };
 };
 
 const createDependsOnMapping = (selectedValue: string, selectedOptions: string[], formConfig: FormComponentConfig[]) => {
@@ -162,7 +145,7 @@ const createDependsOnMapping = (selectedValue: string, selectedOptions: string[]
     };
 };
 
-const useGridSizes = (config: { dependsOn?: Dependency, priceBy?: string }) => {
+const useGridSizes = (config: { dependsOn?: PricingDependency, priceBy?: string }) => {
     return useMemo(() => calculateGridSizes(config), [config]);
 };
 
@@ -179,14 +162,14 @@ function ConfigPricingSequence() {
 
     const priceByOptions = useMemo(() => {
         switch (true) {
-          case selected.type.includes('select'):
-            return ["Per Option", "Option Value", "Constant", "Scaled Option Value"];
-          case selected.type.includes('number'):
-            return ["Constant", "Input"];
-          default:
-            return ["Constant"];
+            case selected.type.includes('select'):
+                return ["Per Option", "Option Value", "Constant", "Scaled Option Value"];
+            case selected.type.includes('number'):
+                return ["Constant", "Input"];
+            default:
+                return ["Constant"];
         }
-      }, [selected.type]);
+    }, [selected.type]);
 
     const commonNumberFieldProps = useMemo(() => ({
         inputRef: inputRef,
@@ -211,11 +194,26 @@ function ConfigPricingSequence() {
         const depConfig = formConfig.find(config => config.label === dependency.name);
 
         if (depConfig) {
+            console.log('something change and I found', depConfig);
             updatedDependsOnCompOptions[dependency.name] = depConfig.options.map(opt => ({ label: opt, value: opt }));
             updatedSelectedFormOptions[dependency.name] = '';
         }
         if (selected.options.length > 0) {
             updatedDependsOnCompOptions['Per Option'] = selected.options.map(opt => ({ label: opt, value: opt }));
+        }
+
+        const sortedSelectedOptions = selected.options.sort();
+        const sortedDependsOnKeys = Object.keys(state.dependsOn.values).sort();
+
+        if (!_.isEqual(sortedSelectedOptions, sortedDependsOnKeys)) {
+            // dependsOn values must be using old options that have since been edited
+            const changedIdxSelected = selected.options.findIndex(option => !sortedDependsOnKeys.includes(option));
+            const changedIdxHere = sortedDependsOnKeys.findIndex(option => !selected.options.includes(option));
+
+            const newDependsOn = _.cloneDeep(state.dependsOn);
+            newDependsOn.values[selected.options[changedIdxSelected]] = state.dependsOn.values[sortedDependsOnKeys[changedIdxHere]];
+            delete newDependsOn.values[sortedDependsOnKeys[changedIdxHere]];
+            dispatch({ type: ActionType.SetDependsOn, payload: newDependsOn });
         }
 
         setDependsOnCompOptions(updatedDependsOnCompOptions);
@@ -266,14 +264,19 @@ function ConfigPricingSequence() {
         }
     }, [state.constantValue]);
 
+    console.log(state)
+
     const handleDependsOnChange = useCallback((event: React.ChangeEvent<{ value: unknown }>) => {
         const selectedValue = event.target.value as string;
+        console.log(selectedValue)
 
         if (selectedValue === '') {
             dispatch({ type: ActionType.SetPriceBy, payload: '' });
             dispatch({ type: ActionType.SetDependsOn, payload: { name: '', values: {} } });
             return;
         }
+
+        console.log(formConfig);
 
         const updatedDependsOn = createDependsOnMapping(selectedValue, selected.options, formConfig);
         dispatch({ type: ActionType.SetDependsOn, payload: updatedDependsOn });

@@ -39,47 +39,50 @@ export default function Login() {
 
     useEffect
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         await login(credentials);
         await getUser();
         navigate(location.state?.from ? location.state.from : '/');
     }
 
     return (
-        <Box sx={{ width: '100vw', height: '100vh' }} alignItems={'center'} display="flex" justifyContent={'center'}>
-            <Paper elevation={3} sx={{ p: '2rem', borderRadius: '1rem', backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
-                <Stack display='flex' alignItems={'center'} justifyContent={'center'}>
-                    <Divider />
-                    <Box display='flex' alignItems={'center'} justifyContent={'center'}>
-                        <Logo />
-                        <Stack ml={'6rem'}>
+        <form onSubmit={handleSubmit}>
+            <Box sx={{ width: '100vw', height: '100vh' }} alignItems={'center'} display="flex" justifyContent={'center'}>
+                <Paper elevation={3} sx={{ p: '2rem', borderRadius: '1rem', backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+                    <Stack display='flex' alignItems={'center'} justifyContent={'center'}>
+                        <Divider />
+                        <Box display='flex' alignItems={'center'} justifyContent={'center'}>
+                            <Logo />
+                            <Stack ml={'6rem'}>
 
-                            <TextFieldSmaller select label="Select User" variant='filled' value={credentials.username || ''} onChange={handleChange} name="username">
-                                {availableUsers.map((user) => (
-                                    <MenuItemSmaller key={user.id} value={user.username}>
-                                        {user.username}
-                                    </MenuItemSmaller>
-                                ))}
-                            </TextFieldSmaller>
+                                <TextFieldSmaller select label="Select User" variant='filled' value={credentials.username || ''} onChange={handleChange} name="username">
+                                    {availableUsers.map((user) => (
+                                        <MenuItemSmaller key={user.id} value={user.username}>
+                                            {user.username}
+                                        </MenuItemSmaller>
+                                    ))}
+                                </TextFieldSmaller>
 
 
-                            <TextFieldSmaller
-                                label="Password"
-                                type="password"
-                                variant='filled'
-                                value={credentials.password || ''}
-                                onChange={handleChange}
-                                name="password"
-                                error={badPassword} />
-                        </Stack>
-                    </Box>
-                    <Divider />
-                    <ButtonWidest variant="contained" onClick={handleSubmit}>
-                        Login
-                    </ButtonWidest>
+                                <TextFieldSmaller
+                                    label="Password"
+                                    type="password"
+                                    variant='filled'
+                                    value={credentials.password || ''}
+                                    onChange={handleChange}
+                                    name="password"
+                                    error={badPassword} />
+                            </Stack>
+                        </Box>
+                        <Divider />
+                        <ButtonWidest variant="contained" type='submit'>
+                            Login
+                        </ButtonWidest>
 
-                </Stack>
-            </Paper>
-        </Box>
+                    </Stack>
+                </Paper>
+            </Box>
+        </form>
     )
 }

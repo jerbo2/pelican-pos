@@ -4,10 +4,18 @@ import logging, json
 from typing import List, Dict, Union
 
 import crud, models, schemas, auth
-from database import engine, get_db
-from typing import Annotated
+from database import engine, get_db, SessionLocal
+from typing import Annotated, Optional
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
+import asyncio
+from contextlib import asynccontextmanager
+import traceback
+from enum import Enum
+
+class Operation(str, Enum):
+    decrement = "decrement"
+    increment = "increment"
 
 # Database setup
 models.Base.metadata.create_all(bind=engine)
@@ -34,8 +42,27 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
+async def order_cleanup_task():
+    while True:
+        db = SessionLocal()
+        try:
+            crud.cleanup_orders(db)
+        finally:
+            db.close()
+        await asyncio.sleep(600)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    task = asyncio.create_task(order_cleanup_task())
+    yield
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
+
 # FastAPI app initialization
-app = FastAPI(root_path="/api/v1")
+app = FastAPI(root_path="/api/v1", lifespan=lifespan)
 protected_router = APIRouter(dependencies=[Depends(auth.get_current_active_user)])
 
 # WebSocket endpoint
@@ -67,6 +94,7 @@ def create_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
 @protected_router.patch("/items/update/{item_id}", response_model=schemas.Item)
 def update_item(item_id: int, item: schemas.ItemUpdate, db: Session = Depends(get_db)):
     db_item = crud.get_item(db, item_id=item_id)
+    print(db_item)
     if db_item is None:
         raise HTTPException(status_code=404, detail="Item not found")
     return crud.update_item(db=db, db_item=db_item, item=item)
@@ -84,6 +112,29 @@ def check_price(item_id: int, configurations: List[Dict], db: Session = Depends(
     if price is None:
         raise HTTPException(status_code=404, detail="Item not found")
     return price
+
+@protected_router.get("/items/inventory/{item_id}", response_model=Dict)
+def get_available_inventory(item_id: int, db: Session = Depends(get_db)):
+    inventory = crud.get_available_inventory(db, item_id=item_id)
+    if inventory is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return inventory
+
+@protected_router.post("/orders-items/inventory/evaluate", response_model=Dict)
+def edit_inventory(commit: bool, operation: Operation, order_id: Optional[int] = None, order_item_id: Optional[int] = None, db: Session = Depends(get_db)):
+    try:
+        return crud.edit_inventory(db, order_id=order_id, order_item_id=order_item_id, operation=operation, commit=commit)
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=400, detail=str(e))
+    
+@protected_router.post("/orders-items/inventory/check-impact", response_model=Dict)
+def edit_inventory(order_item_config: schemas.OrderItemConfig, db: Session = Depends(get_db)):
+    try:
+        return crud.check_inventory_impact(db, order_item_config=order_item_config)
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=400, detail=str(e))
 
 # CRUD endpoints for orders
 @protected_router.post("/orders/create/", response_model=schemas.Order)

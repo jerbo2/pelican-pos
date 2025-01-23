@@ -205,11 +205,11 @@ export default function Checkout({ open, onClose, pricingTotals }: CheckoutProps
     const handleMethodChange = (method: PaymentState['method']) => {
         dispatch({ type: 'RESET' });
         dispatch({ type: 'SET_METHOD', method });
-        if (method.includes('→')) {
-            dispatch({ type: 'SET_REMAINING_BALANCE', remainingBalance: pricingTotals.total_amount.toFixed(2) });
-        }
-        else if (method === 'Card') {
+        if (method === 'Card') {
             dispatch({ type: 'SET_CARD_PAID', cardPaid: pricingTotals.total_amount.toFixed(2) });
+        }
+        else {
+            dispatch({ type: 'SET_REMAINING_BALANCE', remainingBalance: pricingTotals.total_amount.toFixed(2) });
         }
     };
 
@@ -254,7 +254,7 @@ export default function Checkout({ open, onClose, pricingTotals }: CheckoutProps
                 <CenterGrid container>
                     <CloseButton override={true} handleOnConfirmed={onClose} />
                     <CenterGrid item xs={12}>
-                        <Typography variant='h4' mt={'8px'}>Total: ${pricingTotals.total_amount}</Typography>
+                        <Typography variant='h4' mt={'8px'}>Total: ${pricingTotals.total_amount.toFixed(2)}</Typography>
                     </CenterGrid>
 
                     <CenterGrid item xs={12}><Divider /></CenterGrid>
@@ -300,7 +300,7 @@ export default function Checkout({ open, onClose, pricingTotals }: CheckoutProps
                                 onChange={(e) => handleCashPaidChange(e.target.value)}
                                 {...commonPaidProps} />
                             <Typography variant='h5' sx={{ position: 'absolute', top: '1.8rem', right: '0.5rem' }}>
-                                {state.method === 'Cash' || state.method === 'Card → Cash' || parseFloat(state.cashPaid) > pricingTotals.total_amount
+                                {state.method === 'Card → Cash' || parseFloat(state.cashPaid) > pricingTotals.total_amount
                                     ? `Change: $${state.change}`
                                     : `Remaining: $${state.remainingBalance}`}
                             </Typography>

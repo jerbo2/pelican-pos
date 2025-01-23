@@ -21,6 +21,8 @@ services:
       - "8080:8080"
     volumes:
       - ./backend/app:/app
+      - ./backend/alembic:/alembic
+      - ./backend/alembic.ini:/alembic.ini
     depends_on:
       - db
     environment:

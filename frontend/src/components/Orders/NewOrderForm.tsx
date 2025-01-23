@@ -1,10 +1,10 @@
-import { useContext, Dispatch, SetStateAction, useEffect } from "react";
+import { useContext, useState, Dispatch, SetStateAction, useEffect } from "react";
 import { ItemContext } from "../Configuration/contexts/ItemContext";
 import axios from "axios";
 import { UIContext } from "../BaseComps/contexts/UIContext";
 import { useNavigate } from "react-router";
 import { OrderContext } from "./contexts/OrderContext";
-import { Order } from "../BaseComps/dbTypes";
+import { Item, Order } from "../BaseComps/dbTypes";
 import BackIcon from "../BaseComps/BackIcon";
 import OrderFormBase from "./OrderFormBase";
 import { updateItemWithFormConfig } from "../Configuration/ConfigBuildList";
@@ -21,6 +21,7 @@ export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormPr
     const { formConfig, setFormConfig } = useContext(FormConfigContext)
     const { setSnackbarMessage, setOpenSnackbar } = useContext(UIContext);
     const { activeOrder, setActiveOrder, formValues } = useContext(OrderContext);
+    const [item, setItem] = useState<Item>();
 
     const navigate = useNavigate();
     const pageName = !showCards ? `CREATING NEW ${itemName.toLocaleUpperCase()} ORDER` : 'SELECT AN ITEM'
@@ -38,18 +39,18 @@ export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormPr
         if (formConfig.every(config => config.type === 'price')) {
             addToOrder();
         }
+        setItem(storedItems.find(item => item.name === itemName));
     }, [formConfig])
 
     const addToOrder = async () => {
         // PUT request to add item to order
-        const item_to_add = storedItems.find(item => item.name === itemName);
 
-        if (!item_to_add) {
+        if (!item) {
             console.error(`Couldn't find ${itemName} in storedItems.`);
             return;
         }
 
-        await updateItemWithFormConfig(item_to_add.id, formConfig, formValues)
+        await updateItemWithFormConfig(item.id, formConfig, formValues)
 
         let orderID = activeOrder.id
 
@@ -59,9 +60,9 @@ export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormPr
             orderID = await createOrder()
         }
 
-        const putUrl = `/api/v1/orders/${orderID}/add/${item_to_add.id}`
+        const putUrl = `/api/v1/orders/${orderID}/add/${item.id}`
 
-        let configurations = formValues.map((formValue, _) => {
+        let configurations = formValues.map((formValue) => {
             return {
                 label: formValue.label,
                 value: formValue.value,
@@ -97,6 +98,7 @@ export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormPr
             handleCancel={() => setShowCards(true)}
             showCards={showCards}
             toolbarLeftIcon={<BackIcon />}
+            itemId={item?.id}
         />
     )
 }

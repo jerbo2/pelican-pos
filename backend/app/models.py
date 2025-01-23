@@ -24,6 +24,7 @@ class Item(Base):
     form_cfg = Column(JSONB, index=True)
     category_id = Column(Integer, ForeignKey("categories.id"))
     tax_rate = Column(Float, default=0.0)
+    inventory_config = Column(JSONB, index=True)
 
     category = relationship("Category", back_populates="items")
     orders = relationship("OrderItem", back_populates="item")
@@ -35,21 +36,22 @@ class Order(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
+    last_interacted_at = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
     status = Column(String, default="pending")
     customer_name = Column(String, index=True, nullable=True)
     customer_phone_number = Column(String, index=True, nullable=True)
     complete_at = Column(DateTime, nullable=True)
 
     # Relationships
-    items = relationship("OrderItem", back_populates="order")
-    transaction = relationship("Transaction", back_populates="order", uselist=False)
+    items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
+    transaction = relationship("Transaction", back_populates="order", uselist=False, cascade="all, delete-orphan")
 
 
 class Transaction(Base):
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True, index=True)
-    order_id = Column(Integer, ForeignKey("orders.id"), nullable=False)
+    order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
     payment_method = Column(String, nullable=True)
     total_non_taxable = Column(Float, default=0.0)
     total_taxable = Column(Float, default=0.0)
@@ -70,7 +72,7 @@ class Transaction(Base):
 class OrderItem(Base):
     __tablename__ = "order_items"
     id = Column(Integer, primary_key=True)  # Add a unique primary key
-    order_id = Column(Integer, ForeignKey("orders.id"))
+    order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"))
     item_id = Column(Integer, ForeignKey("items.id"))
     configurations = Column(ARRAY(JSONB))
     quantity = Column(Integer, default=1)

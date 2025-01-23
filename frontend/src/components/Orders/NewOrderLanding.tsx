@@ -33,7 +33,6 @@ export default function NewOrderLanding() {
           <Hidden smDown>
             <IconButton
               color="inherit"
-              aria-label="back"
               size="large"
               onClick={handleRightIconClick}
             >

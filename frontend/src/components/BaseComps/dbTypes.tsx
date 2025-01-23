@@ -1,14 +1,14 @@
 import { Dayjs } from "dayjs";
 
-interface Dependency {
+interface PricingDependency {
     name: string;
-    values: Record<string, number>;
+    values: Record<string, Record<string, string>>;
 }
 
 type PricingConfig = {
     affectsPrice: boolean;
     isBasePrice?: boolean;
-    dependsOn?: Dependency;
+    dependsOn: PricingDependency;
     priceFactor?: string;
     priceBy?: string;
     constantValue?: string;
@@ -28,12 +28,30 @@ type FormComponentConfig = {
     pricing_config: PricingConfig;
 }
 
+interface InventoryDependency {
+    name: string;
+    amounts: Record<string, string>;
+}
+
+interface InventoryDecrementDependency {
+    names: Array<string>;
+    amounts: Record<string, string | Record<string, string>>;
+}
+
+type InventoryConfig = {
+    manageItemInventory: boolean;
+    dependsOn: InventoryDependency;
+    decrementDependsOn: InventoryDecrementDependency;
+    decrementer: string;
+}
+
 type Item = {
     name: string;
     form_cfg: FormComponentConfig[];
     category_id: number;
     id: number;
     tax_rate: number;
+    inventory_config: InventoryConfig;
 }
 
 type Category = {
@@ -89,4 +107,4 @@ type Order = AdditionalOrderInfo & {
     transaction: Transaction;
 }
 
-export type { Dependency, PricingConfig, FormValue, FormComponentConfig, Item, Category, CategoryWithItems, OrderItems, Order, AdditionalOrderInfo, Transaction}
+export type { PricingDependency, PricingConfig, FormValue, FormComponentConfig, Item, Category, CategoryWithItems, OrderItems, Order, AdditionalOrderInfo, Transaction, InventoryConfig, InventoryDependency, InventoryDecrementDependency}

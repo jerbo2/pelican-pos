@@ -24,11 +24,13 @@ import {
   ToggleButton as MUIToggleButton,
   ToggleButtonGroup as MUIToggleButtonGroup,
   ToggleButtonProps as MUIToggleButtonProps,
+  Paper as MUIPaper,
 } from '@mui/material';
 import { DateTimePicker as MUIDateTimePicker, MobileDateTimePicker as MUIMobileDateTimePicker } from '@mui/x-date-pickers';
 import { DataGrid as MUIDataGrid } from '@mui/x-data-grid';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { DRAWER_WIDTH } from './Constants';
+import { alpha } from '@mui/material/styles';
 
 interface DialogProps extends MUIDialogProps {
   shiftamount?: number;
@@ -66,6 +68,10 @@ const ButtonWidest = styled(Button)({
   width: '100%',
 });
 
+const ButtonAuto = styled(Button)({
+  width: 'auto',
+});
+
 const ListItemButton = styled(MUIListItemButton)({
   '& .MuiListItemText-primary': {
     fontSize: '1.75rem',
@@ -96,6 +102,13 @@ const Popup = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2, 4, 3),
   borderRadius: '0.375rem',
   overflowY: 'auto',
+}));
+
+const Paper = styled(MUIPaper)(({ theme }) => ({
+  padding: '8px',
+  margin: '2px',
+  color: theme.palette.primary.main,
+  backgroundColor: alpha(theme.palette.secondary.main, 0.5),
 }));
 
 const DrawerMain = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -197,6 +210,10 @@ const Select = styled(MUISelect)({
   },
 });
 
+const SelectSmaller = styled(MUISelect)({
+  fontSize: '1.5rem',
+});
+
 const IconButton = styled(MUIIconButton)({
   margin: '8px',
   fontSize: '3.5rem',
@@ -210,11 +227,12 @@ const IconButtonSmaller = styled(MUIIconButton)({
 });
 
 const Divider = styled(MUIDivider)(({ theme }) => ({
-  margin: '24px',
+  margin: '24px 0px 24px 0px',
   width: '100%',
   border: `0.5px solid ${theme.palette.primary.main}`,
   borderRadius: '0.375rem',
 }));
+
 
 const FormControl = styled(MUIFormControl)({
   padding: '0px',
@@ -412,6 +430,7 @@ export {
   Button,
   ButtonWider,
   ButtonWidest,
+  ButtonAuto,
   CenterGrid,
   Popup,
   DrawerMain,
@@ -420,6 +439,7 @@ export {
   TextField,
   TextFieldSmaller,
   Select,
+  SelectSmaller,
   IconButton,
   IconButtonSmaller,
   Divider,
@@ -445,5 +465,6 @@ export {
   ItemPriceLine,
   ButtonSmaller,
   ToggleButton,
-  ToggleButtonGroup
+  ToggleButtonGroup,
+  Paper
 };
