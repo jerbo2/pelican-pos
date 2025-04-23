@@ -876,6 +876,7 @@ inventory_config_adapter = TypeAdapter(schemas.InventoryConfig)
 
 def get_available_inventory(db: Session, item_id: int):
     item = db.query(models.Item).filter(models.Item.id == item_id).first()
+    if not item: return None
     inventory_config = inventory_config_adapter.validate_python(item.inventory_config)
     if not inventory_config.manageItemInventory: return None
     return inventory_config.dependsOn.amounts
