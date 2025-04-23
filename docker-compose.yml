@@ -47,7 +47,7 @@ services:
       - fastapi
       
   db:
-    image: postgres
+    image: postgres:16
     restart: always
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
