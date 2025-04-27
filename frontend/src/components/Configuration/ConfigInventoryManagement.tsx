@@ -92,7 +92,7 @@ const ConfigInventoryManagement = forwardRef<InventoryRef>((_, ref) => {
     };
 
     // handle changes to the "decrement depends on" selection
-    const handleDecrementDependsOnChange = (e: React.SyntheticEvent, values: string[]) => {
+    const handleDecrementDependsOnChange = (_: React.SyntheticEvent, values: string[]) => {
         if (values.length > 2) return;
 
         if (decrementDependsOn.names.length > values.length || values.length === 0) {

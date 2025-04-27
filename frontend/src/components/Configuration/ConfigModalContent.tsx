@@ -13,7 +13,7 @@ import ConfirmationButton from '../BaseComps/ConfirmationButton';
 import ConfigPricingSequence from './ConfigPricingSequence';
 import axios from 'axios';
 import { DRAWER_WIDTH } from '../Constants';
-import _, { set } from 'lodash';
+import _ from 'lodash';
 import CloseButton from '../BaseComps/CloseButton';
 
 const formCompDelConfirm = 'Are you sure you want to delete this form option?'

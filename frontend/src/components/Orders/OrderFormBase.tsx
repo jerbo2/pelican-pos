@@ -9,7 +9,6 @@ import { OrderContext } from "./contexts/OrderContext";
 import { ItemContext } from "../Configuration/contexts/ItemContext";
 import { Typography } from "@mui/material";
 import axios from "axios";
-import _ from 'lodash';
 
 const confirmCancelOrderText = 'Are you sure you want to cancel?'
 

@@ -4,7 +4,7 @@ import FormDialog from './FormDialog';
 
 interface ConfirmationButtonProps {
     onConfirmed: () => void;
-    dialogContent?: string;
+    dialogContent?: string | ReactNode;
     shiftAmount?: number;
     override?: boolean;
     children: ReactNode;
@@ -51,7 +51,7 @@ function ConfirmationButton({ onConfirmed, dialogContent, shiftAmount = 0, overr
                 shiftAmount={shiftAmount}
                 handleSubmit={() => {}}
                 dialogTitle='Confirmation'
-                dialogContent={dialogContent || 'Are you sure you want to delete this item?'}
+                dialogContent={dialogContent}
                 dialogActions={
                     <>
                         <ButtonWidest onClick={handleClose}>No</ButtonWidest>

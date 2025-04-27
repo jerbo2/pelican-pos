@@ -9,7 +9,7 @@ interface FormDialogProps {
   handleCloseDialog: () => void;
   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;  
   dialogTitle: string;
-  dialogContent: string;
+  dialogContent: string | React.ReactNode;
   dialogActions: React.ReactNode;
   dialogExtras?: React.ReactNode;
   shiftAmount?: number;

@@ -51,6 +51,7 @@ const OrderItemDetails: React.FC<OrderItemDetailsProps> = ({ item, index, disabl
             <CenterGrid item xs={3}>
                 <ConfirmationButton
                     color='primary'
+                    dialogContent='Are you sure you want to delete this item?'
                     disabled={disableCondition}
                     aria-label='dec'
                     buttonType={IconButton}
