@@ -1,19 +1,20 @@
 FROM python:3.10-slim
 
+# Install necessary dependencies for wkhtmltopdf
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends wkhtmltopdf --fix-missing && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 # Set the working directory
 WORKDIR /app
 
-# Copy requirements.txt
-COPY ./requirements.txt /code/requirements.txt
+COPY ./backend/app .
 
-# Install necessary dependencies for wkhtmltopdf
-RUN apt-get update && apt-get install -y \
-    wkhtmltopdf --fix-missing
+COPY ./backend/alembic ./alembic/
+COPY ./backend/alembic.ini .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-
-# Copy the rest of the application code
-COPY ./backend/app /app
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 EXPOSE 8080
