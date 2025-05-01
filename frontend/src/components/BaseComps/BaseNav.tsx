@@ -2,12 +2,14 @@ import { CenterGrid, ButtonWider, ButtonWidest } from "../Styled"
 import { useNavigate } from "react-router"
 import { List, Hidden, Button, Divider, ListItem } from "@mui/material"
 import BaseToolBar from "./BaseToolBar"
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from 'axios';
 import { Category } from "./dbTypes";
 import TemporaryDrawer from "./TemporaryDrawer";
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import Box from '@mui/material/Box';
+
+import { UserContext } from "./contexts/UserContext";
 
 interface BaseItems {
     pageRoot: string;
@@ -21,6 +23,7 @@ export default function BaseNav({ pageRoot, pageName, rightIcon, renderItems = t
     const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
     const [openDrawer, setOpenDrawer] = useState(false);
+    const { user } = useContext(UserContext);
 
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpenDrawer(newOpen);
@@ -57,7 +60,7 @@ export default function BaseNav({ pageRoot, pageName, rightIcon, renderItems = t
                 </ListItem>
                 <Divider />
                 <ListItem>
-                    <ButtonWidest variant="contained" onClick={() => navigate('/config')}>Config</ButtonWidest>
+                    <ButtonWidest variant="contained" onClick={() => navigate('/config')} disabled={!user?.is_admin}>Config</ButtonWidest>
                 </ListItem>
                 <Divider />
             </List>
