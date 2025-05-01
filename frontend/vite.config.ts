@@ -25,6 +25,7 @@ export default defineConfig({
           }
         }
       }
-    }
+    },
+    target: "es2017"
   }
 })
