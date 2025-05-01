@@ -78,8 +78,6 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
             "inventory_config": inventory
         };
 
-        console.log('payload', payload);
-
         try {
             const res = await axiosMethod(url, payload);
             setSnackbarMessage(`${itemName} ${itemExists ? 'Updated' : 'Saved'}!`);
