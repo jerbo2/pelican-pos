@@ -1,8 +1,7 @@
 .env
 node_modules
 .venv
-nginx.crt
-nginx.key
+*.pem
 test.ipynb
 
 # Byte-compiled / optimized / DLL files

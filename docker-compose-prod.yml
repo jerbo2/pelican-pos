@@ -10,6 +10,9 @@ services:
       - fastapi
     environment:
       - TZ=America/New_York
+    volumes:
+      - ./nginx/nginx-prod.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
 
   fastapi:
     build:
