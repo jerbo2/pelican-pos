@@ -79,4 +79,4 @@ const ItemProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     );
 };
 
-export { ItemContext, ItemProvider };
+export { ItemContext, ItemProvider, defaultInventoryConfig };

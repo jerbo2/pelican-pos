@@ -12,7 +12,7 @@ import { ButtonWidest, ListItemButton } from '../Styled';
 import PersistentDrawerLeft from '../BaseComps/PersistentDrawerLeft';
 
 import { UIContext } from "../BaseComps/contexts/UIContext";
-import { ItemContext } from "./contexts/ItemContext";
+import { defaultInventoryConfig, ItemContext } from "./contexts/ItemContext";
 import { FormConfigContext } from "./contexts/FormConfigContext";
 import { WebSocketContext } from '../BaseComps/contexts/WebSocketContext';
 
@@ -38,16 +38,19 @@ const emptyPricingConfig: PricingConfig = {
 
 export default function ConfigDrawer({ options, children }: ConfigDrawerProps) {
   const { openDrawer, setOpenDialog, handleOpenDrawer, setOpenPopup, setOpenDrawer, setDialogType } = useContext(UIContext);
-  const { itemName, storedItems, setStoredItems, setItemName, setTaxRate } = useContext(ItemContext);
+  const { itemName, storedItems, setStoredItems, setItemName, setTaxRate, setInventory } = useContext(ItemContext);
   const { formConfig, setFormConfig, setSelected } = useContext(FormConfigContext);
   const { lastMessage, sendMessage } = useContext(WebSocketContext);
 
   useEffect(() => {
     const messageData = JSON.parse(lastMessage || '{}');
+    console.log('WebSocket message received:', messageData);
+    if (messageData.itemName && messageData.itemName !== itemName) return;
+    console.log('Processing message:', messageData);
     switch (messageData.type) {
       case 'config-update':
         if (formConfig.length !== 0) {
-          const selected = messageData.payload.config;
+          const selected = messageData.payload;
           setFormConfig((prevState: FormComponentConfig[]) => {
             const newConfig = [...prevState];
             newConfig[selected.order] = selected;
@@ -56,14 +59,14 @@ export default function ConfigDrawer({ options, children }: ConfigDrawerProps) {
           });
         }
         break;
-      case 'items-update':
-        setStoredItems(messageData.payload);
-        break;
       case 'item-tax-rate-update':
         setTaxRate(messageData.payload);
         break;
       case 'item-name-update':
         setItemName(messageData.payload);
+        break;
+      case 'item-inventory-config-update':
+        setInventory(messageData.payload);
         break;
       default:
         break;
@@ -95,6 +98,8 @@ export default function ConfigDrawer({ options, children }: ConfigDrawerProps) {
     setOpenDrawer(false);
     setFormConfig([]);
     setItemName('');
+    setTaxRate(0);
+    setInventory(defaultInventoryConfig);
     sendMessage(JSON.stringify({ type: 'items-update', payload: newStoredItems }))
   }
 
@@ -103,6 +108,7 @@ export default function ConfigDrawer({ options, children }: ConfigDrawerProps) {
     setFormConfig([]);
     setItemName('');
     setTaxRate(0);
+    setInventory(defaultInventoryConfig);
   }
 
   const handleOpenPopup = (formObjType: string) => {

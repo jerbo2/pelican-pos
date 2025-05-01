@@ -1,13 +1,22 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { UIContext } from "../BaseComps/contexts/UIContext";
 import { ItemContext } from "./contexts/ItemContext";
 import { FormConfigContext } from "./contexts/FormConfigContext";
+import { WebSocketContext } from "../BaseComps/contexts/WebSocketContext";
 import BaseCurrentItems from "../BaseComps/BaseCurrentItems";
 
 export default function ConfigCurrentItems() {
-    const { storedItems, setItemName, setTaxRate, setInventory } = useContext(ItemContext);
+    const { storedItems, setStoredItems, setItemName, setTaxRate, setInventory } = useContext(ItemContext);
     const { openDrawer, handleOpenDrawer } = useContext(UIContext);
     const { setFormConfig } = useContext(FormConfigContext);
+    const { lastMessage } = useContext(WebSocketContext);
+
+    useEffect(() => {
+        const messageData = JSON.parse(lastMessage || '{}');
+        if (messageData.type === 'items-update') {
+            setStoredItems(messageData.payload);
+        }
+    }, [lastMessage]);
 
     const handleTapCard = (str_id: string) => {
         console.log('tapped card', str_id);

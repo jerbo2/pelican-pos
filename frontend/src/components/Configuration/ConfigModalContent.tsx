@@ -78,6 +78,8 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
             "inventory_config": inventory
         };
 
+        console.log('payload', payload);
+
         try {
             const res = await axiosMethod(url, payload);
             setSnackbarMessage(`${itemName} ${itemExists ? 'Updated' : 'Saved'}!`);
@@ -89,7 +91,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
             // update entire form config to reflect changes
             setFormConfig(res.data.form_cfg);
             sendMessage(JSON.stringify({ type: 'items-update', payload: newStoredItems }));
-            sendMessage(JSON.stringify({ type: 'config-update', payload: res.data.form_cfg[selected.order] }));
+            sendMessage(JSON.stringify({ type: 'config-update', payload: res.data.form_cfg[selected.order], itemName: itemName }));
             handleClosePopup();
         } catch (err) {
             console.log(err);

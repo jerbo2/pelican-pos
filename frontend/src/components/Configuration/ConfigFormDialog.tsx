@@ -54,7 +54,7 @@ export default function ConfigFormDialog() {
     try {
       await axios.patch(url, { tax_rate: rate });
       setTaxRate(rate);
-      sendMessage(JSON.stringify({ type: 'item-tax-rate-update', payload: rate }));
+      sendMessage(JSON.stringify({ type: 'item-tax-rate-update', payload: rate, itemName: itemName }));
       sendMessage(JSON.stringify({ type: 'items-update', payload: storedItems.map(item => item.name === itemName ? { ...item, tax_rate: rate } : item) }));
       setStoredItems(storedItems.map(item => item.name === itemName ? { ...item, tax_rate: rate } : item));
     } catch (err) {
@@ -68,7 +68,7 @@ export default function ConfigFormDialog() {
     try {
       await axios.patch(url, { name: name });
       setItemName(name);
-      sendMessage(JSON.stringify({ type: 'item-name-update', payload: name }));
+      sendMessage(JSON.stringify({ type: 'item-name-update', payload: name, itemName: itemName }));
       sendMessage(JSON.stringify({ type: 'items-update', payload: storedItems.map(item => item.name === itemName ? { ...item, name } : item) }));
       setStoredItems(storedItems.map(item => item.name === itemName ? { ...item, name } : item));
     } catch (err) {
@@ -83,7 +83,7 @@ export default function ConfigFormDialog() {
     try {
       await axios.patch(url, { inventory_config: inventoryConfig });
       setInventory(inventoryConfig);
-      sendMessage(JSON.stringify({ type: 'item-inventory-config-update', payload: inventoryConfig }));
+      sendMessage(JSON.stringify({ type: 'item-inventory-config-update', payload: inventoryConfig, itemName: itemName }));
       sendMessage(JSON.stringify({ type: 'items-update', payload: storedItems.map(item => item.name === itemName ? { ...item, inventory_config: inventoryConfig } : item) }));
       setStoredItems(storedItems.map(item => item.name === itemName ? { ...item, inventory_config: inventoryConfig } : item));
     } catch (err) {
