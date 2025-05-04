@@ -53,7 +53,7 @@ const OrderProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         if (sessionStorage.getItem('activeOrder')) {
             const getOrder = async () => {
                 const orderID = JSON.parse(sessionStorage.getItem('activeOrder') || '{}');
-                const url = `/api/v1/orders/${orderID}/`
+                const url = `/orders/${orderID}/`
                 const order = await axios.get(url)
                 setActiveOrder(order.data)
                 console.log(order.data)

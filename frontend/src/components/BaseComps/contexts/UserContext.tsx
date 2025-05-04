@@ -19,41 +19,41 @@ interface Credentials {
 const UserContext = createContext<{
     user: User | null;
     setUser: Dispatch<SetStateAction<User | null>>;
-    token: string | null;
-    setToken: Dispatch<SetStateAction<string | null>>;
-    login: (credentials: Credentials) => void;
+    authValid: boolean | null;
+    setAuthValid: Dispatch<SetStateAction<boolean>>;
+    authChecked: boolean;
+    setAuthChecked: Dispatch<SetStateAction<boolean>>;
+    login: (credentials: Credentials) => Promise<void>;
     logout: () => void;
-    getUser: () => void;
+    getUser: () => Promise<void>;
     badPassword: boolean;
 }>({
     user: null,
     setUser: () => null,
-    token: null,
-    setToken: () => null,
-    login: () => null,
+    authValid: null,
+    setAuthValid: () => null,
+    authChecked: false,
+    setAuthChecked: () => null,
+    login: async () => {},
     logout: () => null,
-    getUser: () => null,
+    getUser: async () => {},
     badPassword: false,
 });
 
 const UserProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState(localStorage.getItem('token') || null);
+    const [authValid, setAuthValid] = useState(false);
     const [badPassword, setBadPassword] = useState(false);
+    const [authChecked, setAuthChecked] = useState(false);
 
     useEffect(() => {
-        if (token) {
-            localStorage.setItem('token', token);
-            getUser();
-        } else {
-            localStorage.removeItem('token');
-        }
-    }, [token]);
+        getUser();
+    }, []);
 
     const login = async (credentials: { username: string, password: string }) => {
         try {
-            const response = await axios.post(
-                '/api/v1/token',
+            await axios.post(
+                '/token',
                 qs.stringify(credentials),
                 {
                     headers: {
@@ -62,9 +62,7 @@ const UserProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                     }
                 }
             );
-            setToken(response.data.access_token);
             setBadPassword(false);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
         } catch (error) {
             console.error('Error logging in:', error);
             setBadPassword(true);
@@ -72,26 +70,29 @@ const UserProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     };
 
     const getUser = async () => {
-        if (!token) return;
         try {
-            const response = await axios.get('/api/v1/users/me');
+            const response = await axios.get('/users/me');
             setUser(response.data);
-            localStorage.setItem('admin', response.data.is_admin)
+            setAuthValid(true);
         } catch (error) {
             console.error('Error getting user:', error);
-            localStorage.removeItem('token');
-            localStorage.removeItem('admin');
-            setToken(null);
+            setAuthValid(false);
         }
+        setAuthChecked(true);
     }
 
-    const logout = () => {
-        setToken(null);
-        setUser(null);
+    const logout = async () => {
+        try {
+            await axios.post('/logout');
+            setAuthValid(false);
+            setUser(null);
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
     };
 
     return (
-        <UserContext.Provider value={{ user, setUser, token, setToken, login, logout, getUser, badPassword }}>
+        <UserContext.Provider value={{ user, setUser, authValid, setAuthValid, authChecked, setAuthChecked, login, logout, getUser, badPassword }}>
             {children}
         </UserContext.Provider>
     );

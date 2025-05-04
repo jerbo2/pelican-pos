@@ -15,7 +15,7 @@ export default function NewOrderLanding() {
 
   useEffect(() => {
     const get_order_items = async () => {
-      const url = `/api/v1/orders-items/items/${activeOrder.id}/`
+      const url = `/orders-items/items/${activeOrder.id}/`
       const order_items = await axios.get(url)
       setOrderItems(order_items.data)
     }

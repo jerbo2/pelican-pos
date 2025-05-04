@@ -21,7 +21,7 @@ export default function Login() {
 
     const handleGetAvailableUsers = async () => {
         try {
-            const res = await axios.get('/api/v1/users/');
+            const res = await axios.get('/users/');
             setAvailableUsers(res.data);
         } catch (error) {
             console.error(error);

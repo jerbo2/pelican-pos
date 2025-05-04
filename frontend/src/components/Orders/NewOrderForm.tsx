@@ -28,7 +28,7 @@ export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormPr
 
     const createOrder = async () => {
         // GET request to create a new order
-        const postUrl = '/api/v1/orders/create/'
+        const postUrl = '/orders/create/'
         const order = await axios.post(postUrl, {})
         sessionStorage.setItem('activeOrder', JSON.stringify(order.data.id))
         return order.data.id
@@ -60,7 +60,7 @@ export default function NewOrderForm({ showCards, setShowCards }: NewOrderFormPr
             orderID = await createOrder()
         }
 
-        const putUrl = `/api/v1/orders/${orderID}/add/${item.id}`
+        const putUrl = `/orders/${orderID}/add/${item.id}`
 
         let configurations = formValues.map((formValue) => {
             return {

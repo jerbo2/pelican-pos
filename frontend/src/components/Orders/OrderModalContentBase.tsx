@@ -124,7 +124,7 @@ export default function OrderModalContent({ submitButtonText, overrideSubmit }: 
 
     const saveQuantityChange = async (orderItem: OrderItems) => {
         if (orderItem.quantity === originalOrderItems.find(item => item.id === orderItem.id)?.quantity) return;
-        const baseURL = `/api/v1/orders-items/${orderItem.id}`;
+        const baseURL = `/orders-items/${orderItem.id}`;
         const isDelete = orderItem.quantity === 0;
 
         try {
@@ -183,7 +183,7 @@ export default function OrderModalContent({ submitButtonText, overrideSubmit }: 
             // save quantity changes in parallel
             await Promise.all(orderItems.map(orderItem => saveQuantityChange(orderItem)));
 
-            const url = `/api/v1/orders/${activeOrder.id}/update`;
+            const url = `/orders/${activeOrder.id}/update`;
             const payload = {
                 status: newStatus,
                 ...additionalOrderInfo,
@@ -234,7 +234,7 @@ export default function OrderModalContent({ submitButtonText, overrideSubmit }: 
     }
 
     const deleteOrder = async () => {
-        const delUrl = `/api/v1/orders/${activeOrder.id}/delete`;
+        const delUrl = `/orders/${activeOrder.id}/delete`;
         try {
             await axios.delete(delUrl);
             setOrders((prevOrders) => prevOrders.filter(order => order.id !== activeOrder.id));

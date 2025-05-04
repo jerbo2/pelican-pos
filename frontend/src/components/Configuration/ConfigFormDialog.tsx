@@ -21,7 +21,7 @@ export default function ConfigFormDialog() {
     return storedItems.find(item => item.name === itemName);
   }, [storedItems, itemName]);
 
-  const url = `/api/v1/items/update/${item?.id}`;
+  const url = `/admin/items/update/${item?.id}`;
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -59,6 +59,8 @@ export default function ConfigFormDialog() {
       setStoredItems(storedItems.map(item => item.name === itemName ? { ...item, tax_rate: rate } : item));
     } catch (err) {
       console.error(err);
+      setOpenSnackbar(true);
+      setSnackbarMessage('Failed to update tax rate');
     }
     handleCloseDialog();
   };
@@ -73,6 +75,8 @@ export default function ConfigFormDialog() {
       setStoredItems(storedItems.map(item => item.name === itemName ? { ...item, name } : item));
     } catch (err) {
       console.error(err);
+      setOpenSnackbar(true);
+      setSnackbarMessage('Failed to update item name');
     }
     handleCloseDialog();
   };
@@ -88,6 +92,8 @@ export default function ConfigFormDialog() {
       setStoredItems(storedItems.map(item => item.name === itemName ? { ...item, inventory_config: inventoryConfig } : item));
     } catch (err) {
       console.error(err);
+      setOpenSnackbar(true);
+      setSnackbarMessage('Failed to update inventory configuration');
     }
     handleCloseDialog();
   }

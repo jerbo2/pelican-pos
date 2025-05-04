@@ -2,6 +2,7 @@
 node_modules
 .venv
 *.pem
+*.crt
 test.ipynb
 
 # Byte-compiled / optimized / DLL files

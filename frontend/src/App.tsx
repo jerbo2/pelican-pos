@@ -13,20 +13,21 @@ import { WebSocketProvider } from './components/BaseComps/contexts/WebSocketCont
 import { WEBSOCKET_URL } from './components/Constants'
 
 const AppRoutes = () => {
-  const { token } = useContext(UserContext)
+  const { authValid, authChecked, user } = useContext(UserContext)
   const location = useLocation();
 
   const PrivateRoutes = () => {
     const location = useLocation();
+    if (!authChecked) return null;
     return (
-      token ? <Outlet /> : <Navigate to='/login' state={{ from: location }} />
+      authValid ? <Outlet /> : <Navigate to='/login' state={{ from: location }} />
     )
   }
 
   const AdminRoutes = () => {
-    const is_admin = localStorage.getItem('admin') === 'true';
+    if (!authChecked) return null;
     return (
-      is_admin ? <Outlet /> : <Navigate to='/' />
+      user?.is_admin ? <Outlet /> : <Navigate to='/' />
     )
   }
 

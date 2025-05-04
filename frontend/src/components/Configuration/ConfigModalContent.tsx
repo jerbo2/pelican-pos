@@ -66,7 +66,7 @@ export default function ConfigModalContent({ handleClosePopup }: { handleClosePo
             return;
         }
 
-        const url = itemExists ? `/api/v1/items/update/${storedItem.id}/` : '/api/v1/items/create/';
+        const url = itemExists ? `/admin/items/update/${storedItem.id}/` : '/admin/items/create/';
         const axiosMethod = itemExists ? axios.patch : axios.post;
         console.log('newformconfig', newFormConfig)
 

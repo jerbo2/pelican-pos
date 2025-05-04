@@ -50,7 +50,7 @@ const ItemProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     const getStoredItems = async () => {
         try {
-            const res = await axios.get('/api/v1/categories?include_items=True');
+            const res = await axios.get('/categories?include_items=True');
             const match = res.data.find((category: CategoryWithItems) => category.name.toLowerCase() === categoryName?.toLowerCase());
             if (match) {
                 setStoredItems(match.items);

@@ -36,7 +36,7 @@ export default function BaseNav({ pageRoot, pageName, rightIcon, renderItems = t
     useEffect(() => {
         if (!renderItems) return;
         const get_categories = async () => {
-            const response = await axios.get('/api/v1/categories?include_items=False');
+            const response = await axios.get('/categories?include_items=False');
             setCategories(response.data)
         }
         get_categories()

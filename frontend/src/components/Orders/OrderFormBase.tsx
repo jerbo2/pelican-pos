@@ -128,7 +128,7 @@ export default function OrderFormBase({ pageName, handleSubmit, handleCancel, to
     }, [editItem, inventory]);
 
     const checkInventoryImpact = async () => {
-        const url = `/api/v1/orders-items/inventory/check-impact`;
+        const url = `/orders-items/inventory/check-impact`;
         try {
             const res = await axios.post(url, { configurations: formValues, item_id: itemId });
             console.log(res.data);

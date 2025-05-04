@@ -15,7 +15,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.fastapi
-    command: uvicorn main:app --host 0.0.0.0 --port 8080 --reload
+    command: uvicorn main:app --host 0.0.0.0 --port 8080 --reload --proxy-headers --forwarded-allow-ips=*
     ports:
       - "8080:8080"
     volumes:

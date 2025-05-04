@@ -45,7 +45,7 @@ export default function OrderFormEdit({rootPage}: {rootPage: string}) {
     const handleSubmit = async () => {
         try {
             // PATCH request to update config & price in order item
-            const url = `/api/v1/orders-items/${editItem.id}/update/`;
+            const url = `/orders-items/${editItem.id}/update/`;
             const configurations = formValues.map(formValue => ({
                 label: formValue.label,
                 value: formValue.value

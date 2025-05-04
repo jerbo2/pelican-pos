@@ -35,7 +35,7 @@ async function updateItemWithFormConfig(itemId: number, formCfg: FormComponentCo
     // Check if the form_cfg was actually updated
     if (!_.isEqual(formCfg, updatedFormCfg)) {
         console.log('updating form config to reflect input price')
-        const updateItemUrl = `/api/v1/items/update/${itemId}`;
+        const updateItemUrl = `/admin/items/update/${itemId}`;
         try {
             const res = await axios.patch(updateItemUrl, { form_cfg: updatedFormCfg });
             console.log(res.data);
@@ -70,7 +70,7 @@ function ConfigBuildList() {
 
     const checkPrice = async () => {
         const item = storedItems.find(item => item.name === itemName);
-        const url = `/api/v1/items/${item?.id}/check_price/`
+        const url = `/items/${item?.id}/check_price/`
         const configurations = formValues.map((formValue, _) => {
             return { label: formValue.label, value: formValue.value }
         })

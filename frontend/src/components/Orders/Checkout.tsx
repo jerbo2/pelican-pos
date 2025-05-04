@@ -121,7 +121,7 @@ export default function Checkout({ open, onClose, pricingTotals }: CheckoutProps
         onClose();
 
         if (printReceipt) {
-            const printUrl = `/api/v1/orders/${activeOrder.id}/print_receipt`;
+            const printUrl = `/orders/${activeOrder.id}/print_receipt`;
             try {
                 await axios.post(printUrl);
             }
@@ -158,7 +158,7 @@ export default function Checkout({ open, onClose, pricingTotals }: CheckoutProps
 
 
     const handleCheckout = async () => {
-        const updateOrderUrl = `/api/v1/orders/${activeOrder.id}/update`;
+        const updateOrderUrl = `/orders/${activeOrder.id}/update`;
 
         let adjustedPaymentMethod = state.method;
         if (state.method === 'Cash → Card' && parseFloat(state.change) > 0) {

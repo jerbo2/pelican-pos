@@ -36,7 +36,7 @@ export default function Reports() {
     const getReports = async () => {
         if (reports.length > 0) return;
         try {
-            const res = await axios.get(`/api/v1/reports/`);
+            const res = await axios.get(`/admin/reports/`);
             setReports(res.data);
         }
         catch (error) {

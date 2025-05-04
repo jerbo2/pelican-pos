@@ -37,7 +37,7 @@ const emptyPricingConfig: PricingConfig = {
 
 
 export default function ConfigDrawer({ options, children }: ConfigDrawerProps) {
-  const { openDrawer, setOpenDialog, handleOpenDrawer, setOpenPopup, setOpenDrawer, setDialogType } = useContext(UIContext);
+  const { openDrawer, setOpenDialog, handleOpenDrawer, setOpenPopup, setOpenDrawer, setDialogType, setOpenSnackbar, setSnackbarMessage } = useContext(UIContext);
   const { itemName, storedItems, setStoredItems, setItemName, setTaxRate, setInventory } = useContext(ItemContext);
   const { formConfig, setFormConfig, setSelected } = useContext(FormConfigContext);
   const { lastMessage, sendMessage } = useContext(WebSocketContext);
@@ -80,7 +80,7 @@ export default function ConfigDrawer({ options, children }: ConfigDrawerProps) {
       return;
     }
 
-    const url = `/api/v1/items/delete/${item.id}/`;
+    const url = `/admin/items/delete/${item.id}/`;
 
     try {
       await axios.delete(url);
@@ -88,12 +88,18 @@ export default function ConfigDrawer({ options, children }: ConfigDrawerProps) {
       return newStoredItems;
     } catch (err) {
       console.error("Failed to delete the item:", err);
+      return null;
     }
   }
 
   const onDeleteConfirmed = async () => {
     console.log('deleting:', itemName)
     const newStoredItems = await handleDelete(itemName);
+    if (!newStoredItems) {
+      setOpenSnackbar(true);
+      setSnackbarMessage('Failed to delete item');
+      return;
+    }
     setStoredItems(newStoredItems || []);
     setOpenDrawer(false);
     setFormConfig([]);

@@ -16,7 +16,8 @@ import axios from 'axios';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || '/api/v1';
 
 const theme = createTheme({
   palette: {

@@ -10,7 +10,7 @@ import { WebSocketContext } from '../BaseComps/contexts/WebSocketContext';
 
 export const fetchOrders = async (status: string) => {
     try {
-        const response = await axios.get(`/api/v1/orders?status=${status}`);
+        const response = await axios.get(`/orders?status=${status}`);
         let data = response.data;
         data = data.map((order: Order, _: number) => {
             return {
@@ -112,7 +112,7 @@ export default function OrdersTable({ status }: { status: string }) {
             complete_at: row.complete_at.tz(dayjs.tz.guess()),
         });
 
-        const url = `/api/v1/orders-items/items/${table_comp.id}/`;
+        const url = `/orders-items/items/${table_comp.id}/`;
         const response = await axios.get(url);
         setOpenPopup(true);
         console.log(response.data)

@@ -158,7 +158,7 @@ export default function PrintDialog() {
 
         const payload = Array.from(payloadMap.values());
 
-        const printUrl = `/api/v1/orders/${activeOrder.id}/print_tickets`;
+        const printUrl = `/orders/${activeOrder.id}/print_tickets`;
 
         try {
             await axios.post(printUrl, payload);
@@ -173,7 +173,7 @@ export default function PrintDialog() {
         console.log('orderItem:', orderItem);
         if (orderItem.printed) return;
         const wasPrinted = printTickets.includes(rowVals[index].ticket);
-        const updateUrl = `/api/v1/orders-items/${orderItem.id}/update`;
+        const updateUrl = `/orders-items/${orderItem.id}/update`;
 
         try {
             await axios.patch(updateUrl, { printed: wasPrinted })
